@@ -1,0 +1,32 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: org.xtext.hipie
+Bundle-Vendor: My Company
+Bundle-Version: 1.0.0.qualifier
+Bundle-SymbolicName: org.xtext.hipie; singleton:=true
+Bundle-ActivationPolicy: lazy
+Require-Bundle: org.eclipse.xtext;visibility:=reexport,
+ org.eclipse.core.resources;bundle-version="3.9.1",
+ org.eclipse.equinox.common;bundle-version="3.5.0",
+ org.eclipse.xtext.util,
+ org.eclipse.emf.ecore,
+ org.eclipse.emf.common,
+ org.eclipse.xtext.xbase.lib,
+ org.antlr.runtime,
+ org.eclipse.xtext.common.types,
+ org.objectweb.asm;bundle-version="[5.0.1,6.0.0)";resolution:=optional,
+ org.eclipse.core.runtime;bundle-version="3.10.0"
+Import-Package: org.apache.log4j
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Export-Package: org.xtext.hipie,
+ org.xtext.hipie.services,
+ org.xtext.hipie.hIPIE,
+ org.xtext.hipie.hIPIE.impl,
+ org.xtext.hipie.hIPIE.util,
+ org.xtext.hipie.serializer,
+ org.xtext.hipie.parser.antlr,
+ org.xtext.hipie.parser.antlr.internal,
+ org.xtext.hipie.validation,
+ org.xtext.hipie.scoping,
+ org.xtext.hipie.generator,
+ org.xtext.hipie.formatting

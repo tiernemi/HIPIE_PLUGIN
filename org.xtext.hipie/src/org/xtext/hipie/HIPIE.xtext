@@ -1,0 +1,518 @@
+grammar org.xtext.hipie.HIPIE with org.eclipse.xtext.common.Terminals 
+
+generate hIPIE "http://www.xtext.org/hipie/HIPIE"
+
+import "http://www.eclipse.org/emf/2002/Ecore" as ecore
+ 
+Program :
+	composition_header+=CompositionHeader? 
+	base_props+=BaseProp+
+	permissions=Permissions?
+	input_section+=InputSection?
+	contract_instances+=ContractInstance* 
+	output_section+=OutputSection?
+	integrate_section=IntegrateSection?
+	visual_section+=VisualSection* 
+	generate_section+=GenerateSection? 
+	custom_section+=CustomSection? 
+	resource_section+=ResourceSection?
+;
+ 
+BaseProp: 
+	(( name='NAME' | name='DESCRIPTION' | name='AUTHOR' |  name='LICENSE' | name='COPYRIGHT' | name='VERSION' | name='LABEL' | name='ID' | name='TEMPLATE' ) val_list=ValueList ';' ) |
+	(name='CATEGORY' cat_list=CategoryTypeList ';')
+;
+   
+CategoryType: 
+	name=('CLEAN' | 'INPUT' | 'APPEND' | 'LINK' | 'ANALYSIS' | 'CUSTOM' | 'VISUALIZE' | 'OUTPUT')
+;
+
+CategoryTypeList: 
+	cats+=CategoryType ( ',' cats+=CategoryType)*
+;
+
+Value: 
+	name=UTOKEN|name=TOKEN | int_val=INT | str_val=STRING
+;
+
+ValueList: 
+	vals+=Value ( ',' vals+=Value )*
+;
+
+TOKEN :
+	ID
+;
+
+UTOKEN :
+	'_'ID
+;
+
+TOKEN_list: 
+	TOKEN ( ',' TOKEN )*
+;
+
+Assign: 
+	vals_l=Value '=' vals_r=ValueList
+;
+
+AssignList: 
+	assigns+=Assign ( ',' assigns+=Assign)*
+;
+
+CompositionHeader: 
+	name='HEADER' (assigns+=Assign)* => 'END'
+;
+
+InstanceID: 
+	'(' name=TOKEN ')'
+;
+
+InstanceOptions: 
+	':' in_ops+=InstanceOption ( ',' in_ops+=InstanceOption )*
+;
+
+InstanceOption: 
+	('LABEL'|'VERSION') '(' ValueList ')'
+;
+
+ContractInstance: 
+	sec_name='INSTANCE' TOKEN instId=InstanceID instance_ops=InstanceOptions? (assigns+=Assign)* 'END'
+;
+
+FieldDecl: 
+	'FIELD' name=TOKEN (input_ops=InputOptions)? ';'
+;
+
+KelAttrDecl: 
+	'ATTRIBUTE' name=TOKEN input_ops=InputOptions? ';'
+;
+
+KelEntityDeclSimple: 
+	'ENTITY' name=TOKEN input_ops=InputOptions? ';'
+;
+
+KelEntityDecl: 
+	'ENTITY' name=TOKEN input_ops=InputOptions? attrdecl=KelAttrDecl? => 'END'
+;
+
+EnumEntry: 
+	val_l=Value ( '=' val_r=Value)?
+;
+
+EnumList: 
+	en_ents+=EnumEntry ( ',' en_ents+=EnumEntry)*
+;
+
+EnumDecl: 
+	enum_dec='ENUM' '(' enum_list=EnumList ')'
+;
+ 
+InputSection: 
+	name='INPUTS' (inputs+=InputValue)+ => 'END'
+;
+
+Bool:
+	'BOOL' name=TOKEN
+;
+
+IntVar:
+	'INT' name=TOKEN
+;
+
+StringVar:
+	'STRING' name=TOKEN
+;
+
+Dataset:
+	'DATASET' name=TOKEN
+;
+
+Group:
+	'GROUP' name=TOKEN
+;
+
+Real :
+	'REAL' name=TOKEN
+;
+
+InputSimpleTypes : 
+	(Bool|IntVar|EnumDecl|StringVar|Real)
+;
+
+Record :
+	'RECORD' name=TOKEN
+;
+
+KelBase :
+	'KELBASE' name=TOKEN
+;
+
+Datatype :
+	(InputSimpleTypes| Record | Dataset | KelBase | Group)
+;
+
+InputValue: 
+	(InputSimpleTypes| Record | Dataset) (input_op_list=InputOptions)? ';' |
+      Dataset (input_op_list=InputOptions)? (fields+=FieldDecl)* => 'END' |
+      KelBase (input_op_list=InputOptions)? (kel_ops+=KelEntityDecl|kel_ops+=KelEntityDeclSimple|kel_ops+=KelAttrDecl)* |
+      Group (input_op_list=InputOptions)? (vals+=InputValue)* => 'END'  
+; 
+ 
+InputOptions:
+	':' input_ops+=InputOption ( ',' input_ops+=InputOption )*
+;
+
+InputOption:
+	  (atr='OPTIONAL'|atr='DEFINED'|atr='DISABLED'|atr='MAPBYTYPE'|atr='MAPBYNAME'|atr='MANY') |
+		form='FORMFIELD' '(' form_op=FormfieldOption ')' | 
+		enab='ENABLE' '('  (assigns_list=AssignList)  ')' | 
+        type='TYPE' '(' type_op=InputtypeOptions ')' | 
+        (atr='RANGE'|atr='DEFAULT'|atr='MAXLENGTH'|atr='DISABLED' | atr='DESCRIPTION' |atr='NULL'| atr='FIELDLENGTH' | atr='ROWS'  | atr='COLS' | atr='_HTML_STYLECLASS' | atr='LABEL') '(' vals+=ValueList ')'
+;
+
+FormfieldOption: 
+	('CHECKBOX'|'RADIO'|'SELECT'|'MULTIPLESELECT'|'TEXTAREA'|'HIDDEN'|'TEXT')
+;
+
+InputtypeOption: 
+	('STRING'|'UNICODE'|'UNISTR'|'INTEGER'|'DECIMAL'|'NUMERIC'|'REAL')
+;
+
+InputtypeOptions: 
+	in_type_op+=InputtypeOption ( ',' in_type_op+=InputtypeOption )*
+;
+
+
+IntegrateSection: 
+	name='INTEGRATE' (outputs+=OutputValue)+ => 'END'
+;
+
+OutputSection : 
+	name='OUTPUTS' (outputs+=OutputValue)+ => 'END'
+;
+
+OutfieldDecl : 
+	(IntVar|Bool|StringVar|fields+=FieldDecl) 
+;
+
+
+ECLInteger :
+	'INTEGER' INT? name=TOKEN
+;
+
+ECLUnsigned :
+	'UNSIGNED' INT? name=TOKEN
+;
+
+ECLString :
+	'STRING' INT? name=TOKEN
+;
+
+ECLQstring :
+	'QSTRING' INT? name=TOKEN
+;
+
+ECLVarstring :
+	'VARSTRING' INT? name=TOKEN
+;
+
+ECLUnicode :
+	'UNICODE' INT? name=TOKEN
+;
+
+ECLVarunicode:
+	'VARUNICODE' INT? name=TOKEN
+;
+
+ECLData :
+	'DATA' name=TOKEN
+;
+
+ECLReal :
+	'REAL' name=TOKEN
+;
+
+ECLBoolean :
+	'BOOL' name=TOKEN
+;
+
+ECLNumType :
+	ECLNUMBEREDTYPE INT? name=TOKEN
+;
+
+ECLDecType :
+	ECLDECIMALTYPE INT? name=TOKEN
+;
+                   
+ECLfieldType: 
+	( ECLInteger | ECLQstring | ECLString |  ECLReal | ECLUnicode | ECLData | ECLVarstring | ECLVarunicode | ECLUnsigned | ECLNumType | ECLDecType | ECLBoolean)
+;
+
+ECLOutputDecl: 
+	ECLfieldType (options=OutputOptions)? ';' | NestedDatasetDecl
+;
+
+ServiceInputValue: 
+	ECLfieldType (in_ops=InputOptions)? ';' | NestedDatasetDecl
+;
+
+ServiceInputSection: 
+	'INPUTS' (servs+=ServiceInputValue)+ 'END'
+;
+
+NestedDatasetDecl:
+	OutDataset (options=OutputOptions)? (decl+=ECLOutputDecl)+ 'END'
+;
+				
+OutputOption: 
+	type=('SIDE'|'LARGE'|'SMALL'|'FEW'|'WUID'|'APPEND'|'SCOREDSEARCH'|'DATABOMB'|'OPTIONAL') | 
+    (atr=('WUID'|'FROM') '(' name=TOKEN ')') |
+    (atr='ENABLE' '(' assigns=AssignList ')') |
+    (atr='PREFIX' '(' (name=TOKEN) ')') |
+    (atr=('WUID'|'FILLS'|'SOAP') '(' vals=ValueList ')') |
+    (atr=('DESCRIPTION'|'SOAP'|'JSON'|'ROXIE'|'XPATH') '(' vals=Value ')')
+;
+                
+OutputOptions: 
+	':' output_ops+=OutputOption ( ',' output_ops+=OutputOption )*
+;
+
+
+OutTypeSimple :
+	 type=('BOOL'|'INT'|'STRING'|'ACTION')? vals=Value 
+;
+
+OutDataset :
+	'DATASET' name=TOKEN (out_base=OutputBase)? (ops=OutputOptions)?
+;
+
+Service :
+	'SERVICE' name=TOKEN ops=OutputOptions (serv=ServiceInputSection)?
+;
+
+OutputValue: 
+ 	OutTypeSimple  ';' |     
+    OutDataset (ecl_vars+=ECLOutputDecl)* => 'END' |
+    OutDataset ';' |
+    Service (ecl_vars+=ECLOutputDecl)* => 'END' |
+    Service ';'   
+;
+ 
+OutputBase:  
+	'(' base=[Datatype|TOKEN] ')'
+;
+ 
+Permissions: 
+	name='PERMISSIONS' (perms+=Permission)* => 'END'
+;
+
+Permission: 
+	(name='VIEW'|name='EDIT'|name='RUN') ':' ('PUBLIC'|'PRIVATE'|cust_levs+=CustomPermissionLevel (',' cust_levs+=CustomPermissionLevel
+	)?) ';'
+;
+
+CustomPermissionLevel:
+	('USER'|'GROUP') '(' vals+=Value (',' vals+=Value)* ')'
+; 
+ 
+               
+GenerateSection: 
+	(GenerateBodyInline | GenerateBodySalt | GenerateBodyKel)
+;
+   
+GenerateBodyInline : 
+	name='GENERATES'  GEN_BLOCK
+;  
+
+GenerateBodySalt :
+	name='GENERATES' 'SALT' '(' TOKEN ')' ':' ('SCOREDSEARCH'|'PROFILE') => 'ENDGENERATES'               
+;
+
+GenerateBodyKel :
+	name='GENERATES' 'KEL' '(' TOKEN ')' => 'ENDGENERATES' 
+;
+
+VisualSection: 
+	section_name='VISUALIZE' name=TOKEN (vis_ops=VisualSectionOptions)? (vis_elements+=Visualization)+ => 'END'
+;
+
+VisName :
+	name=('CHORO'|'LINE'|'TIMELINE'|'PIE'|'BAR'|'TABLE'|'GRAPH'|'FORM'|'GROUP'|'SLIDER')
+;
+
+VisInputValue:
+	InputSimpleTypes (in_ops=InputOptions)? ';'
+;
+
+VisBasisParens:
+	'(' input=VisBasis ')'
+;
+
+Visualization: 
+	type=VisName name=TOKEN  (parens=VisBasisParens)? (vis_op=VisualOptions)? ';' |
+    type=VisName name=TOKEN (parens=VisBasisParens)? (vis_op=VisualOptions)? (input_val+=VisInputValue)+ => 'END' 
+;
+
+VisBasis: 
+	basis=[OutDataset|TOKEN] (filter=VisFilter)? (quals=VisBasisQualifiers)?
+;
+
+VisFilter :
+	'(' + vals+=Value + ')'
+;
+
+VisBasisQualifiers: 
+	'{' funcs=Function ( ',' qfuncs+=QFunction )* '}'
+;
+
+PosVizData : 
+	ECLfieldType | FieldDecl
+;
+
+Function: 
+	/*vars=[PosVizData] |*/  vals=Value |
+	/*'-' vars=[PosVizData] |*/  '-' vals=Value |
+    AggFunction | '-' AggFunction |
+    CountFunction | '-' CountFunction |
+    'SCALE' '(' (/*(vars=[PosVizData])|*/CountFunction|AggFunction) ',' type=INT ')'
+;
+
+QFunction:
+	Function|NestBasisQualifier
+;
+
+NestBasisQualifier: 
+	(TOKEN) VisBasisQualifiers
+;
+
+CountFunction: 
+	'COUNT'
+;
+
+AggFunction:
+	('SUM'|'AVE'|'MAX'|'MIN') '(' TOKEN  ')'
+;
+    
+VisualSectionOptions: 
+	':' vis_ops+=VisualSectionOption ( ',' vis_ops+=VisualSectionOption )*
+;
+
+VisualSectionOption: 
+	(name='LABEL'|name='TITLE') '(' vals=Value ')' | 
+	name='ENABLE' '(' assigns=AssignList ')' |
+	(name='EXPLORE' | name='PRIMARY')
+;
+
+VizAssign: 
+	val_l=Value '=' val_r=ValueList
+;
+
+VizAssignList: 
+	assigns+=VizAssign ( ',' assigns+=VizAssign)*
+;
+
+VizEnumDecl: 
+	name='ENUM' '(' assigns=VizAssignList ')'
+;
+
+VisualOptions: 
+	':' vis_ops+=VisualOption ( ',' vis_ops+=VisualOption )*
+;
+
+VisualOption: 
+	(name='TITLE'|name='DATE'|name='DESCRIPTION'|name='PICTURE'|name='STATE'|name='COUNTY'|name='FIRST'|name='WEIGHT'|name='SIZE'|name='LEVELS'|name='LEVEL'|name='UID'|name='TYPE') '(' funcs+=Function ')' |
+    (name='ICON'|name='FLAG'|name='TYPE') '(' funcs+=Function (',' decl=VizEnumDecl)? ')' |
+    vis_cust=VisualCustomOption |
+    name='COLLAPSE' | 
+    name='VISIBILITY' '(' visibility_op=VisibilityOption ')' |
+    name='ENABLE' '(' assigns+=AssignList ')' |
+    VisualCustomOption '(' funcs+=Function ( ',' funcs+=Function)* ')' |
+    VisualMultival '(' funcs+=Function ( ',' funcs+=Function )* ')'|
+    SelectOption |
+    LinkOption
+;
+               
+SelectEvent:
+	Value
+;
+
+SelectOptionMapping:
+	(TOKEN) '->' TOKEN ( ',' TOKEN )*
+;
+
+SelectOption:
+	'SELECTS' '(' (SelectEvent ',')? maps+=SelectOptionMapping (',' maps+=SelectOptionMapping)* ')' 
+;
+
+LinkOption:
+	'LINK' '(' name=TOKEN ( ',' ops+=VisualOption )* ')'
+;                         
+               
+VisualMultival: 
+	(name='X'|name='Y'|name='COLOR'|name='RANGE'|name='FILTER'|name='LABEL'|name='VALUE'|name='SORT'|name='BRANCHES')
+;
+
+VisibilityOption:
+	(name='MODAL'|name='VISIBLE')
+;
+
+VisualCustomOption:
+	name=TOKEN
+;
+        
+CustomSection: 
+	name='CUSTOM' (cust_vals+=CustomValue)* => 'END'
+;
+
+CustomValue:
+	TOKEN Value ';'
+;
+
+ResourceType:(name='LOGICALFILE'|name='INDEX'|name='SUPERFILE'|name='ECL'|name='FILE'|name='IMAGE');
+
+ResourceOption: 
+	('FONT'|'VALUE'|'DESCRIPTION' |'FILENAME' |'LABEL'|'URL'|'DALIIP'|'CLUSTER'|VisualCustomOption) '(' vals=Value ')'
+;
+
+ResourceOptions: 
+	res_ops+=ResourceOption ( ',' res_ops+=ResourceOption )*
+;
+
+ResourceValue: 
+	Value ':' (res_ops=ResourceOptions)? ';'
+;
+
+ResourceSection: 
+	name='RESOURCES' (res_vals+=ResourceValue)+ => 'END'
+;
+
+terminal WS  : 
+ (' '|'\t'|'\r'|'\n')+
+ ;
+ 
+terminal INT returns ecore::EInt:
+	('0'..'9')+
+;
+
+terminal STRING :
+	'"' ( '\\'('b'|'t'|'n'|'f'|'r'|'u'|'"'|"'"|'\\') | !('\\'|'"') )* '"' |
+	"'" ( '\\'('b'|'t'|'n'|'f'|'r'|'u'|'"'|"'"|'\\') | !('\\'|"'") )* "'" 
+;
+
+terminal ECLNUMBEREDTYPE:
+	('UNICODE'|'STRING'|'UNSIGNED'|'INTEGER'|'QSTRING'|'VARSTRING'|'VARUNICODE'|'REAL')('0'..'9')*
+;
+
+terminal ECLDECIMALTYPE: 
+	('DECIMAL')('0'..'9')*
+;
+
+//terminal UTOKEN: 
+//	('_')('a'..'z'|'A'..'Z'|'0'..'9'|'_'|'-')('a'..'z'|'A'..'Z'|'0'..'9'|'_')*
+//;
+
+terminal GEN_BLOCK :
+	'INLINE' -> 'ENDGENERATES'
+;
+
+
