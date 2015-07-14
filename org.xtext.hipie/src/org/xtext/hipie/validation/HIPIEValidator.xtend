@@ -21,7 +21,7 @@ class HIPIEValidator extends AbstractHIPIEValidator {
 	@Check
 	def checkIfBPString(BaseProp base) {
 	// Checks if some of the base_props are strings					
-		if (base.name == "LABEL" || base.name == "DESCRIPTION" || base.name == "AUTHOR" || base.name == "COPYRIGHT" || base.name == "LICENSE") 
+		if (base.property == "LABEL" || base.property == "DESCRIPTION" || base.property == "AUTHOR" || base.property == "COPYRIGHT" || base.property == "LICENSE") 
 		{
 			for (i : 0..<base.val_list.vals.size())
 			{

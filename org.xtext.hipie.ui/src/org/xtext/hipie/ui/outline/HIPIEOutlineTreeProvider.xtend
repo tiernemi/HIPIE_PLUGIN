@@ -7,6 +7,9 @@ import org.eclipse.xtext.ui.editor.outline.IOutlineNode
 import org.xtext.hipie.hIPIE.*
 import org.xtext.hipie.hIPIE.Value
 import org.xtext.hipie.hIPIE.OutputOptions
+import org.eclipse.xtext.ui.editor.outline.impl.DocumentRootNode
+import org.eclipse.xtext.ui.editor.outline.impl.AbstractOutlineNode
+import org.eclipse.swt.graphics.Image
 
 /**
  * Customization of the default outline structure.
@@ -14,15 +17,38 @@ import org.xtext.hipie.hIPIE.OutputOptions
  * See https://www.eclipse.org/Xtext/documentation/304_ide_concepts.html#outline
  */
 class HIPIEOutlineTreeProvider extends org.eclipse.xtext.ui.editor.outline.impl.DefaultOutlineTreeProvider {
-	def protected void _createChildren(IOutlineNode parentNode,
-           BaseProp prop) {
-        for(Value out_val : prop.val_list.vals) {
-            createEObjectNode(parentNode.parent.parent, out_val);
-        }
+	
+	def protected void _createChildren(DocumentRootNode parentNode,
+           Program prog) {
+           	if (prog.base_props != null)
+      			createEStructuralFeatureNode(parentNode, prog, HIPIEPackage.Literals.PROGRAM__BASE_PROPS , null as Image , "Plugin Properties", false)
+      		if (prog.permissions != null)
+       			createEStructuralFeatureNode(parentNode, prog, HIPIEPackage.Literals.PROGRAM__PERMISSIONS , null as Image , "Plugin Permissions", false)
+       		if (prog.input_section != null)
+       			createEStructuralFeatureNode(parentNode, prog, HIPIEPackage.Literals.PROGRAM__INPUT_SECTION , null as Image , "Inputs", false)
+       		if (prog.output_section != null)
+       			createEStructuralFeatureNode(parentNode, prog, HIPIEPackage.Literals.PROGRAM__OUTPUT_SECTION , null as Image , "Outputs", false)
+       		if (prog.visual_section.size != 0)
+       			createEStructuralFeatureNode(parentNode, prog, HIPIEPackage.Literals.PROGRAM__VISUAL_SECTION , null as Image , "Visualize", false)
+       		if (prog.resource_section != null)
+       			createEStructuralFeatureNode(parentNode, prog, HIPIEPackage.Literals.PROGRAM__RESOURCE_SECTION , null as Image , "Resources", false)
+       		if (prog.custom_section != null)
+       			createEStructuralFeatureNode(parentNode, prog, HIPIEPackage.Literals.PROGRAM__CUSTOM_SECTION , null as Image , "Custom", false)
+       		if (prog.generate_section != null)
+       			createEStructuralFeatureNode(parentNode, prog, HIPIEPackage.Literals.PROGRAM__GENERATE_SECTION , null as Image , "Generates", false)
+       		if (prog.composition_header != null)
+       			createEStructuralFeatureNode(parentNode, prog, HIPIEPackage.Literals.PROGRAM__COMPOSITION_HEADER , null as Image , "Composition Header", false)
+       		if (prog.contract_instances.size != 0)
+       			createEStructuralFeatureNode(parentNode, prog, HIPIEPackage.Literals.PROGRAM__CONTRACT_INSTANCES , null as Image , "Contract Instances", false)
+       		if (prog.integrate_section != null)
+       			createEStructuralFeatureNode(parentNode, prog, HIPIEPackage.Literals.PROGRAM__INTEGRATE_SECTION , null as Image , "Integrates", false)
     }
     def protected boolean _isLeaf(BaseProp prop) {
 		return true 
     }
+    
+    
+    
     def protected boolean _isLeaf(Visualization vis) {
 		return true 
     }

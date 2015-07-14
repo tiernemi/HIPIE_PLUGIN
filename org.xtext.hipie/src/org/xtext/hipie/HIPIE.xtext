@@ -5,34 +5,34 @@ generate hIPIE "http://www.xtext.org/hipie/HIPIE"
 import "http://www.eclipse.org/emf/2002/Ecore" as ecore
  
 Program :
-	composition_header+=CompositionHeader? 
+	composition_header=CompositionHeader? 
 	base_props+=BaseProp+
 	permissions=Permissions?
-	input_section+=InputSection?
+	input_section=InputSection?
 	contract_instances+=ContractInstance* 
-	output_section+=OutputSection?
+	output_section=OutputSection?
 	integrate_section=IntegrateSection?
 	visual_section+=VisualSection* 
-	generate_section+=GenerateSection? 
-	custom_section+=CustomSection? 
-	resource_section+=ResourceSection?
+	generate_section=GenerateSection? 
+	custom_section=CustomSection? 
+	resource_section=ResourceSection?
 ;
  
 BaseProp: 
-	(( name='NAME' | name='DESCRIPTION' | name='AUTHOR' |  name='LICENSE' | name='COPYRIGHT' | name='VERSION' | name='LABEL' | name='ID' | name='TEMPLATE' ) val_list=ValueList ';' ) |
-	(name='CATEGORY' cat_list=CategoryTypeList ';')
+	(property=('NAME' | 'DESCRIPTION' | 'AUTHOR' | 'LICENSE' | 'COPYRIGHT' | 'VERSION' | 'LABEL' | 'ID' | 'TEMPLATE' ) val_list=ValueList ';')|
+	(property='CATEGORY' cat_list=CategoryTypeList ';')
 ;
    
 CategoryType: 
-	name=('CLEAN' | 'INPUT' | 'APPEND' | 'LINK' | 'ANALYSIS' | 'CUSTOM' | 'VISUALIZE' | 'OUTPUT')
+	category_type=('CLEAN' | 'INPUT' | 'APPEND' | 'LINK' | 'ANALYSIS' | 'CUSTOM' | 'VISUALIZE' | 'OUTPUT')
 ;
 
 CategoryTypeList: 
-	cats+=CategoryType ( ',' cats+=CategoryType)*
+	categories+=CategoryType ( ',' categories+=CategoryType)*
 ;
 
 Value: 
-	name=UTOKEN|name=TOKEN | int_val=INT | str_val=STRING
+	name=UTOKEN|name=TOKEN|int_val=INT|str_val=STRING
 ;
 
 ValueList: 
