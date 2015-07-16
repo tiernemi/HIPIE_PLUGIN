@@ -71,8 +71,7 @@ class HIPIEGenerator implements IGenerator {
 			for (i : 0..<dataFolder.members.size) {
 				data_file_paths += " " + dataFolder.members.get(i).rawLocation.toOSString() 
 			}
-			//data_file_paths = data_file_paths.replaceAll("\\\\", "\\\\\\\\")
-			var databombFileString = databombFile.rawLocation.toOSString()//.replaceAll("\\\\", "\\\\\\\\")
+			var databombFileString = databombFile.rawLocation.toOSString()
 			var cmd = 'java -cp ' + compilerPathString + ' org/hpcc/HIPIE/commandline/CommandLineService -csv' + data_file_paths + ' -separator \\t -escape / -quote \\\" -lineseparator \\n -o ' + databombFileString 
 			System.out.println(cmd)
 			val proc_data = Runtime.getRuntime().exec(cmd) as Process ;

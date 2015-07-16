@@ -5,6 +5,7 @@ package org.xtext.hipie.ui.labeling
 
 import com.google.inject.Inject
 import org.xtext.hipie.hIPIE.*
+import org.eclipse.emf.edit.provider.StyledString
 
 /**
  * Provides labels for EObjects.
@@ -30,7 +31,67 @@ class HIPIELabelProvider extends org.eclipse.xtext.ui.label.DefaultEObjectLabelP
 		}
 	}
 	
-	
+	def text(Bool obj)
+	{
+		var label_string = ""
+		label_string = obj.name + " : " + obj.type
+	}
+	def text(FieldDecl obj)
+	{
+		var label_string = ""
+		label_string = obj.name + " : " + obj.type
+		return new StyledString("helllo")
+	}
+	def text(IntVar obj)
+	{
+		var label_string = ""
+		label_string = obj.name + " : " + obj.type
+	}
+	def text(StringVar obj)
+	{
+		var label_string = ""
+		label_string = obj.name + " : " + obj.type
+	}
+	def text(Group obj)
+	{
+		var label_string = ""
+		label_string = obj.name + " : " + obj.type
+	}
+	def text(Real obj)
+	{
+		var label_string = ""
+		label_string = obj.name + " : " + obj.type
+	}
+	def text(Record obj)
+	{
+		var label_string = ""
+		label_string = obj.name + " : " + obj.type
+	}
+	def text(KelAttrDecl obj)
+	{
+		var label_string = ""
+		label_string = obj.name + " : " + obj.type
+	}
+	def text(KelEntityDecl obj)
+	{
+		var label_string = ""
+		label_string = obj.name + " : " + obj.type
+	}
+	def text(KelEntityDeclSimple obj)
+	{
+		var label_string = ""
+		label_string = obj.name + " : " + obj.type
+	}
+	def text(KelBase obj)
+	{
+		var label_string = ""
+		label_string = obj.name + " : " + obj.type
+	}
+	def text(Dataset obj)
+	{
+		var label_string = ""
+		label_string = obj.name + " : " + obj.type
+	}
 	
 	def text(BaseProp base)
 	{
@@ -74,7 +135,7 @@ class HIPIELabelProvider extends org.eclipse.xtext.ui.label.DefaultEObjectLabelP
 		base.property + " : " + label_string
 	}
 	
-	def text(OutDataset out_dataset)
+	 def text(OutDataset out_dataset)
 	{
 		var out_string = ""
 		for (i : 0..<out_dataset.ops.output_ops.size)
@@ -90,7 +151,7 @@ class HIPIELabelProvider extends org.eclipse.xtext.ui.label.DefaultEObjectLabelP
 		}
 		out_dataset.name + out_string
 	}
-	
+	/* 
 	def text(Visualization vis)
 	{
 		var vis_type = vis.type.name
@@ -112,7 +173,7 @@ class HIPIELabelProvider extends org.eclipse.xtext.ui.label.DefaultEObjectLabelP
 	def text(OutTypeSimple out)
 	{
 		var out_string = ""
-		if (out.type != null)
+		if (out.sitype != null)
 		{
 			if (out.vals.name != null)
 			{
@@ -120,5 +181,6 @@ class HIPIELabelProvider extends org.eclipse.xtext.ui.label.DefaultEObjectLabelP
 			}
 		}
 	}
+	*/
 	
 }

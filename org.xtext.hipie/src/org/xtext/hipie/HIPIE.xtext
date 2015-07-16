@@ -5,17 +5,17 @@ generate hIPIE "http://www.xtext.org/hipie/HIPIE"
 import "http://www.eclipse.org/emf/2002/Ecore" as ecore
  
 Program :
-	composition_header=CompositionHeader? 
-	base_props+=BaseProp+
-	permissions=Permissions?
-	input_section=InputSection?
-	contract_instances+=ContractInstance* 
-	output_section=OutputSection?
-	integrate_section=IntegrateSection?
-	visual_section+=VisualSection* 
-	generate_section=GenerateSection? 
-	custom_section=CustomSection? 
-	resource_section=ResourceSection?
+	(composition_header=CompositionHeader)? 
+	(base_props+=BaseProp)+ 
+	(permissions=Permissions)? 
+	(input_section=InputSection)?
+	(contract_instances+=ContractInstance)* 
+	(output_section=OutputSection)?
+	(integrate_section=IntegrateSection)?
+	(visual_section+=VisualSection)* 
+	(generate_section=GenerateSection)? 
+	(custom_section=CustomSection)? 
+	(resource_section=ResourceSection)?
 ;
  
 BaseProp: 
@@ -52,7 +52,7 @@ TOKEN_list:
 ;
 
 Assign: 
-	vals_l=Value '=' vals_r=ValueList
+	val_l=Value '=' vals_r=ValueList
 ;
 
 AssignList: 
@@ -60,7 +60,7 @@ AssignList:
 ;
 
 CompositionHeader: 
-	name='HEADER' (assigns+=Assign)* => 'END'
+	{CompositionHeader} 'HEADER' (assigns+=Assign)* -> 'END'
 ;
 
 InstanceID: 
@@ -72,27 +72,27 @@ InstanceOptions:
 ;
 
 InstanceOption: 
-	('LABEL'|'VERSION') '(' ValueList ')'
+	option=('LABEL'|'VERSION') '(' val_list=ValueList ')'
 ;
 
 ContractInstance: 
-	sec_name='INSTANCE' TOKEN instId=InstanceID instance_ops=InstanceOptions? (assigns+=Assign)* 'END'
+	'INSTANCE' name=TOKEN instId=InstanceID options=InstanceOptions? (assigns+=Assign)* -> 'END'
 ;
 
 FieldDecl: 
-	'FIELD' name=TOKEN (input_ops=InputOptions)? ';'
+	type='FIELD' name=TOKEN (options=InputOptions)? ';'
 ;
 
 KelAttrDecl: 
-	'ATTRIBUTE' name=TOKEN input_ops=InputOptions? ';'
+	type='ATTRIBUTE' name=TOKEN options=InputOptions? ';'
 ;
 
 KelEntityDeclSimple: 
-	'ENTITY' name=TOKEN input_ops=InputOptions? ';'
+	type='ENTITY' name=TOKEN options=InputOptions? ';'
 ;
 
 KelEntityDecl: 
-	'ENTITY' name=TOKEN input_ops=InputOptions? attrdecl=KelAttrDecl? => 'END'
+	type='ENTITY' name=TOKEN options=InputOptions? attrdecl=KelAttrDecl? 'END'
 ;
 
 EnumEntry: 
@@ -104,58 +104,58 @@ EnumList:
 ;
 
 EnumDecl: 
-	enum_dec='ENUM' '(' enum_list=EnumList ')'
+	type='ENUM' '(' enum_list=EnumList ')'
 ;
  
 InputSection: 
-	name='INPUTS' (inputs+=InputValue)+ => 'END'
+	name='INPUTS' (inputs+=InputValue)+ -> 'END'
 ;
 
 Bool:
-	'BOOL' name=TOKEN
+	type='BOOL' name=TOKEN
 ;
 
 IntVar:
-	'INT' name=TOKEN
+	type='INT' name=TOKEN
 ;
 
 StringVar:
-	'STRING' name=TOKEN
+	type='STRING' name=TOKEN
 ;
 
 Dataset:
-	'DATASET' name=TOKEN
+	type='DATASET' name=TOKEN (options=InputOptions)? (';'|((fields+=FieldDecl)* 'END'))
 ;
 
 Group:
-	'GROUP' name=TOKEN
+	type='GROUP' name=TOKEN (input_op_list=InputOptions)? (vals+=InputValue)* 'END'
 ;
 
 Real :
-	'REAL' name=TOKEN
+	type='REAL' name=TOKEN
 ;
 
 InputSimpleTypes : 
-	(Bool|IntVar|EnumDecl|StringVar|Real)
+	Bool|IntVar|EnumDecl|StringVar|Real
 ;
 
 Record :
-	'RECORD' name=TOKEN
+	type='RECORD' name=TOKEN
 ;
 
 KelBase :
-	'KELBASE' name=TOKEN
+	type='KELBASE' name=TOKEN (options=InputOptions)? (kels+=(KelEntityDecl|KelEntityDeclSimple|KelAttrDecl))* 'END'
 ;
 
 Datatype :
-	(InputSimpleTypes| Record | Dataset | KelBase | Group)
+(Record | Dataset | KelBase | Group)
 ;
 
 InputValue: 
-	(InputSimpleTypes| Record | Dataset) (input_op_list=InputOptions)? ';' |
-      Dataset (input_op_list=InputOptions)? (fields+=FieldDecl)* => 'END' |
-      KelBase (input_op_list=InputOptions)? (kel_ops+=KelEntityDecl|kel_ops+=KelEntityDeclSimple|kel_ops+=KelAttrDecl)* |
-      Group (input_op_list=InputOptions)? (vals+=InputValue)* => 'END'  
+	(in_val=(InputSimpleTypes|Record) (options=InputOptions)? ';')  |
+     in_val=Dataset  |
+     in_val=KelBase   |
+     in_val=Group
 ; 
  
 InputOptions:
@@ -163,19 +163,19 @@ InputOptions:
 ;
 
 InputOption:
-	  (atr='OPTIONAL'|atr='DEFINED'|atr='DISABLED'|atr='MAPBYTYPE'|atr='MAPBYNAME'|atr='MANY') |
-		form='FORMFIELD' '(' form_op=FormfieldOption ')' | 
-		enab='ENABLE' '('  (assigns_list=AssignList)  ')' | 
-        type='TYPE' '(' type_op=InputtypeOptions ')' | 
-        (atr='RANGE'|atr='DEFAULT'|atr='MAXLENGTH'|atr='DISABLED' | atr='DESCRIPTION' |atr='NULL'| atr='FIELDLENGTH' | atr='ROWS'  | atr='COLS' | atr='_HTML_STYLECLASS' | atr='LABEL') '(' vals+=ValueList ')'
+	  atr=('OPTIONAL'|'DEFINED'|'DISABLED'|'MAPBYTYPE'|'MAPBYNAME'|'MANY') |
+		atr='FORMFIELD' '(' form_op=FormfieldOption ')' | 
+		atr='ENABLE' '('  (assigns_list=AssignList)  ')' | 
+        atr='TYPE' '(' type_op=InputtypeOptions ')' | 
+        atr=('RANGE'|'DEFAULT'|'MAXLENGTH'|'DISABLED' |'DESCRIPTION' |'NULL'|'FIELDLENGTH'|'ROWS'|'COLS'|'_HTML_STYLECLASS'|'LABEL') '(' vals+=ValueList ')'
 ;
 
 FormfieldOption: 
-	('CHECKBOX'|'RADIO'|'SELECT'|'MULTIPLESELECT'|'TEXTAREA'|'HIDDEN'|'TEXT')
+	selec=('CHECKBOX'|'RADIO'|'SELECT'|'MULTIPLESELECT'|'TEXTAREA'|'HIDDEN'|'TEXT')
 ;
 
 InputtypeOption: 
-	('STRING'|'UNICODE'|'UNISTR'|'INTEGER'|'DECIMAL'|'NUMERIC'|'REAL')
+	in_type=('UNICODE'|'UNISTR'|'INTEGER'|'DECIMAL'|'NUMERIC'|'REAL'|'STRING')
 ;
 
 InputtypeOptions: 
@@ -184,17 +184,16 @@ InputtypeOptions:
 
 
 IntegrateSection: 
-	name='INTEGRATE' (outputs+=OutputValue)+ => 'END'
+	{IntegrateSection} 'INTEGRATE' (outputs+=OutputValue)+ 'END'
 ;
 
 OutputSection : 
-	name='OUTPUTS' (outputs+=OutputValue)+ => 'END'
+	name='OUTPUTS' (outputs+=OutputValue)+ 'END'
 ;
 
 OutfieldDecl : 
-	(IntVar|Bool|StringVar|fields+=FieldDecl) 
+	decl=(IntVar|Bool|StringVar|FieldDecl) 
 ;
-
 
 ECLInteger :
 	'INTEGER' INT? name=TOKEN
@@ -204,8 +203,10 @@ ECLUnsigned :
 	'UNSIGNED' INT? name=TOKEN
 ;
 
+// Bug type=STRING Not sure why this causes syntax to break
+
 ECLString :
-	'STRING' INT? name=TOKEN
+	"STRING" INT? name=TOKEN
 ;
 
 ECLQstring :
@@ -237,23 +238,23 @@ ECLBoolean :
 ;
 
 ECLNumType :
-	ECLNUMBEREDTYPE INT? name=TOKEN
+	type=ECLNUMBEREDTYPE INT? name=TOKEN
 ;
 
 ECLDecType :
-	ECLDECIMALTYPE INT? name=TOKEN
+	type=ECLDECIMALTYPE INT? name=TOKEN
 ;
                    
-ECLfieldType: 
+ECLFieldType: 
 	( ECLInteger | ECLQstring | ECLString |  ECLReal | ECLUnicode | ECLData | ECLVarstring | ECLVarunicode | ECLUnsigned | ECLNumType | ECLDecType | ECLBoolean)
 ;
 
 ECLOutputDecl: 
-	ECLfieldType (options=OutputOptions)? ';' | NestedDatasetDecl
+	(ecl_field_type=ECLFieldType (options=OutputOptions)? ';') | nest=NestedDatasetDecl
 ;
 
 ServiceInputValue: 
-	ECLfieldType (in_ops=InputOptions)? ';' | NestedDatasetDecl
+	ecl_field_type=ECLFieldType (options=InputOptions)? ';' | nest=NestedDatasetDecl
 ;
 
 ServiceInputSection: 
@@ -261,7 +262,7 @@ ServiceInputSection:
 ;
 
 NestedDatasetDecl:
-	OutDataset (options=OutputOptions)? (decl+=ECLOutputDecl)+ 'END'
+	type='DATASET' name=TOKEN (ops=OutputOptions)? (ecl_decls+=ECLOutputDecl)+ => 'END'
 ;
 				
 OutputOption: 
@@ -279,23 +280,21 @@ OutputOptions:
 
 
 OutTypeSimple :
-	 type=('BOOL'|'INT'|'STRING'|'ACTION')? vals=Value 
+	type=('BOOL'|'INT'|'STRING'|'ACTION')? vals=Value 
 ;
 
 OutDataset :
-	'DATASET' name=TOKEN (out_base=OutputBase)? (ops=OutputOptions)?
+	type='DATASET' name=TOKEN (out_base=OutputBase)? (ops=OutputOptions)? (';'|(ecl_decls+=ECLOutputDecl)* 'END')
 ;
 
 Service :
-	'SERVICE' name=TOKEN ops=OutputOptions (serv=ServiceInputSection)?
+	type='SERVICE' name=(TOKEN|UTOKEN) (ops=OutputOptions) (serv=ServiceInputSection)? (';'|(ecl_decls+=ECLOutputDecl)* 'END')   
 ;
 
 OutputValue: 
- 	OutTypeSimple  ';' |     
-    OutDataset (ecl_vars+=ECLOutputDecl)* => 'END' |
-    OutDataset ';' |
-    Service (ecl_vars+=ECLOutputDecl)* => 'END' |
-    Service ';'   
+ (out_val=OutTypeSimple  ';') |     
+    out_val=OutDataset  |
+    out_val=Service
 ;
  
 OutputBase:  
@@ -303,11 +302,11 @@ OutputBase:
 ;
  
 Permissions: 
-	name='PERMISSIONS' (perms+=Permission)* => 'END'
+	{Permissions} 'PERMISSIONS' (perms+=Permission)* 'END'
 ;
 
 Permission: 
-	(name='VIEW'|name='EDIT'|name='RUN') ':' ('PUBLIC'|'PRIVATE'|cust_levs+=CustomPermissionLevel (',' cust_levs+=CustomPermissionLevel
+	type=('VIEW'|'EDIT'|'RUN') ':' ('PUBLIC'|'PRIVATE'|cust_levs+=CustomPermissionLevel (',' cust_levs+=CustomPermissionLevel
 	)?) ';'
 ;
 
@@ -317,31 +316,31 @@ CustomPermissionLevel:
  
                
 GenerateSection: 
-	(GenerateBodyInline | GenerateBodySalt | GenerateBodyKel)
+	 body=(GenerateBodyInline | GenerateBodySalt | GenerateBodyKel)
 ;
    
 GenerateBodyInline : 
-	name='GENERATES'  GEN_BLOCK
+	'GENERATES' type=GEN_BLOCK
 ;  
 
 GenerateBodySalt :
-	name='GENERATES' 'SALT' '(' TOKEN ')' ':' ('SCOREDSEARCH'|'PROFILE') => 'ENDGENERATES'               
+	'GENERATES' type='SALT' '(' name=TOKEN ')' ':' op=('SCOREDSEARCH'|'PROFILE') => 'ENDGENERATES'               
 ;
 
 GenerateBodyKel :
-	name='GENERATES' 'KEL' '(' TOKEN ')' => 'ENDGENERATES' 
+	'GENERATES' type='KEL' '(' name=TOKEN ')' => 'ENDGENERATES' 
 ;
 
 VisualSection: 
-	section_name='VISUALIZE' name=TOKEN (vis_ops=VisualSectionOptions)? (vis_elements+=Visualization)+ => 'END'
+	type='VISUALIZE' name=TOKEN (ops=VisualSectionOptions)? (vis_elements+=Visualization)+ => 'END'
 ;
 
 VisName :
-	name=('CHORO'|'LINE'|'TIMELINE'|'PIE'|'BAR'|'TABLE'|'GRAPH'|'FORM'|'GROUP'|'SLIDER')
+	('CHORO'|'LINE'|'TIMELINE'|'PIE'|'BAR'|'TABLE'|'GRAPH'|'FORM'|'GROUP'|'SLIDER')
 ;
 
 VisInputValue:
-	InputSimpleTypes (in_ops=InputOptions)? ';'
+	types=InputSimpleTypes (in_ops=InputOptions)? ';'
 ;
 
 VisBasisParens:
@@ -366,7 +365,7 @@ VisBasisQualifiers:
 ;
 
 PosVizData : 
-	ECLfieldType | FieldDecl
+	types=(ECLFieldType | FieldDecl)
 ;
 
 Function: 
@@ -461,17 +460,19 @@ VisualCustomOption:
 ;
         
 CustomSection: 
-	name='CUSTOM' (cust_vals+=CustomValue)* => 'END'
+	{CustomSection} 'CUSTOM' (cust_vals+=CustomValue)* 'END'
 ;
 
 CustomValue:
-	TOKEN Value ';'
+	name=TOKEN vals=Value ';'
 ;
 
-ResourceType:(name='LOGICALFILE'|name='INDEX'|name='SUPERFILE'|name='ECL'|name='FILE'|name='IMAGE');
+ResourceType:
+	type=('LOGICALFILE'|'INDEX'|'SUPERFILE'|'ECL'|'FILE'|'IMAGE')
+;
 
 ResourceOption: 
-	('FONT'|'VALUE'|'DESCRIPTION' |'FILENAME' |'LABEL'|'URL'|'DALIIP'|'CLUSTER'|VisualCustomOption) '(' vals=Value ')'
+	 ('FONT'|'VALUE'|'DESCRIPTION' |'FILENAME' |'LABEL'|'URL'|'DALIIP'|'CLUSTER'|VisualCustomOption) '(' vals=Value ')'
 ;
 
 ResourceOptions: 
@@ -479,11 +480,11 @@ ResourceOptions:
 ;
 
 ResourceValue: 
-	Value ':' (res_ops=ResourceOptions)? ';'
+	res_type=ResourceType name=TOKEN (':' res_ops=ResourceOptions)? ';'
 ;
 
 ResourceSection: 
-	name='RESOURCES' (res_vals+=ResourceValue)+ => 'END'
+	'RESOURCES' (res_vals+=ResourceValue)+ 'END'
 ;
 
 terminal WS  : 

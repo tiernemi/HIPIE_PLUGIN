@@ -5,11 +5,17 @@ package org.xtext.hipie.ui.outline
 
 import org.eclipse.xtext.ui.editor.outline.IOutlineNode
 import org.xtext.hipie.hIPIE.*
-import org.xtext.hipie.hIPIE.Value
 import org.xtext.hipie.hIPIE.OutputOptions
+import org.xtext.hipie.hIPIE.Dataset
 import org.eclipse.xtext.ui.editor.outline.impl.DocumentRootNode
-import org.eclipse.xtext.ui.editor.outline.impl.AbstractOutlineNode
 import org.eclipse.swt.graphics.Image
+import javax.inject.Inject
+import org.eclipse.xtext.ui.label.StylerFactory
+import org.eclipse.swt.graphics.RGB
+import org.eclipse.swt.SWT
+import org.eclipse.xtext.ui.editor.utils.TextStyle
+import org.eclipse.jface.viewers.StyledString
+import org.eclipse.swt.graphics.FontData
 
 /**
  * Customization of the default outline structure.
@@ -18,6 +24,355 @@ import org.eclipse.swt.graphics.Image
  */
 class HIPIEOutlineTreeProvider extends org.eclipse.xtext.ui.editor.outline.impl.DefaultOutlineTreeProvider {
 	
+	
+	// Outline label definitions
+	@Inject
+    private StylerFactory stylerFactory;
+     
+    def protected TextStyle getTypeTextStyle() {
+      var textStyle = new TextStyle();
+      textStyle.setColor(new RGB(125,38,205));
+      textStyle.setFontData(new FontData("typefont", 9, SWT.NORMAL))
+      textStyle.setStyle(SWT.NORMAL);
+      return textStyle;
+    } 
+    
+    def protected TextStyle getBasisTextStyle() {
+      var textStyle = new TextStyle();
+      textStyle.setColor(new RGB(140,140,140));
+      textStyle.setFontData(new FontData("basefont", 9, SWT.ITALIC))
+      textStyle.setStyle(SWT.ITALIC);
+      return textStyle;
+    }
+    
+    def protected TextStyle getBasePropTextStyle() {
+      var textStyle = new TextStyle();
+      textStyle.setFontData(new FontData("basepropfont", 10, SWT.BOLD))
+      textStyle.setStyle(SWT.BOLD);
+      return textStyle;
+    }
+    
+    // Base Props //
+   	def public Object _text(BaseProp obj) 
+	{
+		var label_string = ""
+		if (obj.val_list != null)
+		{
+			for (i : 0..<obj.val_list.vals.size)
+			{
+				if (obj.val_list.vals.get(i).name != null)
+				{
+					if(label_string.length != 0)
+						label_string += ", "
+					label_string += obj.val_list.vals.get(i).name
+				}
+				else if (obj.val_list.vals.get(i).str_val != null)
+				{
+					if(label_string.length != 0)
+						label_string += ", "
+					label_string += obj.val_list.vals.get(i).str_val
+				}
+				else 
+				{
+					if(label_string.length != 0)
+						label_string += ", "
+					label_string += obj.val_list.vals.get(i).int_val
+				}
+			}
+		}		
+		if (obj.cat_list != null)
+		{
+			for (i : 0..<obj.cat_list.categories.size)
+				{
+					if(obj.cat_list.categories.get(i) != null)
+					{
+						if(label_string.length != 0)
+							label_string += ", "
+						label_string += obj.cat_list.categories.get(i).category_type
+					}
+				}
+		}
+		var typestring = new StyledString(obj.property ,stylerFactory.createXtextStyleAdapterStyler(getBasePropTextStyle()) )
+		var namestring = new StyledString(label_string) 
+		return typestring.append(" : ").append(namestring)
+	}
+    
+    // Inputs //
+    
+    def public Object _text(Bool obj) 
+    {
+      var typestring = new StyledString(obj.type , stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
+      var namestring = new StyledString(obj.name)
+      var label_string = namestring.append(" : ").append(typestring)
+      return label_string
+    }
+    
+    def public Object _text(FieldDecl obj)
+	{
+      var typestring = new StyledString(obj.type , stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
+      var namestring = new StyledString(obj.name)
+      var label_string = namestring.append(" : ").append(typestring)
+      return label_string
+	}
+	
+	def public Object _text(IntVar obj)
+	{
+      var typestring = new StyledString(obj.type , stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
+      var namestring = new StyledString(obj.name)
+      var label_string = namestring.append(" : ").append(typestring)
+      return label_string
+	}
+	
+	def public Object _text(StringVar obj)
+	{
+      var typestring = new StyledString(obj.type , stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
+      var namestring = new StyledString(obj.name)
+      var label_string = namestring.append(" : ").append(typestring)
+      return label_string
+	}
+	
+	def public Object _text(Group obj)
+	{
+      var typestring = new StyledString(obj.type , stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
+      var namestring = new StyledString(obj.name)
+      var label_string = namestring.append(" : ").append(typestring)
+      return label_string
+	}
+	
+	def public Object _text(Real obj)
+	{
+      var typestring = new StyledString(obj.type , stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
+      var namestring = new StyledString(obj.name)
+      var label_string = namestring.append(" : ").append(typestring)
+      return label_string
+	}
+	
+	def public Object _text(Record obj)
+	{
+      var typestring = new StyledString(obj.type , stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
+      var namestring = new StyledString(obj.name)
+      var label_string = namestring.append(" : ").append(typestring)
+      return label_string
+	}
+	
+	def public Object _text(KelAttrDecl obj)
+	{
+      var typestring = new StyledString(obj.type , stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
+      var namestring = new StyledString(obj.name)
+      var label_string = namestring.append(" : ").append(typestring)
+      return label_string
+	}
+	
+	def public Object _text(KelEntityDecl obj)
+	{
+      var typestring = new StyledString(obj.type , stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
+      var namestring = new StyledString(obj.name)
+      var label_string = namestring.append(" : ").append(typestring)
+      return label_string
+	}
+	
+	def public Object _text(KelEntityDeclSimple obj)
+	{
+      var typestring = new StyledString(obj.type , stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
+      var namestring = new StyledString(obj.name)
+      var label_string = namestring.append(" : ").append(typestring)
+      return label_string
+	}
+	
+	def public Object _text(KelBase obj)
+	{
+      var typestring = new StyledString(obj.type , stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
+      var namestring = new StyledString(obj.name)
+      var label_string = namestring.append(" : ").append(typestring)
+      return label_string
+	}
+	
+	def public Object _text(Dataset obj)
+	{
+      var typestring = new StyledString(obj.type , stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
+      var namestring = new StyledString(obj.name)
+      var label_string = namestring.append(" : ").append(typestring)
+      return label_string
+	}
+    
+    // Outputs //
+    def public Object _text(ECLFieldType obj)
+    {
+    	var typestring = new StyledString()
+    	var namestring = new StyledString(obj.name)
+    	switch obj 
+    	{
+    		case obj instanceof ECLString : typestring = new StyledString('STRING' , stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
+			case obj instanceof ECLInteger : typestring = new StyledString('INTEGER' , stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
+			case obj instanceof ECLQstring : typestring = new StyledString('QSTRING' , stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
+			case obj instanceof ECLReal : typestring = new StyledString('REAL' , stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
+			case obj instanceof ECLUnicode : typestring = new StyledString('UNICODE' , stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
+			case obj instanceof ECLData : typestring = new StyledString('DATA' , stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
+			case obj instanceof ECLVarstring : typestring = new StyledString('VARSTRING' , stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
+			case obj instanceof ECLVarunicode : typestring = new StyledString('VARUNICODE' , stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
+			case obj instanceof ECLUnsigned : typestring = new StyledString('UNSIGNED' , stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
+			case obj instanceof ECLBoolean : typestring = new StyledString('BOOL' , stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
+			case obj instanceof ECLNumType : typestring = new StyledString((obj as ECLNumType).type , stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
+			case obj instanceof ECLDecType : typestring = new StyledString((obj as ECLDecType).type , stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
+    	}
+		var label_string = namestring.append(" : ").append(typestring)
+      	return label_string
+    }
+    
+    def public Object _text(OutDataset obj)
+	{
+		var typestring = new StyledString(obj.type, stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
+		var optionstring = new StyledString("")
+		var basestring = new StyledString("")
+		var namestring = new StyledString(obj.name)
+		
+		var option_temp_str = ""
+		
+		if (obj.ops != null)
+		{
+			for (i : 0..<obj.ops.output_ops.size)
+			{
+				if (obj.ops.output_ops.get(i).type != null)
+				{
+					if(option_temp_str.length != 0)
+						option_temp_str += ", "
+					option_temp_str += obj.ops.output_ops.get(i).type
+				}
+			}
+		}
+		
+		optionstring = new StyledString(option_temp_str, stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
+		
+		var label_string = namestring
+		if (obj.out_base != null)
+		{
+			basestring = new StyledString(obj.out_base.base.name, stylerFactory.createXtextStyleAdapterStyler(getBasisTextStyle()))
+			label_string = label_string.append(" - ").append(basestring)
+		}
+		
+    	label_string = label_string.append(" : ").append(typestring).append(" ").append(optionstring)
+    	return label_string
+	}
+	
+	def public Object _text(NestedDatasetDecl obj)
+	{
+		var typestring = new StyledString(obj.type, stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
+		var optionstring = new StyledString("")
+		var namestring = new StyledString(obj.name)
+		
+		var option_temp_str = ""
+		
+		if (obj.ops != null)
+		{
+			for (i : 0..<obj.ops.output_ops.size)
+			{
+				if (obj.ops.output_ops.get(i).type != null)
+				{
+					if(option_temp_str.length != 0)
+						option_temp_str += ", "
+					option_temp_str += obj.ops.output_ops.get(i).type
+				}
+			}
+		}
+		
+		optionstring = new StyledString(option_temp_str, stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
+		var label_string = namestring
+    	label_string = label_string.append(" : ").append(typestring).append(" ").append(optionstring)
+    	return label_string	
+	}
+	
+	def public Object _text(Service obj)
+	{
+		var typestring = new StyledString(obj.type, stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
+		var optionstring = new StyledString("")
+		var namestring = new StyledString(obj.name)
+		
+		var option_temp_str = ""
+		
+		if (obj.ops != null)
+		{
+			for (i : 0..<obj.ops.output_ops.size)
+			{
+				if (obj.ops.output_ops.get(i).type != null)
+				{
+					if(option_temp_str.length != 0)
+						option_temp_str += ", "
+					option_temp_str += obj.ops.output_ops.get(i).type
+				}
+			}
+		}
+		
+		optionstring = new StyledString(option_temp_str, stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
+		var label_string = namestring
+    	label_string = label_string.append(" : ").append(typestring).append(" ").append(optionstring)
+    	return label_string	
+	}
+	
+	def public Object _text(ServiceInputSection obj)
+	{
+		return "Inputs"
+	}
+	
+	// Generates //
+    
+	def public Object _text(GenerateBodyInline obj)
+	{
+		return new StyledString("INLINE", stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
+	}
+	
+	def public Object _text(GenerateBodySalt obj)
+	{
+		var typestring = new StyledString(obj.type, stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
+		var namestring = new StyledString(obj.name)
+		var label_string = namestring.append(" : ").append(typestring)
+		return label_string
+	}
+	
+	def public Object _text(GenerateBodyKel obj)
+	{
+		var typestring = new StyledString(obj.type, stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
+		var namestring = new StyledString(obj.name)
+		var label_string = namestring.append(" : ").append(typestring)
+		return label_string
+	}
+	
+	// Visualisation Section //
+	def public Object _text(VisualSection obj)
+	{
+		var typestring = new StyledString(obj.type , stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
+		var namestring = new StyledString(obj.name)
+		var label_string = namestring.append(" : ").append(typestring)
+		return label_string
+	}
+	
+	def public Object _text(Visualization obj)
+	{
+		var typestring = new StyledString(obj.type , stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
+		var namestring = new StyledString(obj.name)
+		var label_string = namestring
+		var basestring = new StyledString("")
+		if (obj.parens != null)
+		{
+			basestring = new StyledString(obj.parens.input.basis.name , stylerFactory.createXtextStyleAdapterStyler(getBasisTextStyle()))
+			label_string = label_string.append(" - ").append(basestring)
+		}
+		label_string = label_string.append(" : ").append(typestring)
+		return label_string
+	}
+	
+	def public Object _text(ResourceValue obj)
+	{
+		var typestring = new StyledString(obj.res_type.type, stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
+		var namestring = new StyledString(obj.name)
+		var label_string = namestring.append(" : ").append(typestring)
+		return label_string
+	}	
+	
+		
+	//....Outline modifications....///
+
+	
+	// Main outline framework //
 	def protected void _createChildren(DocumentRootNode parentNode,
            Program prog) {
            	if (prog.base_props != null)
@@ -43,44 +398,259 @@ class HIPIEOutlineTreeProvider extends org.eclipse.xtext.ui.editor.outline.impl.
        		if (prog.integrate_section != null)
        			createEStructuralFeatureNode(parentNode, prog, HIPIEPackage.Literals.PROGRAM__INTEGRATE_SECTION , null as Image , "Integrates", false)
     }
-    def protected boolean _isLeaf(BaseProp prop) {
-		return true 
-    }
     
-    
-    
-    def protected boolean _isLeaf(Visualization vis) {
-		return true 
-    }
-    def protected boolean _isLeaf(OutTypeSimple out_type) {
-		return true 
-    }
-    def protected void _createNode(IOutlineNode parentNode, OutputOptions out)
+    // Composition Header //
+    def protected void _createNode(IOutlineNode parentNode, CompositionHeader obj)
     {
-    	
+    	if (obj.assigns.size != 0)
+    	{
+    		for (i : 0..<obj.assigns.size)
+    			createNode(parentNode, obj.assigns.get(i).val_l)
+    	}  	
     }
-    def protected void _createNode(IOutlineNode parentNode, VisName vis_name)
+    
+    def protected boolean _isLeaf(CompositionHeader obj) 
     {
-    	
+		if (obj.assigns.size==0)
+			return true 
+		else
+			return false
     }
+    
+    // Base Properties //
+    def protected boolean _isLeaf(BaseProp obj) 
+    {
+		return true 
+    }
+    
+    // Permissions //
+    def protected void _createNode(IOutlineNode parentNode, Permissions obj)
+    {
+    	if (obj.perms.size != 0)
+    		for (i : 0..<obj.perms.size)
+    			createNode(parentNode, obj.perms.get(i))
+    }
+       
+    def protected boolean _isLeaf(Permissions obj)
+    {
+    	if (obj.perms.size == 0)
+    		return true
+    	else
+    		return false
+    }
+    
+    // Input section //
+    def protected void _createNode(IOutlineNode parentNode, InputSection in_sec)
+    {
+    	if (in_sec.inputs.size != 0)
+    	{
+    		for (i : 0..<in_sec.inputs.size)
+    			createNode(parentNode, in_sec.inputs.get(i).in_val)
+    	}  	
+    }
+    
+    def protected boolean _isLeaf(Dataset dat)
+    {
+    	if (dat.fields.size == 0)
+    		return true
+    	else
+    		return false
+    }
+    
+    def protected boolean _isLeaf(KelBase kel)
+    {
+    	if (kel.kels.size == 0)
+    		return true
+    	else
+    		return false
+    }
+    
+    def protected boolean _isLeaf(KelEntityDecl kel_dec)
+    {
+    	if (kel_dec.attrdecl == null)
+    		return true
+    	else
+    		return false
+    }
+    
+    def protected boolean _isLeaf(KelEntityDeclSimple kel_dec)
+    {
+    	return true
+    }
+    
+    def protected boolean _isLeaf(KelAttrDecl kel_att)
+    {
+    	return true
+    }
+    
+    def protected boolean _isLeaf(FieldDecl field_decl)
+    {
+    	return true ;
+    }
+    
+    def protected boolean _isLeaf(Group gr)
+    {
+    	if(gr.vals.size == 0)
+    		return true
+    	else
+    		return false
+    }
+    
+    def protected void _createNode(IOutlineNode parentNode, EnumList en)
+    {
+    	for(i : 0..<en.en_ents.size)
+    		createNode(parentNode , en.en_ents.get(i).val_l)
+    }
+    
+   // Output Section //
+    def protected void _createNode(IOutlineNode parentNode, OutputSection obj)
+    {
+    	if (obj.outputs.size != 0)
+    	{
+    		for (i : 0..<obj.outputs.size)
+    			createNode(parentNode, obj.outputs.get(i).out_val)
+    	}  	
+    }
+    
+    def protected void _createNode(IOutlineNode parentNode, OutTypeSimple obj)
+    {
+    	createNode(parentNode, obj.vals)
+    }
+    
+    def protected void _createNode(IOutlineNode parentNode, ECLOutputDecl obj)
+    {
+    	if (obj.ecl_field_type != null)
+    		createNode(parentNode, obj.ecl_field_type)
+    	else
+    		createNode(parentNode, obj.nest)
+    }
+    
+    def protected void _createNode(IOutlineNode parentNode, ServiceInputValue obj)
+    {
+    	if (obj.ecl_field_type != null)
+    		createNode(parentNode, obj.ecl_field_type)
+    	else
+    		createNode(parentNode, obj.nest)
+    }
+    
+    def protected void _createNode(IOutlineNode parentNode, OutputOptions obj)
+	{
+			
+	}
+    
+	def protected void _createNode(IOutlineNode parentNode, OutputBase obj)
+	{
+		 	
+	}
+    
+    def protected boolean _isLeaf(Value obj) 
+    {
+		return true 
+    }
+    
+    def protected boolean _isLeaf(ECLFieldType obj)
+    {
+    	return true 	
+    }
+    
+    def protected boolean _isLeaf(OutDataset obj)
+    {
+    	if (obj.ecl_decls.size == 0)
+    		return true
+    	else
+    		return false
+    }
+    
+    def protected boolean _isLeaf(NestedDatasetDecl obj)
+    {
+    	if (obj.ecl_decls.size == 0)
+    		return true
+    	else
+    		return false
+    }
+    
+    def protected boolean _isLeaf(Service obj)
+    {
+    	if (obj.ecl_decls.size == 0 && obj.serv == 0)
+    		return true
+    	else
+    		return false
+    }
+
+    // Generates Section //
+    
+    def protected void _createNode(IOutlineNode parentNode, GenerateSection obj)
+    {
+    	if (obj.body != null)
+    	{
+    		createNode(parentNode, obj.body)
+    	}  	
+    }
+    
+    def protected boolean _isLeaf(GenerateBodyInline obj) {
+		return true 
+    }
+    
+    def protected boolean _isLeaf(GenerateBodySalt obj) {
+		return true 
+    }
+    
+    def protected boolean _isLeaf(GenerateBodyKel obj) {
+		return true 
+    }
+    
+    // Visualisation Section //
+                   
+    def protected boolean _isLeaf(VisualSection obj) {
+		if (obj.vis_elements.size != 0)
+			return false
+		else
+			return true
+    }
+    
     def protected void _createNode(IOutlineNode parentNode, VisualOptions vis_ops)
     {
     	
     }
-    def protected void _createNode(IOutlineNode parentNode, VisBasisParens vis_parents)
-    {
-    	
-    }
+    
     def protected void _createNode(IOutlineNode parentNode, VisInputValue vis_in)
     {
     	
     }
-    def protected void _createNode(IOutlineNode parentNode, VisualSectionOptions vis_sec_ops)
+    
+    // Custom Section //
+    
+    def protected void _createNode(IOutlineNode parentNode, CustomSection obj)
     {
-    	
+    	for (i : 0..<obj.cust_vals.size)
+    		createNode(parentNode, obj.cust_vals.get(i))
     }
-    def protected void _createNode(IOutlineNode parentNode, InputOptions input_ops)
+    
+    def protected boolean _isLeaf(CustomValue obj) 
     {
-    	
-    }   
+		return true
+    }
+    
+    def protected boolean _isLeaf(CustomSection obj) 
+    {
+    	if (obj.cust_vals.size == 0)
+			return true
+		else
+			return false
+    }
+    
+    // Resource Section //
+    def protected void _createNode(IOutlineNode parentNode, ResourceSection obj)
+    {
+    	if (obj.res_vals.size != 0)
+    	{
+    		for (i : 0..<obj.res_vals.size)
+    			createNode(parentNode, obj.res_vals.get(i))
+    	}  	
+    }
+ 
+    def protected boolean _isLeaf(ResourceValue obj) 
+    {
+			return true
+    }
 }
