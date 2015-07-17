@@ -13,8 +13,14 @@ import org.eclipse.emf.ecore.util.EcoreUtil
 import org.xtext.hipie.hIPIE.*
 import org.xtext.hipie.hIPIE.VisBasisQualifiers
 import org.eclipse.xtext.scoping.impl.MapBasedScope
-import java.util.Collection
+import java.util.List
+import org.eclipse.emf.common.util.BasicEList
+import org.eclipse.emf.common.util.EList
+import org.eclipse.emf.ecore.EObject
 import org.eclipse.xtext.resource.IEObjectDescription
+import java.util.AbstractList
+import java.util.ArrayList
+import org.eclipse.xtext.resource.EObjectDescription
 
 /**
  * This class contains custom scoping description.
@@ -38,9 +44,7 @@ class HIPIEScopeProvider extends org.eclipse.xtext.scoping.impl.AbstractDeclarat
     		if (parent.eContents.get(i) instanceof OutputSection)
     			return getScope(parent.eContents.get(i), ref)
     }
-
-
-	/* 
+	
     def scope_Function_vars(VisBasisQualifiers context, EReference ref) {
  		val parent = context.eContainer
     	if (parent instanceof VisBasis)
@@ -48,35 +52,52 @@ class HIPIEScopeProvider extends org.eclipse.xtext.scoping.impl.AbstractDeclarat
 			val function_container = parent as VisBasis
 			if (function_container.basis.out_base != null)
 			{
-				val origin = function_container.basis.out_base.base		
+				val origin = function_container.basis.out_base.base
 				val list_1 = Scopes::scopedElementsFor(origin.eContents)
-				val list_2 = Scopes::scopedElementsFor(function_container.basis.eContents)
+				var list_ecl_fields = (function_container.basis.eAllContents.filter(ECLFieldType).toIterable)
+				val list_2 = Scopes::scopedElementsFor(list_ecl_fields)
 				val list = list_1 + list_2 
 				return MapBasedScope::createScope(IScope::NULLSCOPE , list)
 			}
 			else
-				return getScope(function_container.basis , ref)
-    	}
-    }
-    
-    def scope_Function_vars(VisualOption context, EReference ref) {
- 		val parent = context.eContainer 		
-    	if (parent instanceof VisualOptions)
-    	{	    		
-			val function_container = parent.eContainer as Visualization
-			if (function_container.parens.input.basis.out_base != null)
 			{
-				val origin = function_container.parens.input.basis.out_base.base		
-				val list_1 = Scopes::scopedElementsFor(origin.eContents)
-				val list_2 = Scopes::scopedElementsFor(function_container.parens.input.basis.eContents)
-				val list = list_1 + list_2 
-				return MapBasedScope::createScope(IScope::NULLSCOPE , list)
+				var list_ecl_fields = (function_container.basis.eAllContents.filter(ECLFieldType).toIterable)
+				return Scopes::scopeFor(list_ecl_fields)
 			}
-			else
-				return getScope(function_container.parens.input.basis , ref)
     	}
     }
     
-    */
-      
+   
+    def scope_Function_vars(VisualOptions context, EReference ref) {
+ 		val parent = context.eContainer
+    	if (parent instanceof Visualization)
+    	{
+			val viz = parent as Visualization
+			val function_container = viz.parens.input
+			if (function_container.quals == null)
+			{
+				if (function_container.basis.out_base != null)
+				{
+					val origin = function_container.basis.out_base.base
+					val list_1 = Scopes::scopedElementsFor(origin.eContents)
+					var list_ecl_fields = (function_container.basis.eAllContents.filter(ECLFieldType).toIterable)
+					val list_2 = Scopes::scopedElementsFor(list_ecl_fields)
+					val list = list_1 + list_2 
+					return MapBasedScope::createScope(IScope::NULLSCOPE , list)
+				}
+				else
+				{
+					var list_ecl_fields = (function_container.basis.eAllContents.filter(ECLFieldType).toIterable)
+					return Scopes::scopeFor(list_ecl_fields)
+				}
+			}
+			else
+			{
+				println("hello")
+				var valid_vars = (function_container.quals.eAllContents.filter(PosVizData).toIterable)
+				return Scopes::scopeFor(valid_vars)
+			}
+    	}
+    }
+    
 }

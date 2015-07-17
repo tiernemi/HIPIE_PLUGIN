@@ -96,7 +96,33 @@ class HIPIEOutlineTreeProvider extends org.eclipse.xtext.ui.editor.outline.impl.
 		var namestring = new StyledString(label_string) 
 		return typestring.append(" : ").append(namestring)
 	}
-    
+	
+	// Permissions //
+	
+    def public Object _text(Permission obj) 
+    {
+      var namestring = new StyledString(obj.type)
+      var permstring = new StyledString("")
+      
+      if (obj.per != null)
+      {
+      	permstring = permstring.append(" : ")
+      	permstring = permstring.append(new StyledString(obj.per, stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle())))
+      }
+      if (obj.cust_levs.size != 0)
+      	for (i : 0..<obj.cust_levs.size)
+      	{
+      		if(permstring.length != 0)
+  				permstring = permstring.append(new StyledString(" , " , stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle())))
+  			else
+  				permstring = permstring.append(new StyledString(" : "))
+			permstring = permstring.append(new StyledString(obj.cust_levs.get(i).type, stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle())))
+      	}
+      
+      var label_string = namestring.append(permstring)
+      return label_string
+    }	
+
     // Inputs //
     
     def public Object _text(Bool obj) 
@@ -439,6 +465,11 @@ class HIPIEOutlineTreeProvider extends org.eclipse.xtext.ui.editor.outline.impl.
     		return false
     }
     
+    def protected boolean _isLeaf(CustomPermissionLevel obj)
+    {
+    	return true
+    }
+    
     // Input section //
     def protected void _createNode(IOutlineNode parentNode, InputSection in_sec)
     {
@@ -502,7 +533,31 @@ class HIPIEOutlineTreeProvider extends org.eclipse.xtext.ui.editor.outline.impl.
     		createNode(parentNode , en.en_ents.get(i).val_l)
     }
     
-   // Output Section //
+    // Contract Instances //
+    def protected void _createNode(IOutlineNode parentNode, InstanceOptions obj)
+    {
+    	
+    }
+    
+    def protected void _createNode(IOutlineNode parentNode, InstanceID obj)
+    {
+    	
+    }
+    
+    def protected boolean _isLeaf(ContractInstance obj) 
+    {
+    	if (obj.assigns.size == 0)
+			return true
+		else
+			return false
+    }
+    
+    def protected boolean _isLeaf(Assign obj) 
+    {
+		return true 
+    }
+    
+    // Output Section //
     def protected void _createNode(IOutlineNode parentNode, OutputSection obj)
     {
     	if (obj.outputs.size != 0)
@@ -608,12 +663,21 @@ class HIPIEOutlineTreeProvider extends org.eclipse.xtext.ui.editor.outline.impl.
 			return true
     }
     
-    def protected void _createNode(IOutlineNode parentNode, VisualOptions vis_ops)
+    def protected boolean _isLeaf(Visualization obj) {
+			return true
+    }
+    
+    def protected void _createNode(IOutlineNode parentNode, VisualOptions obj)
     {
     	
     }
     
-    def protected void _createNode(IOutlineNode parentNode, VisInputValue vis_in)
+    def protected void _createNode(IOutlineNode parentNode, VisualSectionOptions obj)
+    {
+    	
+    }
+    
+    def protected void _createNode(IOutlineNode parentNode, VisInputValue obj)
     {
     	
     }

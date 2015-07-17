@@ -76,7 +76,7 @@ InstanceOption:
 ;
 
 ContractInstance: 
-	'INSTANCE' name=TOKEN instId=InstanceID options=InstanceOptions? (assigns+=Assign)* -> 'END'
+	'INSTANCE' name=TOKEN instId=InstanceID options=InstanceOptions? (assigns+=Assign)*  'END'
 ;
 
 FieldDecl: 
@@ -266,12 +266,14 @@ NestedDatasetDecl:
 ;
 				
 OutputOption: 
-	type=('SIDE'|'LARGE'|'SMALL'|'FEW'|'WUID'|'APPEND'|'SCOREDSEARCH'|'DATABOMB'|'OPTIONAL') | 
-    (atr=('WUID'|'FROM') '(' name=TOKEN ')') |
+	type=('SIDE'|'LARGE'|'SMALL'|'FEW'|'APPEND'|'SCOREDSEARCH'|'DATABOMB'|'OPTIONAL') | 
+    (atr=('FROM') '(' name=TOKEN ')') |
+    (atr='WUID') ('(' (name=TOKEN|val_list=ValueList) ')')? |
+    (atr='SOAP') '(' val_list=ValueList|vals=Value ')' |
     (atr='ENABLE' '(' assigns=AssignList ')') |
     (atr='PREFIX' '(' (name=TOKEN) ')') |
-    (atr=('WUID'|'FILLS'|'SOAP') '(' vals=ValueList ')') |
-    (atr=('DESCRIPTION'|'SOAP'|'JSON'|'ROXIE'|'XPATH') '(' vals=Value ')')
+    (atr=('FILLS') '(' val_list=ValueList ')') |
+    (atr=('DESCRIPTION'|'JSON'|'ROXIE'|'XPATH') '(' vals=Value ')')
 ;
                 
 OutputOptions: 
@@ -306,12 +308,12 @@ Permissions:
 ;
 
 Permission: 
-	type=('VIEW'|'EDIT'|'RUN') ':' ('PUBLIC'|'PRIVATE'|cust_levs+=CustomPermissionLevel (',' cust_levs+=CustomPermissionLevel
+	type=('VIEW'|'EDIT'|'RUN') ':' (per='PUBLIC'|per='PRIVATE'|cust_levs+=CustomPermissionLevel (',' cust_levs+=CustomPermissionLevel
 	)?) ';'
 ;
 
 CustomPermissionLevel:
-	('USER'|'GROUP') '(' vals+=Value (',' vals+=Value)* ')'
+	type=('USER'|'GROUP') '(' vals+=Value (',' vals+=Value)* ')'
 ; 
  
                
@@ -324,11 +326,11 @@ GenerateBodyInline :
 ;  
 
 GenerateBodySalt :
-	'GENERATES' type='SALT' '(' name=TOKEN ')' ':' op=('SCOREDSEARCH'|'PROFILE') => 'ENDGENERATES'               
+	'GENERATES' type='SALT' '(' name=TOKEN ')' ':' op=('SCOREDSEARCH'|'PROFILE') 'ENDGENERATES'               
 ;
 
 GenerateBodyKel :
-	'GENERATES' type='KEL' '(' name=TOKEN ')' => 'ENDGENERATES' 
+	'GENERATES' type='KEL' '(' name=TOKEN ')' 'ENDGENERATES' 
 ;
 
 VisualSection: 
@@ -357,7 +359,7 @@ VisBasis:
 ;
 
 VisFilter :
-	'(' + vals+=Value + ')'
+	'(' + vals+=[ECLFieldType|TOKEN] + ')'
 ;
 
 VisBasisQualifiers: 
@@ -365,15 +367,15 @@ VisBasisQualifiers:
 ;
 
 PosVizData : 
-	types=(ECLFieldType | FieldDecl)
+	(ECLFieldType | FieldDecl)
 ;
 
 Function: 
-	/*vars=[PosVizData] |*/  vals=Value |
-	/*'-' vars=[PosVizData] |*/  '-' vals=Value |
+	vars=[PosVizData|TOKEN] |  vals=Value |
+	'-' vars=[PosVizData|TOKEN] | '-' vals=Value |
     AggFunction | '-' AggFunction |
     CountFunction | '-' CountFunction |
-    'SCALE' '(' (/*(vars=[PosVizData])|*/CountFunction|AggFunction) ',' type=INT ')'
+    'SCALE' '(' ((vars=[PosVizData|TOKEN])|CountFunction|AggFunction) ',' type=INT ')'
 ;
 
 QFunction:
@@ -397,9 +399,9 @@ VisualSectionOptions:
 ;
 
 VisualSectionOption: 
-	(name='LABEL'|name='TITLE') '(' vals=Value ')' | 
-	name='ENABLE' '(' assigns=AssignList ')' |
-	(name='EXPLORE' | name='PRIMARY')
+	type=('LABEL'|'TITLE') '(' vals=Value ')' | 
+	type='ENABLE' '(' assigns=AssignList ')' |
+	type=('EXPLORE' |'PRIMARY')
 ;
 
 VizAssign: 
@@ -411,7 +413,7 @@ VizAssignList:
 ;
 
 VizEnumDecl: 
-	name='ENUM' '(' assigns=VizAssignList ')'
+	type='ENUM' '(' assigns=VizAssignList ')'
 ;
 
 VisualOptions: 
@@ -419,16 +421,16 @@ VisualOptions:
 ;
 
 VisualOption: 
-	(name='TITLE'|name='DATE'|name='DESCRIPTION'|name='PICTURE'|name='STATE'|name='COUNTY'|name='FIRST'|name='WEIGHT'|name='SIZE'|name='LEVELS'|name='LEVEL'|name='UID'|name='TYPE') '(' funcs+=Function ')' |
-    (name='ICON'|name='FLAG'|name='TYPE') '(' funcs+=Function (',' decl=VizEnumDecl)? ')' |
+	type=('TITLE'|'DATE'|'DESCRIPTION'|'PICTURE'|'STATE'|'COUNTY'|'FIRST'|'WEIGHT'|'SIZE'|'LEVELS'|'LEVEL'|'UID'|'TYPE') '(' funcs+=Function ')' |
+    type=('ICON'|'FLAG'|'TYPE') '(' funcs+=Function (',' decl=VizEnumDecl)? ')' |
     vis_cust=VisualCustomOption |
-    name='COLLAPSE' | 
-    name='VISIBILITY' '(' visibility_op=VisibilityOption ')' |
-    name='ENABLE' '(' assigns+=AssignList ')' |
-    VisualCustomOption '(' funcs+=Function ( ',' funcs+=Function)* ')' |
-    VisualMultival '(' funcs+=Function ( ',' funcs+=Function )* ')'|
-    SelectOption |
-    LinkOption
+    type='COLLAPSE' | 
+    type='VISIBILITY' '(' visibility_op=VisibilityOption ')' |
+    type='ENABLE' '(' assigns+=AssignList ')' |
+    vis_cust=VisualCustomOption '(' funcs+=Function ( ',' funcs+=Function)* ')' |
+    type=VisualMultival '(' funcs+=Function ( ',' funcs+=Function )* ')'|
+    select_op=SelectOption |
+    link_op=LinkOption
 ;
                
 SelectEvent:
@@ -448,11 +450,11 @@ LinkOption:
 ;                         
                
 VisualMultival: 
-	(name='X'|name='Y'|name='COLOR'|name='RANGE'|name='FILTER'|name='LABEL'|name='VALUE'|name='SORT'|name='BRANCHES')
+	('X'|'Y'|'COLOR'|'RANGE'|'FILTER'|'LABEL'|'VALUE'|'SORT'|'BRANCHES')
 ;
 
 VisibilityOption:
-	(name='MODAL'|name='VISIBLE')
+	('MODAL'|'VISIBLE')
 ;
 
 VisualCustomOption:
