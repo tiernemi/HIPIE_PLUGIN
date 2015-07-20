@@ -258,10 +258,10 @@
    <extension
             point="org.eclipse.ui.preferencePages">
         <page
-              category="org.xtext.hipie.HIPIE"
-              class="org.xtext.hipie.ui.HIPIEExecutableExtensionFactory:org.eclipse.xtext.ui.editor.preferences.LanguageRootPreferencePage"
-              id="org.xtext.hipie.HIPIE.compiler.preferencePage"
-              name="Compiler">
+            category="org.xtext.hipie.HIPIE"
+            class="org.xtext.hipie.ui.HIPIEExecutableExtensionFactory:org.eclipse.xtext.builder.preferences.BuilderPreferencePage"
+            id="org.xtext.hipie.HIPIE.compiler.preferencePage"
+            name="Compiler">
             <keywordReference id="org.xtext.hipie.ui.keyword_HIPIE"/>
         </page>
     </extension>
@@ -420,47 +420,6 @@
             extension="dud"
             type="text">
     </fileTypes>
-  </extension>
-  <extension
-        point="org.eclipse.core.runtime.preferences">
-     <initializer
-           class="org.xtext.hipie.ui.CompilerPreferenceInitialiser">
-     </initializer>
-  </extension>
-  <extension
-        point="org.eclipse.ui.views">
-     <view
-           class="org.xtext.hipie.viz.VizualiserPart"
-           id="EvanView"
-           name="Viz"
-           restorable="true">
-     </view>
-  </extension>
-  <extension
-        point="org.eclipse.ui.menus">
-     <menuContribution
-           allPopups="false"
-           locationURI="menu:file?after=additions">
-        <command
-              commandId="VizCommand"
-              label="Visualise"
-              style="push">
-        </command>
-     </menuContribution>
-  </extension>
-  <extension
-        point="org.eclipse.ui.commands">
-     <command
-           id="VizCommand"
-           name="Visualize">
-     </command>
-  </extension>
-  <extension
-        point="org.eclipse.ui.handlers">
-     <handler
-           class="org.xtext.hipie.viz.OpenViewCommand"
-           commandId="VizCommand">
-     </handler>
   </extension>
 
 </plugin>
