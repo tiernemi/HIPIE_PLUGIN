@@ -5,10 +5,19 @@ import org.eclipse.xtext.ui.editor.outline.actions.SortOutlineContribution.Defau
 import org.eclipse.xtext.ui.editor.outline.impl.EObjectNode;
 import org.eclipse.xtext.ui.editor.outline.impl.EStructuralFeatureNode;
 
+/**
+ * @author Michael Tierney
+ * 
+ * This class overrides the default alphabetical ordering of the outline such that the
+ * main HIPIE plugin outline always remains the same.
+ */
+
+
 public class HIPIEOutlineOrdering extends DefaultComparator {
-    @Override
+ 	
+	@Override
     public int getCategory(IOutlineNode node) {
-      if (node instanceof EStructuralFeatureNode)
+    if (node instanceof EStructuralFeatureNode)
       {
     	 if(node.getText().equals("Composition Header"))
     		 return -10 ;

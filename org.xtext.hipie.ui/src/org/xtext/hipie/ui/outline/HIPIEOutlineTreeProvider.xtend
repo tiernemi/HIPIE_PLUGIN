@@ -25,7 +25,8 @@ import org.eclipse.swt.graphics.FontData
 class HIPIEOutlineTreeProvider extends org.eclipse.xtext.ui.editor.outline.impl.DefaultOutlineTreeProvider {
 	
 	
-	// Outline label definitions
+	// Outline label definitions //
+	
 	@Inject
     private StylerFactory stylerFactory;
      
@@ -53,8 +54,8 @@ class HIPIEOutlineTreeProvider extends org.eclipse.xtext.ui.editor.outline.impl.
     }
     
     // Base Props //
-   	def public Object _text(BaseProp obj) 
-	{
+    
+   	def public Object _text(BaseProp obj) {
 		var label_string = ""
 		if (obj.val_list != null)
 		{
@@ -99,8 +100,7 @@ class HIPIEOutlineTreeProvider extends org.eclipse.xtext.ui.editor.outline.impl.
 	
 	// Permissions //
 	
-    def public Object _text(Permission obj) 
-    {
+    def public Object _text(Permission obj) {
       var namestring = new StyledString(obj.type)
       var permstring = new StyledString("")
       
@@ -125,96 +125,84 @@ class HIPIEOutlineTreeProvider extends org.eclipse.xtext.ui.editor.outline.impl.
 
     // Inputs //
     
-    def public Object _text(Bool obj) 
-    {
+    def public Object _text(Bool obj) {
       var typestring = new StyledString(obj.type , stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
       var namestring = new StyledString(obj.name)
       var label_string = namestring.append(" : ").append(typestring)
       return label_string
     }
     
-    def public Object _text(FieldDecl obj)
-	{
+    def public Object _text(FieldDecl obj) {
       var typestring = new StyledString(obj.type , stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
       var namestring = new StyledString(obj.name)
       var label_string = namestring.append(" : ").append(typestring)
       return label_string
 	}
 	
-	def public Object _text(IntVar obj)
-	{
+	def public Object _text(IntVar obj) {
       var typestring = new StyledString(obj.type , stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
       var namestring = new StyledString(obj.name)
       var label_string = namestring.append(" : ").append(typestring)
       return label_string
 	}
 	
-	def public Object _text(StringVar obj)
-	{
+	def public Object _text(StringVar obj) {
       var typestring = new StyledString(obj.type , stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
       var namestring = new StyledString(obj.name)
       var label_string = namestring.append(" : ").append(typestring)
       return label_string
 	}
 	
-	def public Object _text(Group obj)
-	{
+	def public Object _text(Group obj) {
       var typestring = new StyledString(obj.type , stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
       var namestring = new StyledString(obj.name)
       var label_string = namestring.append(" : ").append(typestring)
       return label_string
 	}
 	
-	def public Object _text(Real obj)
-	{
+	def public Object _text(Real obj) {
       var typestring = new StyledString(obj.type , stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
       var namestring = new StyledString(obj.name)
       var label_string = namestring.append(" : ").append(typestring)
       return label_string
 	}
 	
-	def public Object _text(Record obj)
-	{
+	def public Object _text(Record obj) {
       var typestring = new StyledString(obj.type , stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
       var namestring = new StyledString(obj.name)
       var label_string = namestring.append(" : ").append(typestring)
       return label_string
 	}
 	
-	def public Object _text(KelAttrDecl obj)
-	{
+	def public Object _text(KelAttrDecl obj) {
       var typestring = new StyledString(obj.type , stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
       var namestring = new StyledString(obj.name)
       var label_string = namestring.append(" : ").append(typestring)
       return label_string
 	}
 	
-	def public Object _text(KelEntityDecl obj)
-	{
+	def public Object _text(KelEntityDecl obj) {
       var typestring = new StyledString(obj.type , stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
       var namestring = new StyledString(obj.name)
       var label_string = namestring.append(" : ").append(typestring)
       return label_string
 	}
 	
-	def public Object _text(KelEntityDeclSimple obj)
-	{
+	def public Object _text(KelEntityDeclSimple obj) {
       var typestring = new StyledString(obj.type , stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
       var namestring = new StyledString(obj.name)
       var label_string = namestring.append(" : ").append(typestring)
       return label_string
 	}
 	
-	def public Object _text(KelBase obj)
-	{
+	def public Object _text(KelBase obj) {
       var typestring = new StyledString(obj.type , stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
       var namestring = new StyledString(obj.name)
       var label_string = namestring.append(" : ").append(typestring)
       return label_string
 	}
 	
-	def public Object _text(Dataset obj)
-	{
+	def public Object _text(Dataset obj) {
       var typestring = new StyledString(obj.type , stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
       var namestring = new StyledString(obj.name)
       var label_string = namestring.append(" : ").append(typestring)
@@ -222,8 +210,8 @@ class HIPIEOutlineTreeProvider extends org.eclipse.xtext.ui.editor.outline.impl.
 	}
     
     // Outputs //
-    def public Object _text(ECLFieldType obj)
-    {
+    
+    def public Object _text(ECLFieldType obj) {
     	var typestring = new StyledString()
     	var namestring = new StyledString(obj.name)
     	switch obj 
@@ -245,8 +233,7 @@ class HIPIEOutlineTreeProvider extends org.eclipse.xtext.ui.editor.outline.impl.
       	return label_string
     }
     
-    def public Object _text(OutDataset obj)
-	{
+    def public Object _text(OutDataset obj) {
 		var typestring = new StyledString(obj.type, stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
 		var optionstring = new StyledString("")
 		var basestring = new StyledString("")
@@ -280,8 +267,7 @@ class HIPIEOutlineTreeProvider extends org.eclipse.xtext.ui.editor.outline.impl.
     	return label_string
 	}
 	
-	def public Object _text(NestedDatasetDecl obj)
-	{
+	def public Object _text(NestedDatasetDecl obj) {
 		var typestring = new StyledString(obj.type, stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
 		var optionstring = new StyledString("")
 		var namestring = new StyledString(obj.name)
@@ -307,8 +293,7 @@ class HIPIEOutlineTreeProvider extends org.eclipse.xtext.ui.editor.outline.impl.
     	return label_string	
 	}
 	
-	def public Object _text(Service obj)
-	{
+	def public Object _text(Service obj) {
 		var typestring = new StyledString(obj.type, stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
 		var optionstring = new StyledString("")
 		var namestring = new StyledString(obj.name)
@@ -334,45 +319,40 @@ class HIPIEOutlineTreeProvider extends org.eclipse.xtext.ui.editor.outline.impl.
     	return label_string	
 	}
 	
-	def public Object _text(ServiceInputSection obj)
-	{
+	def public Object _text(ServiceInputSection obj) {
 		return "Inputs"
 	}
 	
 	// Generates //
     
-	def public Object _text(GenerateBodyInline obj)
-	{
+	def public Object _text(GenerateBodyInline obj) {
 		return new StyledString("INLINE", stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
 	}
 	
-	def public Object _text(GenerateBodySalt obj)
-	{
+	def public Object _text(GenerateBodySalt obj) {
 		var typestring = new StyledString(obj.type, stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
 		var namestring = new StyledString(obj.name)
 		var label_string = namestring.append(" : ").append(typestring)
 		return label_string
 	}
 	
-	def public Object _text(GenerateBodyKel obj)
-	{
+	def public Object _text(GenerateBodyKel obj) {
 		var typestring = new StyledString(obj.type, stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
 		var namestring = new StyledString(obj.name)
 		var label_string = namestring.append(" : ").append(typestring)
 		return label_string
 	}
 	
-	// Visualisation Section //
-	def public Object _text(VisualSection obj)
-	{
+	// Visualization Section //
+	
+	def public Object _text(VisualSection obj) {
 		var typestring = new StyledString(obj.type , stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
 		var namestring = new StyledString(obj.name)
 		var label_string = namestring.append(" : ").append(typestring)
 		return label_string
 	}
 	
-	def public Object _text(Visualization obj)
-	{
+	def public Object _text(Visualization obj){
 		var typestring = new StyledString(obj.type , stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
 		var namestring = new StyledString(obj.name)
 		var label_string = namestring
@@ -386,8 +366,7 @@ class HIPIEOutlineTreeProvider extends org.eclipse.xtext.ui.editor.outline.impl.
 		return label_string
 	}
 	
-	def public Object _text(ResourceValue obj)
-	{
+	def public Object _text(ResourceValue obj) {
 		var typestring = new StyledString(obj.res_type.type, stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
 		var namestring = new StyledString(obj.name)
 		var label_string = namestring.append(" : ").append(typestring)
@@ -397,37 +376,41 @@ class HIPIEOutlineTreeProvider extends org.eclipse.xtext.ui.editor.outline.impl.
 		
 	//....Outline modifications....///
 
+	def protected void _createNode(IOutlineNode parentNode, Const obj) {
+		
+	}
+ 
 	
 	// Main outline framework //
-	def protected void _createChildren(DocumentRootNode parentNode,
-           Program prog) {
+	
+	def protected void _createChildren(DocumentRootNode parentNode, Program prog) {
+			if (prog.composition_header != null)
+       			createEStructuralFeatureNode(parentNode, prog, HIPIEPackage.Literals.PROGRAM__COMPOSITION_HEADER , null as Image , "Composition Header", false)
            	if (prog.base_props != null)
       			createEStructuralFeatureNode(parentNode, prog, HIPIEPackage.Literals.PROGRAM__BASE_PROPS , null as Image , "Plugin Properties", false)
       		if (prog.permissions != null)
        			createEStructuralFeatureNode(parentNode, prog, HIPIEPackage.Literals.PROGRAM__PERMISSIONS , null as Image , "Plugin Permissions", false)
        		if (prog.input_section != null)
        			createEStructuralFeatureNode(parentNode, prog, HIPIEPackage.Literals.PROGRAM__INPUT_SECTION , null as Image , "Inputs", false)
+       		if (prog.contract_instances.size != 0)
+       			createEStructuralFeatureNode(parentNode, prog, HIPIEPackage.Literals.PROGRAM__CONTRACT_INSTANCES , null as Image , "Contract Instances", false)       			
        		if (prog.output_section != null)
        			createEStructuralFeatureNode(parentNode, prog, HIPIEPackage.Literals.PROGRAM__OUTPUT_SECTION , null as Image , "Outputs", false)
+       		if (prog.integrate_section != null)
+       			createEStructuralFeatureNode(parentNode, prog, HIPIEPackage.Literals.PROGRAM__INTEGRATE_SECTION , null as Image , "Integrates", false)       			
        		if (prog.visual_section.size != 0)
-       			createEStructuralFeatureNode(parentNode, prog, HIPIEPackage.Literals.PROGRAM__VISUAL_SECTION , null as Image , "Visualize", false)
-       		if (prog.resource_section != null)
-       			createEStructuralFeatureNode(parentNode, prog, HIPIEPackage.Literals.PROGRAM__RESOURCE_SECTION , null as Image , "Resources", false)
+       			createEStructuralFeatureNode(parentNode, prog, HIPIEPackage.Literals.PROGRAM__VISUAL_SECTION , null as Image , "Visualize", false)       		
+       		if (prog.generate_section != null)
+       			createEStructuralFeatureNode(parentNode, prog, HIPIEPackage.Literals.PROGRAM__GENERATE_SECTION , null as Image , "Generates", false)       		
        		if (prog.custom_section != null)
        			createEStructuralFeatureNode(parentNode, prog, HIPIEPackage.Literals.PROGRAM__CUSTOM_SECTION , null as Image , "Custom", false)
-       		if (prog.generate_section != null)
-       			createEStructuralFeatureNode(parentNode, prog, HIPIEPackage.Literals.PROGRAM__GENERATE_SECTION , null as Image , "Generates", false)
-       		if (prog.composition_header != null)
-       			createEStructuralFeatureNode(parentNode, prog, HIPIEPackage.Literals.PROGRAM__COMPOSITION_HEADER , null as Image , "Composition Header", false)
-       		if (prog.contract_instances.size != 0)
-       			createEStructuralFeatureNode(parentNode, prog, HIPIEPackage.Literals.PROGRAM__CONTRACT_INSTANCES , null as Image , "Contract Instances", false)
-       		if (prog.integrate_section != null)
-       			createEStructuralFeatureNode(parentNode, prog, HIPIEPackage.Literals.PROGRAM__INTEGRATE_SECTION , null as Image , "Integrates", false)
+       		if (prog.resource_section != null)
+       			createEStructuralFeatureNode(parentNode, prog, HIPIEPackage.Literals.PROGRAM__RESOURCE_SECTION , null as Image , "Resources", false)    
     }
     
     // Composition Header //
-    def protected void _createNode(IOutlineNode parentNode, CompositionHeader obj)
-    {
+    
+    def protected void _createNode(IOutlineNode parentNode, CompositionHeader obj) {
     	if (obj.assigns.size != 0)
     	{
     		for (i : 0..<obj.assigns.size)
@@ -435,8 +418,7 @@ class HIPIEOutlineTreeProvider extends org.eclipse.xtext.ui.editor.outline.impl.
     	}  	
     }
     
-    def protected boolean _isLeaf(CompositionHeader obj) 
-    {
+    def protected boolean _isLeaf(CompositionHeader obj) {
 		if (obj.assigns.size==0)
 			return true 
 		else
@@ -444,35 +426,31 @@ class HIPIEOutlineTreeProvider extends org.eclipse.xtext.ui.editor.outline.impl.
     }
     
     // Base Properties //
-    def protected boolean _isLeaf(BaseProp obj) 
-    {
+    def protected boolean _isLeaf(BaseProp obj) {
 		return true 
     }
     
     // Permissions //
-    def protected void _createNode(IOutlineNode parentNode, Permissions obj)
-    {
+    def protected void _createNode(IOutlineNode parentNode, Permissions obj) {
     	if (obj.perms.size != 0)
     		for (i : 0..<obj.perms.size)
     			createNode(parentNode, obj.perms.get(i))
     }
        
-    def protected boolean _isLeaf(Permissions obj)
-    {
+    def protected boolean _isLeaf(Permissions obj) {
     	if (obj.perms.size == 0)
     		return true
     	else
     		return false
     }
     
-    def protected boolean _isLeaf(CustomPermissionLevel obj)
-    {
+    def protected boolean _isLeaf(CustomPermissionLevel obj) {
     	return true
     }
     
     // Input section //
-    def protected void _createNode(IOutlineNode parentNode, InputSection in_sec)
-    {
+    
+    def protected void _createNode(IOutlineNode parentNode, InputSection in_sec) {
     	if (in_sec.inputs.size != 0)
     	{
     		for (i : 0..<in_sec.inputs.size)
@@ -480,86 +458,75 @@ class HIPIEOutlineTreeProvider extends org.eclipse.xtext.ui.editor.outline.impl.
     	}  	
     }
     
-    def protected boolean _isLeaf(Dataset dat)
-    {
+    def protected boolean _isLeaf(Dataset dat) {
     	if (dat.fields.size == 0)
     		return true
     	else
     		return false
     }
     
-    def protected boolean _isLeaf(KelBase kel)
-    {
+    def protected boolean _isLeaf(KelBase kel) {
     	if (kel.kels.size == 0)
     		return true
     	else
     		return false
     }
     
-    def protected boolean _isLeaf(KelEntityDecl kel_dec)
-    {
+    def protected boolean _isLeaf(KelEntityDecl kel_dec) {
     	if (kel_dec.attrdecl == null)
     		return true
     	else
     		return false
     }
     
-    def protected boolean _isLeaf(KelEntityDeclSimple kel_dec)
-    {
+    def protected boolean _isLeaf(KelEntityDeclSimple kel_dec) {
     	return true
     }
     
-    def protected boolean _isLeaf(KelAttrDecl kel_att)
-    {
+    def protected boolean _isLeaf(KelAttrDecl kel_att) {
     	return true
     }
     
-    def protected boolean _isLeaf(FieldDecl field_decl)
-    {
+    def protected boolean _isLeaf(FieldDecl field_decl) {
     	return true ;
     }
     
-    def protected boolean _isLeaf(Group gr)
-    {
+    def protected boolean _isLeaf(Group gr) {
     	if(gr.vals.size == 0)
     		return true
     	else
     		return false
     }
     
-    def protected void _createNode(IOutlineNode parentNode, EnumList en)
-    {
+    def protected void _createNode(IOutlineNode parentNode, EnumList en) {
     	for(i : 0..<en.en_ents.size)
     		createNode(parentNode , en.en_ents.get(i).val_l)
     }
     
     // Contract Instances //
-    def protected void _createNode(IOutlineNode parentNode, InstanceOptions obj)
-    {
+    
+    def protected void _createNode(IOutlineNode parentNode, InstanceOptions obj) {
     	
     }
     
-    def protected void _createNode(IOutlineNode parentNode, InstanceID obj)
-    {
+    def protected void _createNode(IOutlineNode parentNode, InstanceID obj) {
     	
     }
     
-    def protected boolean _isLeaf(ContractInstance obj) 
-    {
+    def protected boolean _isLeaf(ContractInstance obj) {
     	if (obj.assigns.size == 0)
 			return true
 		else
 			return false
     }
     
-    def protected boolean _isLeaf(Assign obj) 
-    {
+    def protected boolean _isLeaf(Assign obj) {
 		return true 
     }
     
     // Output Section //
-    def protected void _createNode(IOutlineNode parentNode, OutputSection obj)
-    {
+    
+    def protected void _createNode(IOutlineNode parentNode, OutputSection obj) {
     	if (obj.outputs.size != 0)
     	{
     		for (i : 0..<obj.outputs.size)
@@ -567,65 +534,55 @@ class HIPIEOutlineTreeProvider extends org.eclipse.xtext.ui.editor.outline.impl.
     	}  	
     }
     
-    def protected void _createNode(IOutlineNode parentNode, OutTypeSimple obj)
-    {
+    def protected void _createNode(IOutlineNode parentNode, OutTypeSimple obj) {
     	createNode(parentNode, obj.vals)
     }
     
-    def protected void _createNode(IOutlineNode parentNode, ECLOutputDecl obj)
-    {
+    def protected void _createNode(IOutlineNode parentNode, ECLOutputDecl obj) {
     	if (obj.ecl_field_type != null)
     		createNode(parentNode, obj.ecl_field_type)
     	else
     		createNode(parentNode, obj.nest)
     }
     
-    def protected void _createNode(IOutlineNode parentNode, ServiceInputValue obj)
-    {
+    def protected void _createNode(IOutlineNode parentNode, ServiceInputValue obj) {
     	if (obj.ecl_field_type != null)
     		createNode(parentNode, obj.ecl_field_type)
     	else
     		createNode(parentNode, obj.nest)
     }
     
-    def protected void _createNode(IOutlineNode parentNode, OutputOptions obj)
-	{
+    def protected void _createNode(IOutlineNode parentNode, OutputOptions obj) {
 			
 	}
     
-	def protected void _createNode(IOutlineNode parentNode, OutputBase obj)
-	{
+	def protected void _createNode(IOutlineNode parentNode, OutputBase obj) {
 		 	
 	}
     
-    def protected boolean _isLeaf(Value obj) 
-    {
+    def protected boolean _isLeaf(Value obj) {
 		return true 
     }
     
-    def protected boolean _isLeaf(ECLFieldType obj)
-    {
+    def protected boolean _isLeaf(ECLFieldType obj) {
     	return true 	
     }
     
-    def protected boolean _isLeaf(OutDataset obj)
-    {
+    def protected boolean _isLeaf(OutDataset obj) {
     	if (obj.ecl_decls.size == 0)
     		return true
     	else
     		return false
     }
     
-    def protected boolean _isLeaf(NestedDatasetDecl obj)
-    {
+    def protected boolean _isLeaf(NestedDatasetDecl obj) {
     	if (obj.ecl_decls.size == 0)
     		return true
     	else
     		return false
     }
     
-    def protected boolean _isLeaf(Service obj)
-    {
+    def protected boolean _isLeaf(Service obj) {
     	if (obj.ecl_decls.size == 0 && obj.serv == 0)
     		return true
     	else
@@ -634,8 +591,7 @@ class HIPIEOutlineTreeProvider extends org.eclipse.xtext.ui.editor.outline.impl.
 
     // Generates Section //
     
-    def protected void _createNode(IOutlineNode parentNode, GenerateSection obj)
-    {
+    def protected void _createNode(IOutlineNode parentNode, GenerateSection obj) {
     	if (obj.body != null)
     	{
     		createNode(parentNode, obj.body)
@@ -667,25 +623,21 @@ class HIPIEOutlineTreeProvider extends org.eclipse.xtext.ui.editor.outline.impl.
 			return true
     }
     
-    def protected void _createNode(IOutlineNode parentNode, VisualOptions obj)
-    {
+    def protected void _createNode(IOutlineNode parentNode, VisualOptions obj) {
     	
     }
     
-    def protected void _createNode(IOutlineNode parentNode, VisualSectionOptions obj)
-    {
+    def protected void _createNode(IOutlineNode parentNode, VisualSectionOptions obj) {
     	
     }
     
-    def protected void _createNode(IOutlineNode parentNode, VisInputValue obj)
-    {
+    def protected void _createNode(IOutlineNode parentNode, VisInputValue obj) {
     	
     }
     
     // Custom Section //
     
-    def protected void _createNode(IOutlineNode parentNode, CustomSection obj)
-    {
+    def protected void _createNode(IOutlineNode parentNode, CustomSection obj) {
     	for (i : 0..<obj.cust_vals.size)
     		createNode(parentNode, obj.cust_vals.get(i))
     }
@@ -695,8 +647,7 @@ class HIPIEOutlineTreeProvider extends org.eclipse.xtext.ui.editor.outline.impl.
 		return true
     }
     
-    def protected boolean _isLeaf(CustomSection obj) 
-    {
+    def protected boolean _isLeaf(CustomSection obj) {
     	if (obj.cust_vals.size == 0)
 			return true
 		else
@@ -704,8 +655,7 @@ class HIPIEOutlineTreeProvider extends org.eclipse.xtext.ui.editor.outline.impl.
     }
     
     // Resource Section //
-    def protected void _createNode(IOutlineNode parentNode, ResourceSection obj)
-    {
+    def protected void _createNode(IOutlineNode parentNode, ResourceSection obj) {
     	if (obj.res_vals.size != 0)
     	{
     		for (i : 0..<obj.res_vals.size)
@@ -713,8 +663,7 @@ class HIPIEOutlineTreeProvider extends org.eclipse.xtext.ui.editor.outline.impl.
     	}  	
     }
  
-    def protected boolean _isLeaf(ResourceValue obj) 
-    {
+    def protected boolean _isLeaf(ResourceValue obj)  {
 			return true
     }
 }

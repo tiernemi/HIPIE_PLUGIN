@@ -35,6 +35,10 @@ Value:
 	name=UTOKEN|name=TOKEN|int_val=INT|str_val=STRING
 ;
 
+Const:
+	int_val=INT | str_val=STRING
+;
+
 ValueList: 
 	vals+=Value ( ',' vals+=Value )*
 ;
@@ -363,7 +367,7 @@ VisFilter :
 ;
 
 VisBasisQualifiers: 
-	'{' funcs=Function ( ',' qfuncs+=QFunction )* '}'
+	'{' funcs+=Function ( ',' (funcs+=Function)|(nest+=NestBasisQualifier) )* '}'
 ;
 
 PosVizData : 
@@ -371,17 +375,16 @@ PosVizData :
 ;
 
 Function: 
-	vars=[PosVizData|TOKEN] |  vals=Value |
-	'-' vars=[PosVizData|TOKEN] | '-' vals=Value |
-    AggFunction | '-' AggFunction |
-    CountFunction | '-' CountFunction |
-    'SCALE' '(' ((vars=[PosVizData|TOKEN])|CountFunction|AggFunction) ',' type=INT ')'
+	{Function}
+	(vars=[PosVizData|TOKEN] |  vals=Const |
+	'-' vars=[PosVizData|TOKEN] | '-' vals=Const |
+    agg_func=AggFunction | '-' agg_func=AggFunction |
+    count_func=CountFunction | '-' count_func=CountFunction |
+    'SCALE' '(' ((vars=[PosVizData|TOKEN])|count_func=CountFunction|agg_func=AggFunction) ',' type=INT ')')
 ;
 
-QFunction:
-	Function|NestBasisQualifier
-;
 
+// Find out what this does //
 NestBasisQualifier: 
 	(TOKEN) VisBasisQualifiers
 ;
@@ -391,7 +394,7 @@ CountFunction:
 ;
 
 AggFunction:
-	('SUM'|'AVE'|'MAX'|'MIN') '(' TOKEN  ')'
+	('SUM'|'AVE'|'MAX'|'MIN') '(' vars=[PosVizData|TOKEN]  ')'
 ;
     
 VisualSectionOptions: 
@@ -438,7 +441,7 @@ SelectEvent:
 ;
 
 SelectOptionMapping:
-	(TOKEN) '->' TOKEN ( ',' TOKEN )*
+	(src=[PosVizData|TOKEN]) '->' viz+=[Visualization|TOKEN] ( ',' viz+=[Visualization|TOKEN] )*
 ;
 
 SelectOption:

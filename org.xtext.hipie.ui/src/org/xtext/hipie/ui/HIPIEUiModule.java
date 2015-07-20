@@ -25,9 +25,11 @@ public class HIPIEUiModule extends org.xtext.hipie.ui.AbstractHIPIEUiModule {
 		 return HIPIEHighlightingCalc.class;
 		 }
 		 
+	 
 	 public Class<? extends LanguageRootPreferencePage> bindLanguageRootPreferencePage() {
 		 return HIPIEPrefPage.class;
 		 }
+	 @Override
 	 public Class<? extends IComparator>  bindOutlineFilterAndSorter$IComparator() {
 		 return HIPIEOutlineOrdering.class;
 		 }
