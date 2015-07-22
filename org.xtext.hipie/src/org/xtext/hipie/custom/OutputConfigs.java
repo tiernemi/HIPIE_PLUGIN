@@ -13,17 +13,12 @@ public class OutputConfigs implements IOutputConfigurationProvider {
 
 	  public static final String Databomb_OUTPUT = "Databomb";
 	  public static final String HTML_OUTPUT = "HTML";
-	@Override
-	public Set<OutputConfiguration> getOutputConfigurations() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	  /**
 	   * @return a set of {@link OutputConfiguration} available for the generator
 	   */
 	  
-	  /*
+	  
 	   public Set<OutputConfiguration> getOutputConfigurations() {
 	    OutputConfiguration defaultOutput = new OutputConfiguration(IFileSystemAccess.DEFAULT_OUTPUT);
 	    defaultOutput.setDescription("Output folder for generated src.");
@@ -51,5 +46,5 @@ public class OutputConfigs implements IOutputConfigurationProvider {
 	    
 	    return newHashSet(defaultOutput, Databomb, htmlgen);   
 	  }
-	  */
+	  
 	}

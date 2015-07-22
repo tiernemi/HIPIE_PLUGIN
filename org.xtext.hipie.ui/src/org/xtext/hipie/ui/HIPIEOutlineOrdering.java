@@ -2,7 +2,6 @@ package org.xtext.hipie.ui;
 
 import org.eclipse.xtext.ui.editor.outline.IOutlineNode;
 import org.eclipse.xtext.ui.editor.outline.actions.SortOutlineContribution.DefaultComparator;
-import org.eclipse.xtext.ui.editor.outline.impl.EObjectNode;
 import org.eclipse.xtext.ui.editor.outline.impl.EStructuralFeatureNode;
 
 /**

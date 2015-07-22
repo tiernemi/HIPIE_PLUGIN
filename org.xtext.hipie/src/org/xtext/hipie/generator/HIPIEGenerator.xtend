@@ -16,6 +16,14 @@ import org.eclipse.core.resources.IResource
 import org.eclipse.core.runtime.NullProgressMonitor
 import org.eclipse.core.runtime.Path
 import java.io.FileOutputStream
+import org.eclipse.ui.PlatformUI
+import org.eclipse.core.commands.Command
+import org.eclipse.ui.commands.ICommandService
+import org.eclipse.core.commands.ExecutionEvent
+import javax.inject.Inject
+import org.eclipse.e4.ui.di.UISynchronize import java.util.List
+import java.util.ArrayList
+import org.eclipse.core.resources.ProjectScope
 
 /**
  * Generates code from your model files on save.
@@ -25,25 +33,37 @@ import java.io.FileOutputStream
 class HIPIEGenerator implements IGenerator {
 	
 	override void doGenerate(Resource resource, IFileSystemAccess fsa) {
-		// Get Compiler Location //
-		val defaultCompilerPath = ResourcesPlugin.getWorkspace().getRoot().getRawLocation().toOSString()
-		var prefs = InstanceScope.INSTANCE.getNode("org.xtext.hipie.ui")
-		val compilerPath = new Path(prefs.get('Compiler Location' , defaultCompilerPath))
-		val compilerPathString = compilerPath.addTrailingSeparator.toOSString + "HIPIE.jar"
 		
-		var ws_root = ResourcesPlugin.getWorkspace().getRoot()
+		var ws_root = ResourcesPlugin.getWorkspace().getRoot() 
+			
 		if (resource.URI.isPlatformResource()) 
 		{
 			var platformString = resource.URI.toPlatformString(true)
 			var resourceFile = ws_root.findMember(platformString)
 			var project = resourceFile.project
 				
+			var projectScope = new ProjectScope(project) ;
+			var proj_prefs= projectScope.getNode("org.xtext.hipie.ui");
+		
+			// Get Compiler Location //
+			val defaultCompilerPath = ResourcesPlugin.getWorkspace().getRoot().getRawLocation().toOSString() ;
+			var work_prefs = InstanceScope.INSTANCE.getNode("org.xtext.hipie.ui");
+			val compilerPath = new Path(work_prefs.get('Compiler Location' , defaultCompilerPath))
+		
+			var selected_items = proj_prefs.node("data_prefs");
+			var select_string = selected_items.get("select_prefs", "") ;
+			var data_filestrings = select_string.split(" ")
+			var data_filepaths = new ArrayList<Path>	
+			for (i : 0..<data_filestrings.size)
+				if(data_filestrings.get(i).length() > 0)
+						data_filepaths +=  new Path(data_filestrings.get(i))		
+					
 			var ddlFilePath = resourceFile.projectRelativePath.removeFileExtension().addFileExtension("ddl")
 			var ddlFile = project.getFile(ddlFilePath)
 			println(ddlFile.rawLocation.toOSString)
 			
 			//  Generate DDL  //	
-			var ddl_cmd = "java -cp "  + compilerPathString + " org/hpcc/HIPIE/commandline/CommandLineService -databomb " + resourceFile.rawLocation.toOSString() + " -o " + ddlFile.rawLocation.toOSString() + " -verbose"
+			var ddl_cmd = "java -cp "  + compilerPath.toOSString + " org/hpcc/HIPIE/commandline/CommandLineService -databomb " + resourceFile.rawLocation.toOSString() + " -o " + ddlFile.rawLocation.toOSString() + " -verbose"
 			System.out.println(ddl_cmd)
 			var proc = Runtime.getRuntime().exec(ddl_cmd) as Process
 			var in = proc.inputStream
@@ -64,13 +84,12 @@ class HIPIEGenerator implements IGenerator {
 			//  Generate DataBomb  //
 			var databombFilePath =  resourceFile.projectRelativePath.removeFileExtension().addFileExtension("databomb");
 			var databombFile = project.getFile(databombFilePath);
-			var dataFolder = project.getFolder("data")
-			var data_file_paths = ""
-			for (i : 0..<dataFolder.members.size) {
-				data_file_paths += " " + dataFolder.members.get(i).rawLocation.toOSString() 
+			var data_cmd_string = ""
+			for (i : 0..<data_filepaths.size) {
+				data_cmd_string += " " + ws_root.getFile(data_filepaths.get(i)).rawLocation.toOSString
 			}
 			var databombFileString = databombFile.rawLocation.toOSString()
-			var dat_cmd = 'java -cp ' + compilerPathString + ' org/hpcc/HIPIE/commandline/CommandLineService -csv' + data_file_paths + ' -separator \\t -escape / -quote \\\" -lineseparator \\n -o ' + databombFileString 
+			var dat_cmd = 'java -cp ' + compilerPath.toOSString + ' org/hpcc/HIPIE/commandline/CommandLineService -csv' + data_cmd_string + ' -separator \\t -escape / -quote \\\" -lineseparator \\n -o ' + databombFileString 
 			System.out.println(dat_cmd)
 			val proc_data = Runtime.getRuntime().exec(dat_cmd) as Process ;
 			in = proc_data.inputStream
