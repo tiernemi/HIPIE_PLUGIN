@@ -16,12 +16,7 @@ import org.eclipse.core.resources.IResource
 import org.eclipse.core.runtime.NullProgressMonitor
 import org.eclipse.core.runtime.Path
 import java.io.FileOutputStream
-import org.eclipse.ui.PlatformUI
-import org.eclipse.core.commands.Command
-import org.eclipse.ui.commands.ICommandService
-import org.eclipse.core.commands.ExecutionEvent
 import javax.inject.Inject
-import org.eclipse.e4.ui.di.UISynchronize import java.util.List
 import java.util.ArrayList
 import org.eclipse.core.resources.ProjectScope
 
