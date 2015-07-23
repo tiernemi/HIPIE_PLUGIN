@@ -189,8 +189,9 @@
 		<menuContribution locationURI="popup:#TextEditorContext?endof=group.find">
 			<command commandId="org.eclipse.xtext.ui.editor.FindReferences">
 				<visibleWhen checkEnabled="false">
-                	<reference definitionId="org.xtext.hipie.HIPIE.Editor.opened">
-                	</reference>
+       <reference
+             definitionId="org.xtext.hipie.HIPIE.Editor.opened">
+       </reference>
             	</visibleWhen>
 			</command>
 		</menuContribution>
@@ -428,6 +429,7 @@
      </initializer>
   </extension>
   <extension
+<<<<<<< HEAD
         point="org.eclipse.ui.views">
      <view
            class="org.xtext.hipie.viz.VizualiserPart"
@@ -435,11 +437,20 @@
            name="Viz"
            restorable="true">
      </view>
+=======
+        point="org.eclipse.ui.commands">
+     <command
+           description="Gets the data sources"
+           id="org.xtext.hipie.ui.datasources"
+           name="Data Sources">
+     </command>
+>>>>>>> cd5c60a9f13e6953443e5c5a4d51753a456a470e
   </extension>
   <extension
         point="org.eclipse.ui.menus">
      <menuContribution
            allPopups="false"
+<<<<<<< HEAD
            locationURI="menu:file?after=additions">
         <command
               commandId="VizCommand"
@@ -462,5 +473,41 @@
            commandId="VizCommand">
      </handler>
   </extension>
+=======
+           locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
+        <toolbar
+              id="org.xtext.hipie.ui.datatool">
+           <command
+                 commandId="org.xtext.hipie.ui.datasources"
+                 icon="icons/data_folder.png"
+                 label="Data Sources"
+                 style="push">
+              <visibleWhen>
+                 <with
+                       variable="activeEditorId">
+                    <equals
+                          value="org.xtext.hipie.HIPIE">
+                    </equals>
+                 </with>
+              </visibleWhen>
+           </command>
+        </toolbar>
+     </menuContribution>
+  </extension>
+  <extension
+        point="org.eclipse.ui.handlers">
+     <handler
+           class="org.xtext.hipie.ui.handlers.DataSources"
+           commandId="org.xtext.hipie.ui.datasources">
+     </handler>
+  </extension>
+  <extension
+        point="org.eclipse.core.runtime.preferences">
+     <scope
+           class="org.eclipse.core.internal.resources.ProjectPreferences"
+           name="org.xtext.hipie.ui.projectscope">
+     </scope>
+  </extension>
+>>>>>>> cd5c60a9f13e6953443e5c5a4d51753a456a470e
 
 </plugin>

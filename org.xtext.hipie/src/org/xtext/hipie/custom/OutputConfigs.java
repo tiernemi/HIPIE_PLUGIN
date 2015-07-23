@@ -17,6 +17,8 @@ public class OutputConfigs implements IOutputConfigurationProvider {
 	  /**
 	   * @return a set of {@link OutputConfiguration} available for the generator
 	   */
+	  
+	  
 	   public Set<OutputConfiguration> getOutputConfigurations() {
 	    OutputConfiguration defaultOutput = new OutputConfiguration(IFileSystemAccess.DEFAULT_OUTPUT);
 	    defaultOutput.setDescription("Output folder for generated src.");
@@ -44,4 +46,5 @@ public class OutputConfigs implements IOutputConfigurationProvider {
 	    
 	    return newHashSet(defaultOutput, Databomb, htmlgen);   
 	  }
+	  
 	}
