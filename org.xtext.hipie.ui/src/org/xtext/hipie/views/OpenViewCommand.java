@@ -1,4 +1,4 @@
-package org.xtext.hipie.views.design_mode_browser;
+package org.xtext.hipie.views;
 
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
