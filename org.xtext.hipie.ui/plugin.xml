@@ -189,8 +189,9 @@
 		<menuContribution locationURI="popup:#TextEditorContext?endof=group.find">
 			<command commandId="org.eclipse.xtext.ui.editor.FindReferences">
 				<visibleWhen checkEnabled="false">
-                	<reference definitionId="org.xtext.hipie.HIPIE.Editor.opened">
-                	</reference>
+       <reference
+             definitionId="org.xtext.hipie.HIPIE.Editor.opened">
+       </reference>
             	</visibleWhen>
 			</command>
 		</menuContribution>
@@ -426,6 +427,52 @@
      <initializer
            class="org.xtext.hipie.ui.CompilerPreferenceInitialiser">
      </initializer>
+  </extension>
+  <extension
+        point="org.eclipse.ui.commands">
+     <command
+           description="Gets the data sources"
+           id="org.xtext.hipie.ui.datasources"
+           name="Data Sources">
+     </command>
+  </extension>
+  <extension
+        point="org.eclipse.ui.menus">
+     <menuContribution
+           allPopups="false"
+           locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
+        <toolbar
+              id="org.xtext.hipie.ui.datatool">
+           <command
+                 commandId="org.xtext.hipie.ui.datasources"
+                 icon="icons/data_folder.png"
+                 label="Data Sources"
+                 style="push">
+              <visibleWhen>
+                 <with
+                       variable="activeEditorId">
+                    <equals
+                          value="org.xtext.hipie.HIPIE">
+                    </equals>
+                 </with>
+              </visibleWhen>
+           </command>
+        </toolbar>
+     </menuContribution>
+  </extension>
+  <extension
+        point="org.eclipse.ui.handlers">
+     <handler
+           class="org.xtext.hipie.ui.handlers.DataSources"
+           commandId="org.xtext.hipie.ui.datasources">
+     </handler>
+  </extension>
+  <extension
+        point="org.eclipse.core.runtime.preferences">
+     <scope
+           class="org.eclipse.core.internal.resources.ProjectPreferences"
+           name="org.xtext.hipie.ui.projectscope">
+     </scope>
   </extension>
 
 </plugin>
