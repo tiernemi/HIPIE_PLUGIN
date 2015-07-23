@@ -1,4 +1,4 @@
-package org.xtext.hipie.viz;
+package org.xtext.hipie.views.design_mode_browser;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -70,6 +70,32 @@ public class Vizualiser extends Composite {
                
             }
         });
+        
+		Button NoShowProperties = new Button(parent, SWT.PUSH);
+        NoShowProperties.setText("Do not show properties");
+        NoShowProperties.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent e) {
+            	 browser.evaluate("showProperties(false);");
+               
+            }
+        });
+        
+        
+        
+		Button Refresh = new Button(parent, SWT.PUSH);
+        Refresh.setText("Refresh The Page ");
+        Refresh.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent e) {
+                browser.refresh();
+               
+            }
+        });
+        
+        
+
+        
+        
+        
 		
 		
 		

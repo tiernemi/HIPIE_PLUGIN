@@ -1,4 +1,4 @@
-package org.xtext.hipie.viz;
+package org.xtext.hipie.views.design_mode_browser;
 
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
