@@ -189,9 +189,8 @@
 		<menuContribution locationURI="popup:#TextEditorContext?endof=group.find">
 			<command commandId="org.eclipse.xtext.ui.editor.FindReferences">
 				<visibleWhen checkEnabled="false">
-       <reference
-             definitionId="org.xtext.hipie.HIPIE.Editor.opened">
-       </reference>
+                	<reference definitionId="org.xtext.hipie.HIPIE.Editor.opened">
+                	</reference>
             	</visibleWhen>
 			</command>
 		</menuContribution>
@@ -428,107 +427,5 @@
            class="org.xtext.hipie.ui.CompilerPreferenceInitialiser">
      </initializer>
   </extension>
-  <extension
-        point="org.eclipse.ui.commands">
-     <command
-           description="Gets the data sources"
-           id="org.xtext.hipie.ui.datasources"
-           name="Data Sources">
-     </command>
-  </extension>
-  <extension
-        point="org.eclipse.ui.menus">
-     <menuContribution
-           allPopups="false"
-           locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
-        <toolbar
-              id="org.xtext.hipie.ui.datatool">
-           <command
-                 commandId="org.xtext.hipie.ui.datasources"
-                 icon="icons/data_folder.png"
-                 label="Data Sources"
-                 style="push">
-              <visibleWhen>
-                 <with
-                       variable="activeEditorId">
-                    <equals
-                          value="org.xtext.hipie.HIPIE">
-                    </equals>
-                 </with>
-              </visibleWhen>
-           </command>
-        </toolbar>
-     </menuContribution>
-  </extension>
-  <extension
-        point="org.eclipse.ui.handlers">
-     <handler
-           class="org.xtext.hipie.commands_listeners.DataSources"
-           commandId="org.xtext.hipie.ui.datasources">
-     </handler>
-  </extension>
-  <extension
-        point="org.eclipse.core.runtime.preferences">
-     <scope
-           class="org.eclipse.core.internal.resources.ProjectPreferences"
-           name="org.xtext.hipie.ui.projectscope">
-     </scope>
-  </extension>
-  <extension
-        point="org.eclipse.ui.views">
-     <view
-           class="org.xtext.hipie.views.DesignModeView"
-           id="org.xtext.hipie.design_mode"
-           name="Design Mode"
-           restorable="true">
-     </view>
-  </extension>
-  <extension
-        point="org.eclipse.ui.commands">
-     <command
-           id="org.xtext.hipie.visualiser_post_build"
-           name="Design Mode">
-     </command>
-     <command
-           id="org.xtext.hipie.visualiser_select"
-           name="Design Mode_sel">
-     </command>
-  </extension>
-  <extension
-        point="org.eclipse.ui.handlers">
-     <handler
-           class="org.xtext.hipie.commands_listeners.VisualiserPostBuild"
-           commandId="org.xtext.hipie.visualiser_post_build">
-     </handler>
-     <handler
-           class="org.xtext.hipie.commands_listeners.VisualiserSelect"
-           commandId="org.xtext.hipie.ui.visualiser_select">
-     </handler>
-  </extension>
-  <extension
-        point="org.eclipse.ui.menus">
-     <menuContribution
-           locationURI="popup:org.eclipse.ui.navigator.ProjectExplorer#PopupMenu?after=additions">
-        <command
-              commandId="org.xtext.hipie.visualiser_select"
-              label="Design Mode"
-              style="push">
-           <visibleWhen>
-              <with
-                    variable="activeMenuSelection">
-                 <iterate
-                       ifEmpty="false">
-                    <adapt
-                          type="org.eclipse.core.resources.IResource">
-                       <test
-                             property="org.eclipse.core.resources.extension"
-                             value="html">
-                       </test>
-                    </adapt>
-                 </iterate>
-              </with>
-           </visibleWhen>
-        </command>
-     </menuContribution>
-  </extension>
+
 </plugin>

@@ -463,7 +463,7 @@
   <extension
         point="org.eclipse.ui.handlers">
      <handler
-           class="org.xtext.hipie.commands_listeners.DataSources"
+           class="org.xtext.hipie.ui.handlers.DataSources"
            commandId="org.xtext.hipie.ui.datasources">
      </handler>
   </extension>
@@ -474,61 +474,5 @@
            name="org.xtext.hipie.ui.projectscope">
      </scope>
   </extension>
-  <extension
-        point="org.eclipse.ui.views">
-     <view
-           class="org.xtext.hipie.views.DesignModeView"
-           id="org.xtext.hipie.design_mode"
-           name="Design Mode"
-           restorable="true">
-     </view>
-  </extension>
-  <extension
-        point="org.eclipse.ui.commands">
-     <command
-           id="org.xtext.hipie.visualiser_post_build"
-           name="Design Mode">
-     </command>
-     <command
-           id="org.xtext.hipie.visualiser_select"
-           name="Design Mode_sel">
-     </command>
-  </extension>
-  <extension
-        point="org.eclipse.ui.handlers">
-     <handler
-           class="org.xtext.hipie.commands_listeners.VisualiserPostBuild"
-           commandId="org.xtext.hipie.visualiser_post_build">
-     </handler>
-     <handler
-           class="org.xtext.hipie.commands_listeners.VisualiserSelect"
-           commandId="org.xtext.hipie.ui.visualiser_select">
-     </handler>
-  </extension>
-  <extension
-        point="org.eclipse.ui.menus">
-     <menuContribution
-           locationURI="popup:org.eclipse.ui.navigator.ProjectExplorer#PopupMenu?after=additions">
-        <command
-              commandId="org.xtext.hipie.visualiser_select"
-              label="Design Mode"
-              style="push">
-           <visibleWhen>
-              <with
-                    variable="activeMenuSelection">
-                 <iterate
-                       ifEmpty="false">
-                    <adapt
-                          type="org.eclipse.core.resources.IResource">
-                       <test
-                             property="org.eclipse.core.resources.extension"
-                             value="html">
-                       </test>
-                    </adapt>
-                 </iterate>
-              </with>
-           </visibleWhen>
-        </command>
-     </menuContribution>
-  </extension>
+
 </plugin>
