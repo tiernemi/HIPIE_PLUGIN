@@ -56,7 +56,6 @@ public class DataSourcesSelect implements IHandler {
 			IProject cont_project = dud_file.getProject() ;
 			String file_name = dud_file.getName() ;
 
-
 			IScopeContext projectScope = new ProjectScope(cont_project) ;
 			Preferences preferences = projectScope.getNode("org.xtext.hipie.ui");
 			Preferences selected_items = preferences.node("data_prefs");

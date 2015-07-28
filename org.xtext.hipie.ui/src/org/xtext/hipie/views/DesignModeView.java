@@ -11,7 +11,7 @@ public class DesignModeView extends ViewPart {
 
 	static public String ID = "org.xtext.hipie.design_mode" ;
 	
-	DesignModeInternal internal_composite;
+	DesignModeComposite internal_composite;
 	
 	
 	public DesignModeView() {
@@ -20,7 +20,7 @@ public class DesignModeView extends ViewPart {
 
 	@Override
 	public void createPartControl(Composite parent) {	
-		internal_composite = new DesignModeInternal(parent, true);
+		internal_composite = new DesignModeComposite(parent, true);
 	}
 
 	@Override

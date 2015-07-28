@@ -37,11 +37,10 @@ public class DesignModeVisualiserListener {
 						IEditorInput editorFile = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor().getEditorInput() ;
 						IPath dud_filepath = ((FileEditorInput)editorFile).getFile().getFullPath() ;
 						IFile html_file = ResourcesPlugin.getWorkspace().getRoot().getFile(dud_filepath.removeFileExtension().addFileExtension("html")) ;
-
 						if (html_file.exists())
 						{
 							ICommandService command_serv = (ICommandService) PlatformUI.getWorkbench().getService(ICommandService.class)  ;
-							Command command = command_serv.getCommand(VisualiserPostBuild.command_ID) ;
+							Command command = command_serv.getCommand(DesignModePostBuild.command_ID) ;
 							try {
 								command.executeWithChecks(new ExecutionEvent()) ;
 							} catch (ExecutionException e) {

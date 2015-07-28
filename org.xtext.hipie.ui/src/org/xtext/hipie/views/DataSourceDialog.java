@@ -5,19 +5,35 @@ import java.util.Iterator;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.ICheckStateListener;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.ISelectionListener;
+import org.eclipse.ui.ISelectionService;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.SelectionDialog;
 import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
@@ -25,7 +41,7 @@ import org.eclipse.ui.internal.ide.IIDEHelpContextIds;
 import org.eclipse.ui.internal.ide.misc.CheckboxTreeAndListGroup;
 import org.eclipse.ui.model.WorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
-
+import org.osgi.service.prefs.Preferences;
 /**
  * A standard resource selection dialog which solicits a list of resources from
  * the user. The <code>getResult</code> method returns the selected resources.
@@ -50,7 +66,7 @@ public class DataSourceDialog extends SelectionDialog {
 
     // the visual selection widget group
     private CheckboxTreeAndListGroup selectionGroup;
-
+    private Text cmd_args ;
     // constants
     private final static int SIZING_SELECTION_WIDGET_WIDTH = 400;
 
@@ -121,6 +137,25 @@ public class DataSourceDialog extends SelectionDialog {
      * Method declared on Dialog.
      */
     
+    private boolean checkFoldersForValidFiles(IFolder folder)
+    {
+		boolean has_valid_files = false ;
+		try {
+			for (int i = 0 ; i < folder.members().length ; ++i)
+			{
+				IResource member = folder.members()[i] ;
+				if (member instanceof IFile)
+					if (member.getFileExtension().equals("txt") | member.getFileExtension().equals("csv") | member.getFileExtension().equals("dat"))
+						has_valid_files = true ;
+				if (member instanceof IFolder)
+					has_valid_files = checkFoldersForValidFiles((IFolder) member) ;
+			}
+		} catch (CoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	return has_valid_files ;
+    }
     
     protected Control createDialogArea(Composite parent) {
         // page group
@@ -130,7 +165,6 @@ public class DataSourceDialog extends SelectionDialog {
         //as its only child
         ArrayList input = new ArrayList();
         input.add(root);
-
         createMessageArea(composite);
         selectionGroup = new CheckboxTreeAndListGroup(composite, input,
                 getResourceProvider(IResource.FOLDER | IResource.PROJECT
@@ -142,7 +176,49 @@ public class DataSourceDialog extends SelectionDialog {
                 // widgets we need to hardcode the combined widget's
                 // size, otherwise it will open too small
                 SIZING_SELECTION_WIDGET_WIDTH, SIZING_SELECTION_WIDGET_HEIGHT);
-
+  
+        Label label = new Label(composite, SWT.NONE);
+		label.setText("Command Line Arguments");
+        cmd_args = new Text(composite ,SWT.SINGLE | SWT.LEAD | SWT.BORDER) ;
+        cmd_args.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
+      
+        selectionGroup.getListTable().addSelectionListener(new SelectionListener() 
+        {
+			IFile prev_file ;
+        	
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				
+				// Save Previous
+				if (prev_file != null)
+				{
+					String file_name = prev_file.getName() ;
+					IProject cont_project = prev_file.getProject() ;
+					IScopeContext projectScope = new ProjectScope(cont_project) ;
+					Preferences preferences = projectScope.getNode("org.xtext.hipie.ui");
+					Preferences selected_items = preferences.node("data_prefs");
+					selected_items.put("cmd_line__prefs_" + file_name , cmd_args.getText()) ;
+				}
+				
+				// Open New
+				IFile sel_file = (IFile) e.item.getData() ;
+				prev_file = sel_file ;
+				String file_name = sel_file.getName() ;
+				IProject cont_project = sel_file.getProject() ;
+				IScopeContext projectScope = new ProjectScope(cont_project) ;
+				Preferences preferences = projectScope.getNode("org.xtext.hipie.ui");
+				Preferences selected_items = preferences.node("data_prefs");
+				String cmd_string = selected_items.get("cmd_line__prefs_" + file_name , "") ;
+				cmd_args.setText(cmd_string);
+			}
+			
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+        
         composite.addControlListener(new ControlListener() {
             public void controlMoved(ControlEvent e) {
             }
@@ -183,6 +259,12 @@ public class DataSourceDialog extends SelectionDialog {
                         	if(members[i].getType() == IResource.FILE)
                         	{
                         		if(members[i].getFileExtension().equals("txt") | members[i].getFileExtension().equals("csv") | members[i].getFileExtension().equals("dat"))
+                        			results.add(members[i]);
+                        	}
+                        	else if(members[i].getType() == IResource.FOLDER)
+                        	{
+                        		IFolder folder = (IFolder) members[i] ;
+                        		if(checkFoldersForValidFiles(folder))
                         			results.add(members[i]);
                         	}
                         	else
