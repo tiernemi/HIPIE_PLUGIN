@@ -4,6 +4,7 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IHandler;
 import org.eclipse.core.commands.IHandlerListener;
+import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
@@ -30,9 +31,7 @@ public class VisualiserPostBuild implements IHandler {
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		try {
 			DesignModeView view = (DesignModeView) HandlerUtil.getActiveWorkbenchWindowChecked(event).getActivePage().showView(DesignModeView.ID) ;
-			view.setDdl("test_1") ;
-			view.setDatabomb("test_2") ;
-			view.setPersist("test_3") ;
+			view.UpdateView("test_1", "test_2", "test_3");
 			return null ;
 		} catch (PartInitException e) {
 			// TODO Auto-generated catch block

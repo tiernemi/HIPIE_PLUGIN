@@ -10,57 +10,27 @@ import org.eclipse.ui.part.ViewPart;
 public class DesignModeView extends ViewPart {
 
 	static public String ID = "org.xtext.hipie.design_mode" ;
-	private String ddl ;
-	private String databomb ;
-	private String persist ;
-
 	
-	DesignModeInternal browser;
-	DesignModeInternal text;
+	DesignModeInternal internal_composite;
+	
 	
 	public DesignModeView() {
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	@Override
-	public void createPartControl(Composite parent) {
-		text = new DesignModeInternal(parent, true, ddl, databomb, persist);
+	public void createPartControl(Composite parent) {	
+		internal_composite = new DesignModeInternal(parent, true);
 	}
-
 
 	@Override
 	public void setFocus() {
 		// TODO Auto-generated method stub
-	
+		
 	}
 	
-	public void setDdl(String in)
+	public void UpdateView(String dd, String db, String per)
 	{
-		ddl = in ;
-	}
-	
-	public void setDatabomb(String in)
-	{
-		databomb = in ;
-	}
-	
-	public void setPersist(String in)
-	{
-		persist = in ;
-	}
-	
-	public String getDdl()
-	{
-		return ddl ;
-	}
-	
-	public String getDatabomb()
-	{
-		return databomb ;
-	}
-	
-	public String getPersist()
-	{
-		return persist ;
+		internal_composite.setStrings(dd, db, per) ;
 	}
 }

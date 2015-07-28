@@ -45,8 +45,9 @@ class HIPIEGenerator implements IGenerator {
 			var work_prefs = InstanceScope.INSTANCE.getNode("org.xtext.hipie.ui");
 			val compilerPath = new Path(work_prefs.get('Compiler Location' , defaultCompilerPath))
 		
+			var filename = resourceFile.name
 			var selected_items = proj_prefs.node("data_prefs");
-			var select_string = selected_items.get("select_prefs", "") ;
+			var select_string = selected_items.get("select_prefs_" + filename, "")
 			var data_filestrings = select_string.split(" ")
 			var data_filepaths = new ArrayList<Path>	
 			for (i : 0..<data_filestrings.size)

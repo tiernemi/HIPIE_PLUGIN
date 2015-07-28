@@ -459,12 +459,40 @@
            </command>
         </toolbar>
      </menuContribution>
+     <menuContribution
+           allPopups="true"
+           locationURI="popup:org.eclipse.ui.navigator.ProjectExplorer#PopupMenu?after=additions">
+        <command
+              commandId="org.xtext.hipie.ui.datasources_select"
+              label="Data Sources"
+              style="push">
+           <visibleWhen>
+              <with
+                    variable="activeMenuSelection">
+                 <iterate
+                       ifEmpty="false">
+                    <adapt
+                          type="org.eclipse.core.resources.IResource">
+                       <test
+                             property="org.eclipse.core.resources.extension"
+                             value="dud">
+                       </test>
+                    </adapt>
+                 </iterate>
+              </with>
+           </visibleWhen>
+        </command>
+     </menuContribution>
   </extension>
   <extension
         point="org.eclipse.ui.handlers">
      <handler
            class="org.xtext.hipie.commands_listeners.DataSources"
            commandId="org.xtext.hipie.ui.datasources">
+     </handler>
+     <handler
+           class="org.xtext.hipie.commands_listeners.DataSourcesSelect"
+           commandId="org.xtext.hipie.ui.datasources_select">
      </handler>
   </extension>
   <extension
@@ -530,5 +558,29 @@
            </visibleWhen>
         </command>
      </menuContribution>
+  </extension>
+  <extension
+        point="org.eclipse.ui.perspectives">
+     <perspective
+           class="org.xtext.hipie.ui.HipiePerspective"
+           id="org.xtext.hipie.ui.hipie_perspec"
+           name="HIPIE">
+     </perspective>
+  </extension>
+  <extension
+        point="org.eclipse.ui.newWizards">
+     <wizard
+           category="org.xtext.hipie.ui.hipie_cat"
+           class="org.xtext.hipie.ui.HIPIEWizard"
+           finalPerspective="org.xtext.hipie.ui.hipie_perspec"
+           icon="icons/peace.png"
+           id="org.xtext.hipie.ui.HIPIE_wiz"
+           name="HIPIE Plugin Project"
+           project="true">
+     </wizard>
+     <category
+           id="org.xtext.hipie.ui.hipie_cat"
+           name="HIPIE ">
+     </category>
   </extension>
 </plugin>

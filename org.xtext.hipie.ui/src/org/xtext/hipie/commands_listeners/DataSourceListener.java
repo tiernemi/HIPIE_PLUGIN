@@ -39,10 +39,11 @@ public class DataSourceListener {
 					public void run() {
 						IEditorInput EditorFile = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor().getEditorInput() ;
 						IProject cont_project = ((FileEditorInput)EditorFile).getFile().getProject() ;
+						String file_name = ((FileEditorInput)EditorFile).getFile().getName() ;
 						IScopeContext projectScope = new ProjectScope(cont_project) ;
 						Preferences preferences = projectScope.getNode("org.xtext.hipie.ui");
 						Preferences selected_items = preferences.node("data_prefs");
-						String select_string = selected_items.get("select_prefs", "") ;
+						String select_string = selected_items.get("select_prefs_" + file_name, "") ;
 						String[] filepaths = select_string.split(" ") ;
 						ArrayList<Object> prev_sel_files = new ArrayList<Object>() ;
 
@@ -54,7 +55,7 @@ public class DataSourceListener {
 								prev_sel_files.add((IResource) ResourcesPlugin.getWorkspace().getRoot().getFile(filepath)) ;
 							}
 						}
-						if (prev_sel_files.size() == 0)
+						if (prev_sel_files.size() == 0 && ((FileEditorInput)EditorFile).getFile().getFileExtension().equals("dud"))
 						{
 							ICommandService command_serv = (ICommandService) PlatformUI.getWorkbench().getService(ICommandService.class)  ;
 							Command command = command_serv.getCommand("org.xtext.hipie.ui.datasources") ;

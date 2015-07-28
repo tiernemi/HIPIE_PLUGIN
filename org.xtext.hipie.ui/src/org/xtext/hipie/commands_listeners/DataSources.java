@@ -23,6 +23,7 @@ import org.osgi.service.prefs.Preferences;
 import org.xtext.hipie.views.DataSourceDialog;
 
 
+
 public class DataSources implements IHandler {
 
 	public DataSources()
@@ -47,11 +48,12 @@ public class DataSources implements IHandler {
 		
 		IEditorInput EditorFile = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor().getEditorInput() ;
 		IProject cont_project = ((FileEditorInput)EditorFile).getFile().getProject() ;
-
+		String file_name = ((FileEditorInput)EditorFile).getFile().getName() ;
+		
 		IScopeContext projectScope = new ProjectScope(cont_project) ;
 		Preferences preferences = projectScope.getNode("org.xtext.hipie.ui");
 		Preferences selected_items = preferences.node("data_prefs");
-		String select_string = selected_items.get("select_prefs", "") ;
+		String select_string = selected_items.get("select_prefs_" + file_name , "") ;
 		String[] filepaths = select_string.split(" ") ;
 		ArrayList<Object> prev_sel_files = new ArrayList<Object>() ;
 		for (int i = 0 ; i < filepaths.length ; ++i)
@@ -81,7 +83,7 @@ public class DataSources implements IHandler {
 				File temp =  (File) result[i] ;
 				select_list += temp.getFullPath().toOSString() + " " ;
 			}
-		selected_items.put("select_prefs", select_list) ;
+		selected_items.put("select_prefs_" + file_name, select_list) ;
 		try {
 			preferences.flush() ;
 		} catch (BackingStoreException e) {
