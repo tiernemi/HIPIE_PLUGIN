@@ -36,7 +36,7 @@ public class DesignModeComposite extends Composite {
 	private String databomb ;
 
 	private Browser design_mode_browser ;
-	private String derma_html_url = "file:///home/michael/Downloads/derm_page.html" ; 
+	private String derma_html_url = "file:///home/michael/Downloads/derm_clean.html" ; 
 	
 	
 	public DesignModeComposite(final Composite parent, boolean showAddressBar) {
@@ -45,26 +45,22 @@ public class DesignModeComposite extends Composite {
 			parent.setLayout(new GridLayout(2, false));
 			design_mode_browser = new Browser(parent, SWT.NONE);
 			design_mode_browser.setUrl(derma_html_url);
+			design_mode_browser.setJavascriptEnabled(true);
 			design_mode_browser.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-			String dd_cmd = "setStrings(" + ddl +"," + databomb + "," + persist + ");" ;
-			
 			design_mode_browser.addProgressListener(new ProgressAdapter() {
 				public void changed(ProgressEvent event)
 				{
-					if (ddl != "" && databomb != "")
-					{
-						String dd_cmd = "setStrings(" + ddl +"," + databomb + "," + persist + ");" ;
-						design_mode_browser.execute(dd_cmd) ;
-					}
+
+						String dd_cmd = "testWidget(HTML," + ddl +"," + databomb + ");" ;
+						System.out.println(design_mode_browser.execute(dd_cmd)) ;
 				}
 			});
 	}
 	
-	public void setStrings(String dd, String db, String per)
+	public void setStrings(String dd, String db)
 	{
 		ddl = dd ;
 		databomb = db ;
-		persist = per ;
 		design_mode_browser.refresh(); 
 	}
 }

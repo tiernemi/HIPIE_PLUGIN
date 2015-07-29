@@ -37,7 +37,10 @@ public class DesignModeVisualiserListener {
 						IEditorInput editorFile = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor().getEditorInput() ;
 						IPath dud_filepath = ((FileEditorInput)editorFile).getFile().getFullPath() ;
 						IFile html_file = ResourcesPlugin.getWorkspace().getRoot().getFile(dud_filepath.removeFileExtension().addFileExtension("html")) ;
-						if (html_file.exists())
+						IFile ddl_file = ResourcesPlugin.getWorkspace().getRoot().getFile(dud_filepath.removeFileExtension().addFileExtension("dud")) ;
+						IFile databomb_file = ResourcesPlugin.getWorkspace().getRoot().getFile(dud_filepath.removeFileExtension().addFileExtension("databomb")) ;
+
+						if (html_file.exists() && ddl_file.exists() && databomb_file.exists())
 						{
 							ICommandService command_serv = (ICommandService) PlatformUI.getWorkbench().getService(ICommandService.class)  ;
 							Command command = command_serv.getCommand(DesignModePostBuild.command_ID) ;

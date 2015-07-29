@@ -30,6 +30,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.ISelectionService;
@@ -188,7 +189,7 @@ public class DataSourceDialog extends SelectionDialog {
         	
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				
+
 				// Save Previous
 				if (prev_file != null)
 				{
@@ -218,6 +219,22 @@ public class DataSourceDialog extends SelectionDialog {
 				
 			}
 		});
+        
+        cmd_args.addModifyListener(new ModifyListener()
+        {
+
+			@Override
+			public void modifyText(ModifyEvent e) {
+				IFile sel_file = (IFile) selectionGroup.getListTable().getItem(selectionGroup.getListTable().getSelectionIndex()).getData() ;
+				String file_name = sel_file.getName() ;
+				IProject cont_project = sel_file.getProject() ;
+				IScopeContext projectScope = new ProjectScope(cont_project) ;
+				Preferences preferences = projectScope.getNode("org.xtext.hipie.ui");
+				Preferences selected_items = preferences.node("data_prefs");
+				selected_items.put("cmd_line__prefs_" + file_name , cmd_args.getText()) ;
+			}
+        	
+        }) ;
         
         composite.addControlListener(new ControlListener() {
             public void controlMoved(ControlEvent e) {

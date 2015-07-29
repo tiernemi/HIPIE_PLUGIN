@@ -383,8 +383,6 @@ Function:
     'SCALE' '(' ((vars=[PosVizData|TOKEN])|count_func=CountFunction|agg_func=AggFunction) ',' type=INT ')')
 ;
 
-
-// Find out what this does //
 NestBasisQualifier: 
 	(TOKEN) VisBasisQualifiers
 ;

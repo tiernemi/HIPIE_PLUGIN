@@ -109,7 +109,7 @@ public class DesignModeSelect implements IHandler {
 				try {
 					DesignModeView view = (DesignModeView) HandlerUtil.getActiveWorkbenchWindowChecked(event).getActivePage().showView(DesignModeView.ID) ;
 					System.out.println(streamString_ddl) ;
-					view.UpdateView(streamString_ddl, streamString_databomb, "test_3");
+					view.UpdateView(streamString_ddl, streamString_databomb);
 					return null ;
 				} 	catch (PartInitException e) {
 					e.printStackTrace();

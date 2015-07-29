@@ -105,7 +105,7 @@ public class DesignModePostBuild implements IHandler {
 			sc_in.close() ;
 			try {
 				DesignModeView view = (DesignModeView) HandlerUtil.getActiveWorkbenchWindowChecked(event).getActivePage().showView(DesignModeView.ID) ;
-				view.UpdateView(streamString_ddl, streamString_databomb, "test_3");
+				view.UpdateView(streamString_ddl, streamString_databomb);
 				return null ;
 			} 	catch (PartInitException e) {
 				e.printStackTrace();

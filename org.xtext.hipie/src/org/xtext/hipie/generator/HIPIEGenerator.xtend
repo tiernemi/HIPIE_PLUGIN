@@ -19,6 +19,9 @@ import java.io.FileOutputStream
 import javax.inject.Inject
 import java.util.ArrayList
 import org.eclipse.core.resources.ProjectScope
+import org.eclipse.core.resources.IFile
+import java.io.FileWriter
+import java.io.File
 
 /**
  * Generates code from your model files on save.
@@ -80,27 +83,53 @@ class HIPIEGenerator implements IGenerator {
 			//  Generate DataBomb  //
 			var databombFilePath =  resourceFile.projectRelativePath.removeFileExtension().addFileExtension("databomb");
 			var databombFile = project.getFile(databombFilePath);
-			var data_cmd_string = ""
-			for (i : 0..<data_filepaths.size) {
-				data_cmd_string += " " + ws_root.getFile(data_filepaths.get(i)).rawLocation.toOSString
-			}
-			var databombFileString = databombFile.rawLocation.toOSString()
-			var dat_cmd = 'java -cp ' + compilerPath.toOSString + ' org/hpcc/HIPIE/commandline/CommandLineService -csv' + data_cmd_string + ' -separator \\t -escape / -quote \\\" -lineseparator \\n -o ' + databombFileString 
-			System.out.println(dat_cmd)
-			val proc_data = Runtime.getRuntime().exec(dat_cmd) as Process ;
-			in = proc_data.inputStream
-			er = proc_data.errorStream
-			sc_verbose = new Scanner(in)
-			sc_er = new Scanner(er)
-			streamString = new String
-			streamString_er = new String
-			if (sc_verbose.hasNext())
-				streamString = sc_verbose.useDelimiter("\\Z").next() ;
-			if (sc_er.hasNext())
+			var temp_dat_files = new ArrayList()
+			for (j : 0..<data_filepaths.size) {
+				var dat_file = ws_root.getFile(data_filepaths.get(j))
+				var cmd_string = selected_items.get("cmd_line__prefs_" + dat_file.name , "")
+				var data_cmd_string = "-csv " + ws_root.getFile(data_filepaths.get(j)).rawLocation.toOSString + " " + cmd_string
+				var temp_file_path = new Path(dat_file.projectRelativePath.removeFileExtension.toOSString + "temp.databomb")
+				temp_dat_files += temp_file_path
+				var dat_cmd = ""
+				dat_cmd = 'java -cp ' + compilerPath.toOSString + ' org/hpcc/HIPIE/commandline/CommandLineService ' + data_cmd_string + ' -o ' + project.getFile(temp_file_path).rawLocation.toOSString 
+				System.out.println(dat_cmd)
+				var proc_data = Runtime.getRuntime().exec(dat_cmd) as Process				
+				in = proc_data.inputStream
+				er = proc_data.errorStream
+				sc_verbose = new Scanner(in)
+				sc_er = new Scanner(er)
+				streamString = new String
+				streamString_er = new String
+				if (sc_verbose.hasNext())
+					streamString = sc_verbose.useDelimiter("\\Z").next() ;
+				if (sc_er.hasNext())
 					streamString_er = sc_er.useDelimiter("\\Z").next() ;
-			System.out.println(streamString)
-			System.out.println(streamString_er)
+				println(streamString)
+				println(streamString_er)
+				println(data_cmd_string)
+				in.close()
+				er.close()
+				sc_verbose.close()
+				sc_er.close()
+			}
 			
+			for (i : 0..<temp_dat_files.size)
+			{
+				var temp_dat_filepath = project.getFile(temp_dat_files.get(i)).rawLocation.toOSString
+				var in_stream = new FileInputStream(temp_dat_filepath);
+				if (i == 0 && databombFile.exists())
+					databombFile.delete(true,null)
+				var fw = new FileWriter(databombFile.rawLocation.toOSString,true);
+				var streamString_temp = new String
+				var sc_in = new Scanner(in_stream)
+				if (sc_in.hasNext())
+					streamString_temp = sc_in.useDelimiter("\\Z").next()
+				fw.write(streamString_temp)
+				fw.close
+				var file = new File(temp_dat_filepath)
+				file.delete
+				in_stream.close
+			}
 			var in_stream = new FileInputStream(ddlFile.rawLocation.toOSString());
 			var streamString_ddl = new String
 			var sc_in = new Scanner(in_stream)

@@ -29,8 +29,8 @@ public class DesignModeView extends ViewPart {
 		
 	}
 	
-	public void UpdateView(String dd, String db, String per)
+	public void UpdateView(String dd, String db)
 	{
-		internal_composite.setStrings(dd, db, per) ;
+		internal_composite.setStrings(dd, db) ;
 	}
 }
