@@ -22,6 +22,7 @@ import org.eclipse.core.resources.ProjectScope
 import org.eclipse.core.resources.IFile
 import java.io.FileWriter
 import java.io.File
+import org.xtext.hipie.hIPIE.OutDataset
 
 /**
  * Generates code from your model files on save.
@@ -84,10 +85,13 @@ class HIPIEGenerator implements IGenerator {
 			var databombFilePath =  resourceFile.projectRelativePath.removeFileExtension().addFileExtension("databomb");
 			var databombFile = project.getFile(databombFilePath);
 			var temp_dat_files = new ArrayList()
-			for (j : 0..<data_filepaths.size) {
-				var dat_file = ws_root.getFile(data_filepaths.get(j))
+			//var out_datasets = resource.allContents.toIterable.filter(OutDataset).toList.toArray
+			
+			for (i : 0..<temp_dat_files.size) {
+				var dat_filepath = data_filepaths.get(i)
+				var dat_file = ws_root.getFile(dat_filepath)
 				var cmd_string = selected_items.get("cmd_line__prefs_" + dat_file.name , "")
-				var data_cmd_string = "-csv " + ws_root.getFile(data_filepaths.get(j)).rawLocation.toOSString + " " + cmd_string
+				var data_cmd_string = "-csv " + ws_root.getFile(dat_filepath).rawLocation.toOSString + " " + cmd_string
 				var temp_file_path = new Path(dat_file.projectRelativePath.removeFileExtension.toOSString + "temp.databomb")
 				temp_dat_files += temp_file_path
 				var dat_cmd = ""
@@ -112,7 +116,6 @@ class HIPIEGenerator implements IGenerator {
 				sc_verbose.close()
 				sc_er.close()
 			}
-			
 			for (i : 0..<temp_dat_files.size)
 			{
 				var temp_dat_filepath = project.getFile(temp_dat_files.get(i)).rawLocation.toOSString
@@ -124,13 +127,33 @@ class HIPIEGenerator implements IGenerator {
 				var sc_in = new Scanner(in_stream)
 				if (sc_in.hasNext())
 					streamString_temp = sc_in.useDelimiter("\\Z").next()
+				if(i != temp_dat_files.size-1 && temp_dat_files.size > 1)
+				{
+					streamString_temp = streamString_temp.substring(0, streamString_temp.lastIndexOf("}"))
+					streamString_temp += ","
+				}
+				if(i != 0 && temp_dat_files.size > 1)
+				{
+					streamString_temp = streamString_temp.substring(streamString_temp.indexOf("{")+1) 
+				}
 				fw.write(streamString_temp)
 				fw.close
 				var file = new File(temp_dat_filepath)
 				file.delete
 				in_stream.close
 			}
-			var in_stream = new FileInputStream(ddlFile.rawLocation.toOSString());
+			
+			// Creates an empty persist if there is none already //
+			var perFilepath = resourceFile.projectRelativePath.removeFileExtension().addFileExtension("persist")
+			var perFile =  project.getFile(perFilepath)
+			if(!perFile.exists)
+			{
+				var fw_per = new FileWriter(perFile.rawLocation.toOSString)
+				fw_per.close()
+			}
+
+			// Converts ddl file to string //
+			var in_stream = new FileInputStream(ddlFile.rawLocation.toOSString());			
 			var streamString_ddl = new String
 			var sc_in = new Scanner(in_stream)
 			if (sc_in.hasNext())
@@ -140,7 +163,10 @@ class HIPIEGenerator implements IGenerator {
 			streamString_ddl = streamString_ddl.replace(" " , "")
 			streamString_ddl = streamString_ddl.replace("\t" , "")
 			streamString_ddl = streamString_ddl.replace("\r" , "")
+			in_stream.close() 
+			sc_in.close()
 			
+			// Converts databomb to cleaned string 
 			in_stream = new FileInputStream(databombFile.rawLocation.toOSString())
 			var streamString_databomb = new String
 			sc_in = new Scanner(in_stream)
@@ -151,6 +177,20 @@ class HIPIEGenerator implements IGenerator {
 			streamString_databomb = streamString_databomb.replace(" " , "")
 			streamString_databomb = streamString_databomb.replace("\t" , "")
 			streamString_databomb = streamString_databomb.replace("\r" , "")
+			in_stream.close()
+			sc_in.close()
+			
+			in_stream = new FileInputStream(perFile.rawLocation.toOSString());
+			var streamString_per = new String
+			sc_in = new Scanner(in_stream)
+			if (sc_in.hasNext())
+				streamString_per = sc_in.useDelimiter("\\Z").next()
+			streamString_per = streamString_per.replace("\n" , "")
+			streamString_per = streamString_per.replace(" " , "")
+			streamString_per = streamString_per.replace("\t" , "")
+			streamString_per = streamString_per.replace("\r" , "")
+			in_stream.close()
+			sc_in.close()
 			
 			// Generate HTML //
 			var url = new URL("platform:/plugin/org.xtext.hipie/vis_files/marsh.html")		
@@ -162,6 +202,7 @@ class HIPIEGenerator implements IGenerator {
 			
 			streamString_html = streamString_html.replace("%_data_%" , streamString_databomb)
 			streamString_html = streamString_html.replace("%_ddl_%" , streamString_ddl)
+			streamString_html = streamString_html.replace("%_persist_%" , streamString_per)
 			
 			var htmlFilePath = resourceFile.projectRelativePath.removeFileExtension().addFileExtension("html")
 			var htmlFile = project.getFile(htmlFilePath)

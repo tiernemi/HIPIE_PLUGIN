@@ -10,9 +10,11 @@ import org.eclipse.ui.part.ViewPart;
 public class DesignModeView extends ViewPart {
 
 	static public String ID = "org.xtext.hipie.design_mode" ;
-	
-	DesignModeComposite internal_composite;
-	
+	private String persist ;
+	private String ddl ;
+	private String databomb ;
+	private String per_filepath ;
+	DesignModeComposite internal_composite ;	
 	
 	public DesignModeView() {
 		
@@ -29,8 +31,43 @@ public class DesignModeView extends ViewPart {
 		
 	}
 	
-	public void UpdateView(String dd, String db)
+	public void updateView()
 	{
-		internal_composite.setStrings(dd, db) ;
+		internal_composite.setStrings(ddl, databomb, persist, per_filepath);
 	}
+
+	public String getPersist() {
+		return persist;
+	}
+
+	public void setPersist(String persist) {
+		this.persist = persist;
+	}
+
+	public String getDdl() {
+		return ddl;
+	}
+
+	public void setDdl(String ddl) {
+		this.ddl = ddl;
+	}
+
+	public String getDatabomb() {
+		return databomb;
+	}
+
+	public void setDatabomb(String databomb) {
+		this.databomb = databomb;
+	}
+
+	public String getPer_filepath() {
+		return per_filepath;
+	}
+
+	public void setPer_filepath(String per_filepath) {
+		this.per_filepath = per_filepath;
+	}
+	
+	
+	
 }

@@ -50,10 +50,14 @@ public class DesignModePostBuild implements IHandler {
 			
 		IPath ddl_filepath = file.getFullPath().removeFileExtension().addFileExtension("ddl") ;
 		IPath dat_filepath = file.getFullPath().removeFileExtension().addFileExtension("databomb") ;
+		IPath per_filepath = file.getFullPath().removeFileExtension().addFileExtension("persist") ;
+
 		// IPath persist_filepath = file.getFullPath().removeFileExtension().addFileExtension("databomb") ;	
 		IFile ddl_file = ResourcesPlugin.getWorkspace().getRoot().getFile(ddl_filepath) ;
 		IFile dat_file = ResourcesPlugin.getWorkspace().getRoot().getFile(dat_filepath) ;
-			
+		IFile per_file = ResourcesPlugin.getWorkspace().getRoot().getFile(per_filepath) ;
+
+		
 		if (ddl_file.exists() && dat_file.exists())
 		{
 			InputStream in_stream = null;
@@ -72,6 +76,7 @@ public class DesignModePostBuild implements IHandler {
 			streamString_ddl = streamString_ddl.replace(" " , "") ; 
 			streamString_ddl = streamString_ddl.replace("\t" , "") ;
 			streamString_ddl = streamString_ddl.replace("\r" , "") ;
+			
 			try {
 				in_stream.close();
 			} catch (IOException e2) {
@@ -103,10 +108,40 @@ public class DesignModePostBuild implements IHandler {
 				e1.printStackTrace();
 			}
 			sc_in.close() ;
+				
+			String streamString_per = "" ;
+			if(per_file.exists())
+			{
+				try {
+					in_stream = per_file.getContents() ;
+				} catch (CoreException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				sc_in = new Scanner(in_stream) ;
+				if (sc_in.hasNext())
+					streamString_per = sc_in.useDelimiter("\\Z").next() ;
+			
+				streamString_per = streamString_databomb.replace("\n" , "") ;
+				streamString_per = streamString_databomb.replace(" " , "") ;
+				streamString_per = streamString_databomb.replace("\t" , "") ;
+				streamString_per = streamString_databomb.replace("\r" , "") ;
+				
+				try {
+					in_stream.close();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				sc_in.close() ;
+			}
 			try {
 				DesignModeView view = (DesignModeView) HandlerUtil.getActiveWorkbenchWindowChecked(event).getActivePage().showView(DesignModeView.ID) ;
-				view.UpdateView(streamString_ddl, streamString_databomb);
-				return null ;
+				view.setDdl(streamString_ddl);
+				view.setDatabomb(streamString_databomb);
+				view.setPersist(streamString_per);
+				view.setPer_filepath(per_file.getRawLocation().toOSString());
+				view.updateView();
 			} 	catch (PartInitException e) {
 				e.printStackTrace();
 			}
