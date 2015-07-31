@@ -9,141 +9,131 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IHandler;
 import org.eclipse.core.commands.IHandlerListener;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.viewers.TreeSelection;
-import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.handlers.HandlerUtil;
-import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.xtext.hipie.error.HIPIEStatus;
 import org.xtext.hipie.ui.internal.HIPIEActivator;
 import org.xtext.hipie.views.DesignModeView;
 
+/**
+ *  This class opens the design mode view based off the selection in the package explorer.
+ */
+
 public class DesignModeSelect implements IHandler {
 
-	static public String command_ID = "org.xtext.hipie.visualiser_select" ;
+	static public String ID = "org.xtext.hipie.visualiser_select" ;
 	
 	@Override
 	public void addHandlerListener(IHandlerListener handlerListener) {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public void dispose() {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		
-		TreeSelection select = (TreeSelection) HandlerUtil.getCurrentSelection(event) ;
-		Object[] selection_list = select.toArray() ;
+		TreeSelection selectTree = (TreeSelection) HandlerUtil.getCurrentSelection(event) ;
+		Object[] selectionList = selectTree.toArray() ;
 	
-		for (int j=0 ; j<selection_list.length ; ++j) 
+		for (int j=0 ; j<selectionList.length ; ++j) 
 		{
-			IFile html_file = (IFile) Platform.getAdapterManager().getAdapter(selection_list[j], IFile.class) ;				
+			IFile htmlFile = (IFile) Platform.getAdapterManager().getAdapter(selectionList[j], IFile.class) ;				
 				
-			IPath ddl_filepath = html_file.getFullPath().removeFileExtension().addFileExtension("ddl") ;
-			IPath dat_filepath = html_file.getFullPath().removeFileExtension().addFileExtension("databomb") ;
-			IPath per_filepath = html_file.getFullPath().removeFileExtension().addFileExtension("persist") ;
+			IPath ddlFilepath = htmlFile.getFullPath().removeFileExtension().addFileExtension("ddl") ;
+			IPath datFilepath = htmlFile.getFullPath().removeFileExtension().addFileExtension("databomb") ;
+			IPath perFilepath = htmlFile.getFullPath().removeFileExtension().addFileExtension("persist") ;
 
-			// IPath persist_filepath = file.getFullPath().removeFileExtension().addFileExtension("databomb") ;	
-			IFile ddl_file = ResourcesPlugin.getWorkspace().getRoot().getFile(ddl_filepath) ;
-			IFile dat_file = ResourcesPlugin.getWorkspace().getRoot().getFile(dat_filepath) ;
-			IFile per_file = ResourcesPlugin.getWorkspace().getRoot().getFile(per_filepath) ;
+			IFile ddlFile = ResourcesPlugin.getWorkspace().getRoot().getFile(ddlFilepath) ;
+			IFile datFile = ResourcesPlugin.getWorkspace().getRoot().getFile(datFilepath) ;
+			IFile perFile = ResourcesPlugin.getWorkspace().getRoot().getFile(perFilepath) ;
 
 			
-			if (ddl_file.exists() && dat_file.exists())
+			if (ddlFile.exists() && datFile.exists())
 			{
-				InputStream in_stream = null;
+				InputStream inStream = null;
 				try {
-					in_stream = ddl_file.getContents();
+					inStream = ddlFile.getContents();
 				} catch (CoreException e3) {
-					// TODO Auto-generated catch block
 					e3.printStackTrace();
 				}
-				String streamString_ddl = "" ;
-				Scanner sc_in = new Scanner(in_stream) ;
-				if (sc_in.hasNext())
-					streamString_ddl = sc_in.useDelimiter("\\Z").next() ;
+				String streamStringDdl = "" ;
+				Scanner scIn = new Scanner(inStream) ;
+				if (scIn.hasNext())
+					streamStringDdl = scIn.useDelimiter("\\Z").next() ;
 		
-				streamString_ddl = streamString_ddl.replace("\n" , "") ;
-				streamString_ddl = streamString_ddl.replace(" " , "") ; 
-				streamString_ddl = streamString_ddl.replace("\t" , "") ;
-				streamString_ddl = streamString_ddl.replace("\r" , "") ;
+				streamStringDdl = streamStringDdl.replace("\n" , "") ;
+				streamStringDdl = streamStringDdl.replace(" " , "") ; 
+				streamStringDdl = streamStringDdl.replace("\t" , "") ;
+				streamStringDdl = streamStringDdl.replace("\r" , "") ;
 				try {
-					in_stream.close();
+					inStream.close();
 				} catch (IOException e2) {
-					// TODO Auto-generated catch block
 				e2.printStackTrace();
 				}
-				sc_in.close() ;
+				scIn.close() ;
 			
 				try {
-					in_stream = dat_file.getContents() ;
+					inStream = datFile.getContents() ;
 				} catch (CoreException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
-				String streamString_databomb = "" ;
-				sc_in = new Scanner(in_stream) ;
-				if (sc_in.hasNext())
-					streamString_databomb = sc_in.useDelimiter("\\Z").next() ;
+				String streamStringDatabomb = "" ;
+				scIn = new Scanner(inStream) ;
+				if (scIn.hasNext())
+					streamStringDatabomb = scIn.useDelimiter("\\Z").next() ;
 		
-				streamString_databomb = streamString_databomb.replace("\n" , "") ;
-				streamString_databomb = streamString_databomb.replace(" " , "") ;
-				streamString_databomb = streamString_databomb.replace("\t" , "") ;
-				streamString_databomb = streamString_databomb.replace("\r" , "") ;
+				streamStringDatabomb = streamStringDatabomb.replace("\n" , "") ;
+				streamStringDatabomb = streamStringDatabomb.replace(" " , "") ;
+				streamStringDatabomb = streamStringDatabomb.replace("\t" , "") ;
+				streamStringDatabomb = streamStringDatabomb.replace("\r" , "") ;
 			
 				try {
-					in_stream.close();
+					inStream.close();
 				} catch (IOException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
-				sc_in.close() ;
+				scIn.close() ;
 				
-				String streamString_per = "" ;
-				if(per_file.exists())
+				String streamStringPer = "" ;
+				if(perFile.exists())
 				{
 					try {
-						in_stream = per_file.getContents() ;
+						inStream = perFile.getContents() ;
 					} catch (CoreException e1) {
-						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
-					sc_in = new Scanner(in_stream) ;
-					if (sc_in.hasNext())
-						streamString_per = sc_in.useDelimiter("\\Z").next() ;
+					scIn = new Scanner(inStream) ;
+					if (scIn.hasNext())
+						streamStringPer = scIn.useDelimiter("\\Z").next() ;
 				
-					streamString_per = streamString_databomb.replace("\n" , "") ;
-					streamString_per = streamString_databomb.replace(" " , "") ;
-					streamString_per = streamString_databomb.replace("\t" , "") ;
-					streamString_per = streamString_databomb.replace("\r" , "") ;
+					streamStringPer = streamStringDatabomb.replace("\n" , "") ;
+					streamStringPer = streamStringDatabomb.replace(" " , "") ;
+					streamStringPer = streamStringDatabomb.replace("\t" , "") ;
+					streamStringPer = streamStringDatabomb.replace("\r" , "") ;
 					
 					try {
-						in_stream.close();
+						inStream.close();
 					} catch (IOException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
-					sc_in.close() ;
+					scIn.close() ;
 				}
 				try {
 					DesignModeView view = (DesignModeView) HandlerUtil.getActiveWorkbenchWindowChecked(event).getActivePage().showView(DesignModeView.ID) ;
-					view.setDdl(streamString_ddl);
-					view.setDatabomb(streamString_databomb);
-					view.setPersist(streamString_per);
-					view.setPer_filepath(per_file.getRawLocation().toOSString());
+					view.setDdl(streamStringDdl);
+					view.setDatabomb(streamStringDatabomb);
+					view.setPersist(streamStringPer);
+					view.setPer_filepath(perFile.getRawLocation().toOSString());
 					view.updateView();
 					return null ;
 				} 	catch (PartInitException e) {
@@ -151,15 +141,15 @@ public class DesignModeSelect implements IHandler {
 				}
 		
 			}
-			else if(!dat_file.exists())
+			else if(!datFile.exists())
 			{
-				String message = "The corresponding databomb file " + dat_file.getName() + " does not exist." ;
+				String message = "The corresponding databomb file " + datFile.getName() + " does not exist." ;
 				IStatus status = new HIPIEStatus(IStatus.ERROR, HIPIEStatus.DESIGN_MODE_DATBOMB__ERROR, HIPIEActivator.ORG_XTEXT_HIPIE_HIPIE, message, null) ;
 			    StatusManager.getManager().handle(status, StatusManager.LOG|StatusManager.SHOW);
 			}
-			else if(!ddl_file.exists())
+			else if(!ddlFile.exists())
 			{
-				String message = "The corresponding ddl file " + dat_file.getName() + " does not exist." ;
+				String message = "The corresponding ddl file " + datFile.getName() + " does not exist." ;
 				IStatus status = new HIPIEStatus(IStatus.ERROR, HIPIEStatus.DESIGN_MODE_DATBOMB__ERROR, HIPIEActivator.ORG_XTEXT_HIPIE_HIPIE, message, null) ;
 			    StatusManager.getManager().handle(status, StatusManager.LOG|StatusManager.SHOW);
 			}
@@ -170,20 +160,17 @@ public class DesignModeSelect implements IHandler {
 
 	@Override
 	public boolean isEnabled() {
-		// TODO Auto-generated method stub
 		return true;
 	}
 
 	@Override
 	public boolean isHandled() {
-		// TODO Auto-generated method stub
 		return true;
 	}
 
 	@Override
 	public void removeHandlerListener(IHandlerListener handlerListener) {
-		// TODO Auto-generated method stub
-
+		
 	}
 
 }

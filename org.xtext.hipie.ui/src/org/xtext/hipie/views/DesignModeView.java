@@ -1,10 +1,6 @@
 package org.xtext.hipie.views;
 
-import org.eclipse.core.runtime.Path;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.IViewSite;
-import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.ViewPart;
 
 public class DesignModeView extends ViewPart {
@@ -13,8 +9,8 @@ public class DesignModeView extends ViewPart {
 	private String persist ;
 	private String ddl ;
 	private String databomb ;
-	private String per_filepath ;
-	DesignModeComposite internal_composite ;	
+	private String perFilepath ;
+	DesignModeComposite internalComposite ;	
 	
 	public DesignModeView() {
 		
@@ -22,18 +18,16 @@ public class DesignModeView extends ViewPart {
 
 	@Override
 	public void createPartControl(Composite parent) {	
-		internal_composite = new DesignModeComposite(parent, true);
+		internalComposite = new DesignModeComposite(parent, true);
 	}
 
 	@Override
-	public void setFocus() {
-		// TODO Auto-generated method stub
-		
+	public void setFocus() {		
 	}
 	
 	public void updateView()
 	{
-		internal_composite.setStrings(ddl, databomb, persist, per_filepath);
+		internalComposite.setStrings(ddl, databomb, persist, perFilepath);
 	}
 
 	public String getPersist() {
@@ -61,13 +55,10 @@ public class DesignModeView extends ViewPart {
 	}
 
 	public String getPer_filepath() {
-		return per_filepath;
+		return perFilepath;
 	}
 
 	public void setPer_filepath(String per_filepath) {
-		this.per_filepath = per_filepath;
-	}
-	
-	
-	
+		this.perFilepath = per_filepath;
+	}	
 }

@@ -15,6 +15,7 @@ import org.xtext.hipie.views.HIPIEPrefPage;
 /**
  * Use this class to register components to be used within the IDE.
  */
+
 public class HIPIEUiModule extends org.xtext.hipie.ui.AbstractHIPIEUiModule {
 	public HIPIEUiModule(AbstractUIPlugin plugin) {
 		super(plugin);

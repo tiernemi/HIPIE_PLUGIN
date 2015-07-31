@@ -14,9 +14,9 @@ public class CompilerPreferenceInitialiser extends
 
 	@Override
 	public void initializeDefaultPreferences() {
-    	String default_path = ResourcesPlugin.getWorkspace().getRoot().getRawLocation().toOSString() ;
+    	String defaultPath = ResourcesPlugin.getWorkspace().getRoot().getRawLocation().toOSString() ;
 		IPreferenceStore store = HIPIEActivator.getInstance().getPreferenceStore();
-		    store.setDefault("Compiler Location", default_path);
+		    store.setDefault("Compiler Location", defaultPath);
 	}
 
 }

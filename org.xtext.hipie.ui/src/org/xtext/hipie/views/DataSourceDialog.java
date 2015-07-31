@@ -14,9 +14,7 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.ICheckStateListener;
-import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
@@ -30,11 +28,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TableColumn;
-import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.ISelectionListener;
-import org.eclipse.ui.ISelectionService;
-import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.SelectionDialog;
 import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
@@ -44,22 +38,8 @@ import org.eclipse.ui.model.WorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.osgi.service.prefs.Preferences;
 /**
- * A standard resource selection dialog which solicits a list of resources from
- * the user. The <code>getResult</code> method returns the selected resources.
- * <p>
- * This class may be instantiated; it is not intended to be subclassed.
- * </p>
- * <p>
- * Example:
- * <pre>
- * 	ResourceSelectionDialog dialog =
- *		new ResourceSelectionDialog(getShell(), rootResource, msg);
- *	dialog.setInitialSelections(selectedResources);
- *	dialog.open();
- *	return dialog.getResult();
- * </pre>
- * </p>
- * @noextend This class is not intended to be subclassed by clients.
+ * This dialog box is responsible for the selection of data sources for a dud file.
+ *  Only folders and projects containing valid files are visible.
  */
 public class DataSourceDialog extends SelectionDialog {
     // the root element to populate the viewer with
@@ -67,7 +47,7 @@ public class DataSourceDialog extends SelectionDialog {
 
     // the visual selection widget group
     private CheckboxTreeAndListGroup selectionGroup;
-    private Text cmd_args ;
+    private Text cmdArgsTextBox ;
     // constants
     private final static int SIZING_SELECTION_WIDGET_WIDTH = 400;
 
@@ -138,15 +118,15 @@ public class DataSourceDialog extends SelectionDialog {
      * Method declared on Dialog.
      */
     
-    private boolean checkFoldersForValidFiles(IFolder folder)
+    private boolean checkFoldersForValidFiles(IContainer res)
     {
 		boolean has_valid_files = false ;
 		try {
-			for (int i = 0 ; i < folder.members().length ; ++i)
+			for (int i = 0 ; i < res.members().length ; ++i)
 			{
-				IResource member = folder.members()[i] ;
+				IResource member = res.members()[i] ;
 				if (member instanceof IFile)
-					if (member.getFileExtension().equals("txt") | member.getFileExtension().equals("csv") | member.getFileExtension().equals("dat"))
+					if (!member.getName().startsWith("."))
 						has_valid_files = true ;
 				if (member instanceof IFolder)
 					has_valid_files = checkFoldersForValidFiles((IFolder) member) ;
@@ -180,8 +160,8 @@ public class DataSourceDialog extends SelectionDialog {
   
         Label label = new Label(composite, SWT.NONE);
 		label.setText("Command Line Arguments");
-        cmd_args = new Text(composite ,SWT.SINGLE | SWT.LEAD | SWT.BORDER) ;
-        cmd_args.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
+        cmdArgsTextBox = new Text(composite ,SWT.SINGLE | SWT.LEAD | SWT.BORDER) ;
+        cmdArgsTextBox.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
       
         selectionGroup.getListTable().addSelectionListener(new SelectionListener() 
         {
@@ -190,27 +170,27 @@ public class DataSourceDialog extends SelectionDialog {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 
-				// Save Previous
+				// Save Previous. //
 				if (prev_file != null)
 				{
-					String file_name = prev_file.getName() ;
-					IProject cont_project = prev_file.getProject() ;
-					IScopeContext projectScope = new ProjectScope(cont_project) ;
+					String fileName = prev_file.getName() ;
+					IProject contProject = prev_file.getProject() ;
+					IScopeContext projectScope = new ProjectScope(contProject) ;
 					Preferences preferences = projectScope.getNode("org.xtext.hipie.ui");
-					Preferences selected_items = preferences.node("data_prefs");
-					selected_items.put("cmd_line__prefs_" + file_name , cmd_args.getText()) ;
+					Preferences selectedItems = preferences.node("data_prefs");
+					selectedItems.put("cmd_line__prefs_" + fileName , cmdArgsTextBox.getText()) ;
 				}
 				
 				// Open New
-				IFile sel_file = (IFile) e.item.getData() ;
-				prev_file = sel_file ;
-				String file_name = sel_file.getName() ;
-				IProject cont_project = sel_file.getProject() ;
-				IScopeContext projectScope = new ProjectScope(cont_project) ;
+				IFile selFile = (IFile) e.item.getData() ;
+				prev_file = selFile ;
+				String fileName = selFile.getName() ;
+				IProject contProject = selFile.getProject() ;
+				IScopeContext projectScope = new ProjectScope(contProject) ;
 				Preferences preferences = projectScope.getNode("org.xtext.hipie.ui");
-				Preferences selected_items = preferences.node("data_prefs");
-				String cmd_string = selected_items.get("cmd_line__prefs_" + file_name , "") ;
-				cmd_args.setText(cmd_string);
+				Preferences selectedItems = preferences.node("data_prefs");
+				String cmdString = selectedItems.get("cmd_line__prefs_" + fileName , "") ;
+				cmdArgsTextBox.setText(cmdString);
 			}
 			
 			@Override
@@ -220,18 +200,18 @@ public class DataSourceDialog extends SelectionDialog {
 			}
 		});
         
-        cmd_args.addModifyListener(new ModifyListener()
+        cmdArgsTextBox.addModifyListener(new ModifyListener()
         {
 
 			@Override
 			public void modifyText(ModifyEvent e) {
-				IFile sel_file = (IFile) selectionGroup.getListTable().getItem(selectionGroup.getListTable().getSelectionIndex()).getData() ;
-				String file_name = sel_file.getName() ;
-				IProject cont_project = sel_file.getProject() ;
-				IScopeContext projectScope = new ProjectScope(cont_project) ;
+				IFile selFile = (IFile) selectionGroup.getListTable().getItem(selectionGroup.getListTable().getSelectionIndex()).getData() ;
+				String fileName = selFile.getName() ;
+				IProject contProject = selFile.getProject() ;
+				IScopeContext projectScope = new ProjectScope(contProject) ;
 				Preferences preferences = projectScope.getNode("org.xtext.hipie.ui");
-				Preferences selected_items = preferences.node("data_prefs");
-				selected_items.put("cmd_line__prefs_" + file_name , cmd_args.getText()) ;
+				Preferences selectedItems = preferences.node("data_prefs");
+				selectedItems.put("cmd_line__prefs_" + fileName , cmdArgsTextBox.getText()) ;
 			}
         	
         }) ;
@@ -269,23 +249,32 @@ public class DataSourceDialog extends SelectionDialog {
                         return new Object[0];
                     }
                     //filter out the desired resource types
-                    ArrayList results = new ArrayList();
+                    ArrayList<IResource> results = new ArrayList<IResource>();
                     for (int i = 0; i < members.length; i++) {
                         //And the test bits with the resource types to see if they are what we want
                         if ((members[i].getType() & resourceType) > 0) {
                         	if(members[i].getType() == IResource.FILE)
                         	{
-                        		if(members[i].getFileExtension().equals("txt") | members[i].getFileExtension().equals("csv") | members[i].getFileExtension().equals("dat"))
+                        		if(!members[i].getName().startsWith("."))
                         			results.add(members[i]);
                         	}
-                        	else if(members[i].getType() == IResource.FOLDER)
+                        	else if(members[i].getType() == IResource.FOLDER && !members[i].getName().startsWith("."))
                         	{
                         		IFolder folder = (IFolder) members[i] ;
                         		if(checkFoldersForValidFiles(folder))
                         			results.add(members[i]);
                         	}
+                        	else if(members[i].getType() == IResource.PROJECT && !members[i].getName().startsWith("."))
+                        	{
+                        		IProject proj = (IProject) members[i] ;
+                        		if(checkFoldersForValidFiles(proj))
+                        			results.add(members[i]);
+                        	}
                         	else
-                        		results.add(members[i]);
+                        	{
+                        		if (!members[i].getName().startsWith("."))
+                        			results.add(members[i]);
+                        	}
                         }
                     }
                     return results.toArray();

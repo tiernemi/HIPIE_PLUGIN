@@ -5,6 +5,10 @@ import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
 import org.xtext.hipie.views.DesignModeView;
 
+/**
+ * Defines the HIPIE plugin perspective.
+ */
+
 public class HipiePerspective implements IPerspectiveFactory {
 
 	public static String perspec_id = "org.xtext.hipie.ui.hipie_perspec" ;
