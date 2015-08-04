@@ -16,9 +16,10 @@ import org.eclipse.core.resources.IResource
 import org.eclipse.core.runtime.NullProgressMonitor
 import org.eclipse.core.runtime.Path
 import java.io.FileOutputStream
-import javax.inject.Inject
 import java.util.ArrayList
 import org.eclipse.core.resources.ProjectScope
+import java.io.FileWriter
+import java.io.File
 
 /**
  * Generates code from your model files on save.
@@ -31,27 +32,28 @@ class HIPIEGenerator implements IGenerator {
 		
 		var ws_root = ResourcesPlugin.getWorkspace().getRoot() 
 			
-		if (resource.URI.isPlatformResource()) 
-		{
+		if (resource.URI.isPlatformResource()) {
 			var platformString = resource.URI.toPlatformString(true)
 			var resourceFile = ws_root.findMember(platformString)
 			var project = resourceFile.project
 				
 			var projectScope = new ProjectScope(project) ;
-			var proj_prefs= projectScope.getNode("org.xtext.hipie.ui");
+			var projPrefs= projectScope.getNode("org.xtext.hipie.ui");
 		
 			// Get Compiler Location //
 			val defaultCompilerPath = ResourcesPlugin.getWorkspace().getRoot().getRawLocation().toOSString() ;
-			var work_prefs = InstanceScope.INSTANCE.getNode("org.xtext.hipie.ui");
-			val compilerPath = new Path(work_prefs.get('Compiler Location' , defaultCompilerPath))
-		
-			var selected_items = proj_prefs.node("data_prefs");
-			var select_string = selected_items.get("select_prefs", "") ;
-			var data_filestrings = select_string.split(" ")
-			var data_filepaths = new ArrayList<Path>	
-			for (i : 0..<data_filestrings.size)
-				if(data_filestrings.get(i).length() > 0)
-						data_filepaths +=  new Path(data_filestrings.get(i))		
+			var workPrefs = InstanceScope.INSTANCE.getNode("org.xtext.hipie.ui");
+			val compilerPath = new Path(workPrefs.get('Compiler Location' , defaultCompilerPath))
+			
+			// Get Data Source Selections //  
+			var filename = resourceFile.name
+			var selectedItems = projPrefs.node("data_prefs");
+			var selectString = selectedItems.get("select_prefs_" + filename, "")
+			var dataFileSelections = selectString.split(" ")
+			var dataFilePaths = new ArrayList<Path>	
+			for (i : 0..<dataFileSelections.size)
+				if(dataFileSelections.get(i).length() > 0)
+						dataFilePaths +=  new Path(dataFileSelections.get(i))		
 					
 			var ddlFilePath = resourceFile.projectRelativePath.removeFileExtension().addFileExtension("ddl")
 			var ddlFile = project.getFile(ddlFilePath)
@@ -63,84 +65,148 @@ class HIPIEGenerator implements IGenerator {
 			var proc = Runtime.getRuntime().exec(ddl_cmd) as Process
 			var in = proc.inputStream
 			var er = proc.errorStream
-			var sc_verbose = new Scanner(in)
-			var sc_er = new Scanner(er)
+			var scVerbose = new Scanner(in)
+			var scError = new Scanner(er)
 			var streamString = new String
-			var streamString_er = new String
-			if (sc_verbose.hasNext())
-				streamString = sc_verbose.useDelimiter("\\Z").next() ;
-			if (sc_er.hasNext())
-				streamString_er = sc_er.useDelimiter("\\Z").next() ;
+			var streamStringErrors = new String
+			if (scVerbose.hasNext())
+				streamString = scVerbose.useDelimiter("\\Z").next() ;
+			if (scError.hasNext())
+				streamStringErrors = scError.useDelimiter("\\Z").next() ;
 			System.out.println(streamString)
-			System.out.println(streamString_er)
+			System.out.println(streamStringErrors)
 			in.close()
 			er.close() 	
 		
 			//  Generate DataBomb  //
 			var databombFilePath =  resourceFile.projectRelativePath.removeFileExtension().addFileExtension("databomb");
 			var databombFile = project.getFile(databombFilePath);
-			var data_cmd_string = ""
-			for (i : 0..<data_filepaths.size) {
-				data_cmd_string += " " + ws_root.getFile(data_filepaths.get(i)).rawLocation.toOSString
+			var tempDatFilePaths = new ArrayList()
+			
+			for (i : 0..<dataFilePaths.size) {
+				var datFilePath = dataFilePaths.get(i)
+				var datFile = ws_root.getFile(datFilePath)
+				var cmdLineArgs = selectedItems.get("cmd_line__prefs_" + datFile.name , "")
+				var dataCmdString = "-csv " + ws_root.getFile(datFilePath).rawLocation.toOSString + " " + cmdLineArgs
+				var tempFilePath = new Path(datFile.projectRelativePath.removeFileExtension.toOSString + "temp.databomb")
+				tempDatFilePaths += tempFilePath
+				var databombCmd = ""
+				databombCmd = 'java -cp ' + compilerPath.toOSString + ' org/hpcc/HIPIE/commandline/CommandLineService ' + dataCmdString + ' -o ' + project.getFile(tempFilePath).rawLocation.toOSString 
+				System.out.println(databombCmd)
+				var procData = Runtime.getRuntime().exec(databombCmd) as Process				
+				in = procData.inputStream
+				er = procData.errorStream
+				scVerbose = new Scanner(in)
+				scError = new Scanner(er)
+				streamString = new String
+				streamStringErrors = new String
+				if (scVerbose.hasNext())
+					streamString = scVerbose.useDelimiter("\\Z").next() ;
+				if (scError.hasNext())
+					streamStringErrors = scError.useDelimiter("\\Z").next() ;
+				println(streamString)
+				println(streamStringErrors)
+				println(dataCmdString)
+				in.close()
+				er.close()
+				scVerbose.close()
+				scError.close()
 			}
-			var databombFileString = databombFile.rawLocation.toOSString()
-			var dat_cmd = 'java -cp ' + compilerPath.toOSString + ' org/hpcc/HIPIE/commandline/CommandLineService -csv' + data_cmd_string + ' -separator \\t -escape / -quote \\\" -lineseparator \\n -o ' + databombFileString 
-			System.out.println(dat_cmd)
-			val proc_data = Runtime.getRuntime().exec(dat_cmd) as Process ;
-			in = proc_data.inputStream
-			er = proc_data.errorStream
-			sc_verbose = new Scanner(in)
-			sc_er = new Scanner(er)
-			streamString = new String
-			streamString_er = new String
-			if (sc_verbose.hasNext())
-				streamString = sc_verbose.useDelimiter("\\Z").next() ;
-			if (sc_er.hasNext())
-					streamString_er = sc_er.useDelimiter("\\Z").next() ;
-			System.out.println(streamString)
-			System.out.println(streamString_er)
 			
-			var in_stream = new FileInputStream(ddlFile.rawLocation.toOSString());
-			var streamString_ddl = new String
-			var sc_in = new Scanner(in_stream)
-			if (sc_in.hasNext())
-				streamString_ddl = sc_in.useDelimiter("\\Z").next()
-		
-			streamString_ddl = streamString_ddl.replace("\n" , "")
-			streamString_ddl = streamString_ddl.replace(" " , "")
-			streamString_ddl = streamString_ddl.replace("\t" , "")
-			streamString_ddl = streamString_ddl.replace("\r" , "")
+			for (i : 0..<tempDatFilePaths.size) {
+				var tempDatFile = project.getFile(tempDatFilePaths.get(i)).rawLocation.toOSString
+				var inStream = new FileInputStream(tempDatFile);
+				if (i == 0 && databombFile.exists())
+					databombFile.delete(true,null)
+				var fw = new FileWriter(databombFile.rawLocation.toOSString,true);
+				var streamStringTemp = new String
+				var scIn = new Scanner(inStream)
+				if (scIn.hasNext())
+					streamStringTemp = scIn.useDelimiter("\\Z").next()
+				if(i != tempDatFilePaths.size-1 && tempDatFilePaths.size > 1)
+				{
+					streamStringTemp = streamStringTemp.substring(0, streamStringTemp.lastIndexOf("}"))
+					streamStringTemp += ","
+				}
+				if(i != 0 && tempDatFilePaths.size > 1)
+				{
+					streamStringTemp = streamStringTemp.substring(streamStringTemp.indexOf("{")+1) 
+				}
+				fw.write(streamStringTemp)
+				fw.close
+				var file = new File(tempDatFile)
+				file.delete
+				inStream.close
+			}
 			
-			in_stream = new FileInputStream(databombFile.rawLocation.toOSString())
-			var streamString_databomb = new String
-			sc_in = new Scanner(in_stream)
-			if (sc_in.hasNext())
-				streamString_databomb = sc_in.useDelimiter("\\Z").next()
+			// Creates an empty persist if there is none already //
+			var perFilepath = resourceFile.projectRelativePath.removeFileExtension().addFileExtension("persist")
+			var perFile =  project.getFile(perFilepath)
+			if(!perFile.exists) {
+				var fwPer = new FileWriter(perFile.rawLocation.toOSString)
+				fwPer.close()
+			}
+
+			// Converts ddl file to string //
+			var inStream = new FileInputStream(ddlFile.rawLocation.toOSString());			
+			var streamStringDdl = new String
+			var scIn = new Scanner(inStream)
+			if (scIn.hasNext())
+				streamStringDdl = scIn.useDelimiter("\\Z").next()
 		
-			streamString_databomb = streamString_databomb.replace("\n" , "")
-			streamString_databomb = streamString_databomb.replace(" " , "")
-			streamString_databomb = streamString_databomb.replace("\t" , "")
-			streamString_databomb = streamString_databomb.replace("\r" , "")
+			streamStringDdl = streamStringDdl.replace("\n" , "")
+			streamStringDdl = streamStringDdl.replace(" " , "")
+			streamStringDdl = streamStringDdl.replace("\t" , "")
+			streamStringDdl = streamStringDdl.replace("\r" , "")
+			inStream.close() 
+			scIn.close()
+			
+			// Converts databomb to cleaned string 
+			inStream = new FileInputStream(databombFile.rawLocation.toOSString())
+			var streamStringDatabomb = new String
+			scIn = new Scanner(inStream)
+			if (scIn.hasNext())
+				streamStringDatabomb = scIn.useDelimiter("\\Z").next()
+		
+			streamStringDatabomb = streamStringDatabomb.replace("\n" , "")
+			streamStringDatabomb = streamStringDatabomb.replace(" " , "")
+			streamStringDatabomb = streamStringDatabomb.replace("\t" , "")
+			streamStringDatabomb = streamStringDatabomb.replace("\r" , "")
+			inStream.close()
+			scIn.close()
+			
+			inStream = new FileInputStream(perFile.rawLocation.toOSString());
+			var streamString_per = new String
+			scIn = new Scanner(inStream)
+			if (scIn.hasNext())
+				streamString_per = scIn.useDelimiter("\\Z").next()
+			streamString_per = streamString_per.replace("\n" , "")
+			streamString_per = streamString_per.replace(" " , "")
+			streamString_per = streamString_per.replace("\t" , "")
+			streamString_per = streamString_per.replace("\r" , "")
+			inStream.close()
+			scIn.close()
 			
 			// Generate HTML //
 			var url = new URL("platform:/plugin/org.xtext.hipie/vis_files/marsh.html")		
-			var n = url.openConnection().getInputStream()
-			var streamString_html = new String
-			sc_in = new Scanner(n)
-			if (sc_in.hasNext())
-				streamString_html = sc_in.useDelimiter("\\Z").next() 
+			var inStreamConnection = url.openConnection().getInputStream()
+			var streamStringHtml = new String
+			scIn = new Scanner(inStreamConnection)
+			if (scIn.hasNext())
+				streamStringHtml = scIn.useDelimiter("\\Z").next() 
 			
-			streamString_html = streamString_html.replace("%_data_%" , streamString_databomb)
-			streamString_html = streamString_html.replace("%_ddl_%" , streamString_ddl)
+			streamStringHtml = streamStringHtml.replace("%_data_%" , streamStringDatabomb)
+			streamStringHtml = streamStringHtml.replace("%_ddl_%" , streamStringDdl)
+			//streamString_html = streamString_html.replace("%_persist_%" , streamString_per)
 			
 			var htmlFilePath = resourceFile.projectRelativePath.removeFileExtension().addFileExtension("html")
 			var htmlFile = project.getFile(htmlFilePath)
-			var html_out = new FileOutputStream(htmlFile.rawLocation.toOSString)
-			html_out.write(streamString_html.getBytes())
+			var htmlOut = new FileOutputStream(htmlFile.rawLocation.toOSString)
+			htmlOut.write(streamStringHtml.getBytes())
 			project.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor())
 			in.close()
 			er.close() 	
-			html_out.close()
+			htmlOut.close()
 		}
 	}
 }

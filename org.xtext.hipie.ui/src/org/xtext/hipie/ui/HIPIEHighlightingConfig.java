@@ -9,7 +9,7 @@ import static org.eclipse.swt.SWT.*;
 
 public class HIPIEHighlightingConfig implements IHighlightingConfiguration
 {
-	 // provide an id string for the highlighting calculator
+	 // Provide an id string for the highlighting calculator. //
 	 public static final String KEYWORD = "keyword";
 	 public static final String DATATYPE = "datatype";
 	 public static final String COMMENT = "comment";
@@ -18,7 +18,6 @@ public class HIPIEHighlightingConfig implements IHighlightingConfiguration
 	 public static final String GENERATE = "Generate Inline" ;
 	 
 	 public static final String[] ALL_STRINGS = {KEYWORD , STRING} ;
-	
 	
 	 public void configure(IHighlightingConfigurationAcceptor acceptor) {
 		 addType( acceptor, STRING, 125, 38, 205, NORMAL );
@@ -29,12 +28,12 @@ public class HIPIEHighlightingConfig implements IHighlightingConfiguration
 		 addType( acceptor, DATATYPE, 140, 140, 140, ITALIC );
 	 }
 	 
-	 public void addType( IHighlightingConfigurationAcceptor acceptor, String s, int r, int g, int b, int style )
-	 {
-	 TextStyle textStyle = new TextStyle();
-	 textStyle.setBackgroundColor(new RGB(255, 255, 255));
-	 textStyle.setColor(new RGB(r, g, b));
-	 textStyle.setStyle(style);
-	 acceptor.acceptDefaultHighlighting(s, s, textStyle);
+	 public void addType( IHighlightingConfigurationAcceptor acceptor, String s,
+			 int r, int g, int b, int style ){
+		 TextStyle textStyle = new TextStyle();
+		 textStyle.setBackgroundColor(new RGB(255, 255, 255));
+		 textStyle.setColor(new RGB(r, g, b));
+		 textStyle.setStyle(style);
+		 acceptor.acceptDefaultHighlighting(s, s, textStyle);
 	 }
 } 

@@ -20,6 +20,8 @@
     </div>
     <script>
         require(["src/other/Comms", "src/marshaller/Graph", "src/marshaller/HTML"], function (Comms, Graph, HTML) {
+           
+            var persist = '%_persist_%' ;
             new HTML()
                 .target("marshaller")
                 .ddlUrl('%_ddl_%')

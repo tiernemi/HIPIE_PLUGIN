@@ -6,7 +6,7 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IHandler;
 import org.eclipse.core.commands.IHandlerListener;
-import org.eclipse.core.internal.resources.File;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ProjectScope;
@@ -22,6 +22,9 @@ import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 import org.xtext.hipie.views.DataSourceDialog;
 
+/**
+ * Opens data sources dialog based of currently opened file in editor.
+ */
 
 public class DataSources implements IHandler {
 
@@ -32,13 +35,11 @@ public class DataSources implements IHandler {
 	
 	@Override
 	public void addHandlerListener(IHandlerListener handlerListener) {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void dispose() {
-		// TODO Auto-generated method stub
 
 	}
 
@@ -46,46 +47,46 @@ public class DataSources implements IHandler {
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		
 		IEditorInput EditorFile = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor().getEditorInput() ;
-		IProject cont_project = ((FileEditorInput)EditorFile).getFile().getProject() ;
-
-		IScopeContext projectScope = new ProjectScope(cont_project) ;
+		IProject contProject = ((FileEditorInput)EditorFile).getFile().getProject() ;
+		String fileName = ((FileEditorInput)EditorFile).getFile().getName() ;
+		
+		IScopeContext projectScope = new ProjectScope(contProject) ;
 		Preferences preferences = projectScope.getNode("org.xtext.hipie.ui");
-		Preferences selected_items = preferences.node("data_prefs");
-		String select_string = selected_items.get("select_prefs", "") ;
+		Preferences selectedItems = preferences.node("data_prefs");
+		String select_string = selectedItems.get("select_prefs_" + fileName , "") ;
 		String[] filepaths = select_string.split(" ") ;
-		ArrayList<Object> prev_sel_files = new ArrayList<Object>() ;
+		ArrayList<Object> prevSelFiles = new ArrayList<Object>() ;
 		for (int i = 0 ; i < filepaths.length ; ++i)
 		{
 			if(filepaths[i].length() > 0)
 			{
 				Path filepath = new Path(filepaths[i]) ;
 				if (ResourcesPlugin.getWorkspace().getRoot().getFile(filepath).exists())
-					prev_sel_files.add((IResource) ResourcesPlugin.getWorkspace().getRoot().getFile(filepath)) ;
+					prevSelFiles.add((IResource) ResourcesPlugin.getWorkspace().getRoot().getFile(filepath)) ;
 			}
 		}
 		DataSourceDialog dialog = 
 		new DataSourceDialog(HandlerUtil.getActiveShell(event), ResourcesPlugin.getWorkspace().getRoot(), "Select Data Sources") ;
 				dialog.setTitle("Data Source Selection");
 
-		if (prev_sel_files.size() > 0)
-			dialog.setInitialSelections(prev_sel_files.toArray());
-		// user pressed cancel
+		if (prevSelFiles.size() > 0)
+			dialog.setInitialSelections(prevSelFiles.toArray());
+		// User pressed cancel. //
 		if (dialog.open() != Window.OK)
 			return false;
 		Object[] result = dialog.getResult();
 
-		String select_list = "" ;
+		String selectList = "" ;
 		for (int i = 0 ; i < result.length ; ++i)
-			if (result[i] instanceof File)
+			if (result[i] instanceof IFile)
 			{
-				File temp =  (File) result[i] ;
-				select_list += temp.getFullPath().toOSString() + " " ;
+				IFile temp =  (IFile) result[i] ;
+				selectList += temp.getFullPath().toOSString() + " " ;
 			}
-		selected_items.put("select_prefs", select_list) ;
+		selectedItems.put("select_prefs_" + fileName, selectList) ;
 		try {
 			preferences.flush() ;
 		} catch (BackingStoreException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null ;
@@ -93,20 +94,16 @@ public class DataSources implements IHandler {
 
 	@Override
 	public boolean isEnabled() {
-		// TODO Auto-generated method stub
 		return true;
 	}
 
 	@Override
 	public boolean isHandled() {
-		// TODO Auto-generated method stub
 		return true;
 	}
 
 	@Override
 	public void removeHandlerListener(IHandlerListener handlerListener) {
-		// TODO Auto-generated method stub
-
 	}
 
 }
