@@ -38,7 +38,7 @@ public class DesignModeComposite extends Composite {
 	// Composite elements. //
 	private Browser designModeBrowser ;
 	private Button syncButton ;
-	private String dermaHtmlUrl = "file:///home/michael/Downloads/derm.html" ; 
+	private String dermaHtmlUrl = "https://rawgit.com/Evan1415/Design_Mode_Files/master/derm.html" ; 
 	
 	
 	public DesignModeComposite(final Composite parent, boolean showAddressBar) {
@@ -68,8 +68,6 @@ public class DesignModeComposite extends Composite {
 					System.out.println(designModeBrowser.execute(databombCmd)) ;
 					System.out.println(designModeBrowser.execute(persistCmd)) ;
 					System.out.println(designModeBrowser.execute(updateCmd)) ;
-					System.out.println(designModeBrowser.evaluate("return " + databombCmd)) ;
-					System.out.println(designModeBrowser.evaluate("return " + ddlCmd)) ;
 					workPrefs.put("ddl_design_str", ddl);
 					workPrefs.put("databomb_design_str", databomb);
 					workPrefs.put("persist_design_str", persist);
