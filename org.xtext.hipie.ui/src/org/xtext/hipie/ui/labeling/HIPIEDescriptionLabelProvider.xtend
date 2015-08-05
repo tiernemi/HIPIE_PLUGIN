@@ -3,6 +3,8 @@
  */
 package org.xtext.hipie.ui.labeling
 
+import org.eclipse.xtext.resource.IEObjectDescription
+
 //import org.eclipse.xtext.resource.IEObjectDescription
 
 /**
@@ -15,10 +17,10 @@ class HIPIEDescriptionLabelProvider extends org.eclipse.xtext.ui.label.DefaultDe
 	// Labels and icons can be computed like this:
 	
 //	override text(IEObjectDescription ele) {
-//		ele.name.toString
+//		println(ele.name.toString)
 //	}
-//	 
-//	override image(IEObjectDescription ele) {
-//		ele.EClass.name + '.gif'
-//	}	 
+
+	//override image(IEObjectDescription ele) {
+	//	ele.EClass.name + '.gif'
+	//}	 
 }

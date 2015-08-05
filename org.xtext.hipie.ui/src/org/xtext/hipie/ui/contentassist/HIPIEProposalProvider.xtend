@@ -4,10 +4,137 @@
 package org.xtext.hipie.ui.contentassist
 
 import org.xtext.hipie.ui.contentassist.AbstractHIPIEProposalProvider
+import org.eclipse.emf.ecore.EObject
+import org.eclipse.xtext.ui.editor.contentassist.ContentAssistContext
+import org.eclipse.xtext.ui.editor.contentassist.ICompletionProposalAcceptor
+import javax.inject.Inject
+import org.eclipse.xtext.ui.label.StylerFactory
+import org.eclipse.xtext.ui.editor.utils.TextStyle
+import org.eclipse.swt.graphics.RGB
+import org.eclipse.swt.graphics.FontData
+import org.eclipse.swt.SWT
+import org.eclipse.jface.viewers.StyledString
+import org.eclipse.xtext.Assignment
+import org.eclipse.xtext.Keyword
+import org.eclipse.xtext.scoping.IScopeProvider
+import org.xtext.hipie.hIPIE.OutDataset
+import org.eclipse.xtext.naming.QualifiedName
+import org.xtext.hipie.hIPIE.PosVizData
+import org.xtext.hipie.hIPIE.NestedDatasetDecl
+import org.xtext.hipie.hIPIE.Dataset
+import org.xtext.hipie.hIPIE.Visualization
+import org.xtext.hipie.hIPIE.VisualSection
+import org.xtext.hipie.hIPIE.ECLFieldType
+import org.xtext.hipie.hIPIE.FieldDecl
 
 /**
  * See https://www.eclipse.org/Xtext/documentation/304_ide_concepts.html#content-assist
  * on how to customize the content assistant.
  */
 class HIPIEProposalProvider extends AbstractHIPIEProposalProvider {
+	 	 
+	@Inject
+    private StylerFactory stylerFactory;
+     
+    def protected TextStyle getTypeTextStyle() {
+      var textStyle = new TextStyle();
+      textStyle.setColor(new RGB(125,38,205));
+      textStyle.setFontData(new FontData("typefont", 9, SWT.NORMAL))
+      textStyle.setStyle(SWT.NORMAL);
+      return textStyle;
+    } 
+    
+    def protected TextStyle getCrossRefTextStyle() {
+      var textStyle = new TextStyle()
+      textStyle.setColor(new RGB(140,140,140));
+      textStyle.setFontData(new FontData("basefont", 10, SWT.ITALIC))
+      textStyle.setStyle(SWT.ITALIC);
+      return textStyle;
+    }
+    
+    def protected TextStyle getBasePropTextStyle() {
+      var textStyle = new TextStyle();
+      textStyle.setFontData(new FontData("basepropfont", 10, SWT.BOLD))
+      textStyle.setStyle(SWT.BOLD);
+      return textStyle;
+    }
+
+	@Inject
+	private IScopeProvider scopeProvider
+	    
+    
+	override completeKeyword(Keyword keyword, ContentAssistContext contentAssistContext,
+			ICompletionProposalAcceptor acceptor) {
+		if(keyword.getValue().equals("-") || keyword.getValue().equals(",")  || 
+			keyword.getValue().equals("(") || keyword.getValue().equals(")") ||
+			keyword.getValue().equals("{") || keyword.getValue().equals("}") )
+			return;
+		super.completeKeyword(keyword, contentAssistContext, acceptor);
+	}
+	
+	
+	override completeVisBasis_Basis(EObject model, Assignment assignment, ContentAssistContext context, ICompletionProposalAcceptor acceptor) {
+		super.completeVisBasis_Basis(model, assignment, context, acceptor)
+	}
+	
+	override protected StyledString getStyledDisplayString(EObject element, String qualifiedName, String shortName) {
+		if (element instanceof PosVizData) {
+			var obj = element as PosVizData
+			var qualName = getQualifiedName(element, qualifiedName, shortName)
+			var name = new StyledString(qualName.lastSegment)
+			var qualNameString = qualName.toString
+			if (element instanceof ECLFieldType) {
+				var cont = obj.eContainer.eContainer
+				while (cont instanceof OutDataset || cont instanceof NestedDatasetDecl || cont instanceof Dataset) {
+					if (cont instanceof OutDataset){
+						var dataset = cont as OutDataset
+						qualNameString = "OUTPUTS." + dataset.name + "." + qualNameString
+					}
+					if (cont instanceof NestedDatasetDecl){
+						var dataset = cont as NestedDatasetDecl
+						qualNameString = dataset.name + "." + qualNameString
+					}
+					cont = cont.eContainer.eContainer
+				}
+			}
+			if (element instanceof FieldDecl){
+				var cont = obj.eContainer
+				if (cont instanceof Dataset){
+					var dataset = cont as Dataset
+					qualNameString = "INPUTS." + dataset.name + "." + qualNameString
+				}
+			}
+			var qualSec = new StyledString(" - " + qualNameString , stylerFactory.createXtextStyleAdapterStyler(getCrossRefTextStyle()))
+			return name.append(qualSec)
+		}
+		if (element instanceof Visualization) {
+			var viz = element.eContainer as VisualSection
+			var qualName = getQualifiedName(element, qualifiedName, shortName)
+			var name = new StyledString(qualName.lastSegment)
+			var qualNameString = viz.name + "." + qualName.toString
+			var qualSec = new StyledString(" - " + qualNameString , stylerFactory.createXtextStyleAdapterStyler(getCrossRefTextStyle()))
+			return name.append(qualSec)
+		}
+		else {
+			var qualName = getQualifiedName(element, qualifiedName, shortName)
+			var name = new StyledString(qualName.lastSegment)
+			var qualSec = new StyledString(" - " + qualName.toString , stylerFactory.createXtextStyleAdapterStyler(getCrossRefTextStyle()))
+			return name.append(qualSec)
+		}
+	}
+	
+	protected def QualifiedName getQualifiedName(EObject element, String qualifiedName, String shortName) {
+		var qualifiedNameAsString = qualifiedName
+		if (qualifiedNameAsString == null)
+			qualifiedNameAsString = shortName
+		if (qualifiedNameAsString == null) {
+			if (element != null)
+				qualifiedNameAsString = labelProvider.getText(element)
+			else
+				return null
+		}
+		return qualifiedNameConverter.toQualifiedName(qualifiedNameAsString)
+	}
+	
+	
 }

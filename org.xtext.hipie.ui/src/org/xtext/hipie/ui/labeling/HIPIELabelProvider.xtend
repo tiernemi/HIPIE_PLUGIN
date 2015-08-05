@@ -6,6 +6,7 @@ package org.xtext.hipie.ui.labeling
 import com.google.inject.Inject
 import org.xtext.hipie.hIPIE.*
 import org.eclipse.emf.edit.provider.StyledString
+import org.eclipse.swt.graphics.Image
 
 /**
  * Provides labels for EObjects.
@@ -135,7 +136,7 @@ class HIPIELabelProvider extends org.eclipse.xtext.ui.label.DefaultEObjectLabelP
 		base.property + " : " + label_string
 	}
 	
-	 def text(OutDataset out_dataset)
+	def text(OutDataset out_dataset)
 	{
 		var out_string = ""
 		for (i : 0..<out_dataset.ops.output_ops.size)
@@ -151,6 +152,34 @@ class HIPIELabelProvider extends org.eclipse.xtext.ui.label.DefaultEObjectLabelP
 		}
 		out_dataset.name + out_string
 	}
+	
+	def image(OutDataset element) {
+		return "data_folder_out_small.png"
+	}
+	
+	def image(Dataset element) {
+		return "data_folder_in_small.png"
+	}
+	
+	def image(ECLFieldType element) {
+		return "variable.png"
+	}
+	
+	def image(OutTypeSimple element) {		
+		return "variable.png"
+	}
+	
+	def image(InputSimpleTypes element) {		
+		return "variable.png"
+	}
+	
+	def image(Visualization element) {
+		if (element.type == "PIE")
+			return "pie.png"
+		if (element.type == "BAR")
+			return "bar.png"			
+	}
+	
 	/* 
 	def text(Visualization vis)
 	{

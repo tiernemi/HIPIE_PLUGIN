@@ -341,9 +341,11 @@ VisualSection:
 	type='VISUALIZE' name=TOKEN (ops=VisualSectionOptions)? (vis_elements+=Visualization)+ => 'END'
 ;
 
-VisName :
-	('CHORO'|'LINE'|'TIMELINE'|'PIE'|'BAR'|'TABLE'|'GRAPH'|'FORM'|'GROUP'|'SLIDER')
-;
+
+
+//VisName :
+//	('CHORO'|'LINE'|'TIMELINE'|'PIE'|'BAR'|'TABLE'|'GRAPH'|'FORM'|'GROUP'|'SLIDER')
+//;
 
 VisInputValue:
 	types=InputSimpleTypes (in_ops=InputOptions)? ';'
@@ -354,8 +356,8 @@ VisBasisParens:
 ;
 
 Visualization: 
-	type=VisName name=TOKEN  (parens=VisBasisParens)? (vis_op=VisualOptions)? ';' |
-    type=VisName name=TOKEN (parens=VisBasisParens)? (vis_op=VisualOptions)? (input_val+=VisInputValue)+ => 'END' 
+	type=('CHORO'|'LINE'|'TIMELINE'|'PIE'|'BAR'|'TABLE'|'GRAPH'|'FORM'|'GROUP'|'SLIDER') name=TOKEN  (parens=VisBasisParens)? (vis_op=VisualOptions)? ';' |
+    type=('CHORO'|'LINE'|'TIMELINE'|'PIE'|'BAR'|'TABLE'|'GRAPH'|'FORM'|'GROUP'|'SLIDER') name=TOKEN (parens=VisBasisParens)? (vis_op=VisualOptions)? (input_val+=VisInputValue)+ => 'END' 
 ;
 
 VisBasis: 
