@@ -4,6 +4,7 @@
 package org.xtext.hipie.ui;
 
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+
 import org.eclipse.xtext.ui.editor.outline.impl.OutlineFilterAndSorter.IComparator;
 import org.eclipse.xtext.ui.editor.preferences.LanguageRootPreferencePage;
 import org.eclipse.xtext.ui.editor.syntaxcoloring.IHighlightingConfiguration;

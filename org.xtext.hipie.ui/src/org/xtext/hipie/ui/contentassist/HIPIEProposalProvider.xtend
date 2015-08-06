@@ -38,7 +38,7 @@ import org.xtext.hipie.hIPIE.ECLUnsigned
 import org.xtext.hipie.hIPIE.ECLBoolean
 import org.xtext.hipie.hIPIE.ECLNumType
 import org.xtext.hipie.hIPIE.ECLDecType
-import org.eclipse.xtext.RuleCall
+import org.eclipse.jface.text.contentassist.ICompletionProposal
 
 /**
  * See https://www.eclipse.org/Xtext/documentation/304_ide_concepts.html#content-assist
@@ -64,27 +64,45 @@ class HIPIEProposalProvider extends AbstractHIPIEProposalProvider {
       textStyle.setStyle(SWT.ITALIC);
       return textStyle;
     }
+    
+    def protected TextStyle getKeywordTextStyle() {
+      var textStyle = new TextStyle()
+      textStyle.setColor(new RGB(39, 64, 138));
+      textStyle.setFontData(new FontData("keyfont", 10, SWT.BOLD))
+      textStyle.setStyle(SWT.BOLD);
+      return textStyle;
+    }
 
+	 def protected TextStyle getBoldTextStyle() {
+      var textStyle = new TextStyle()
+      textStyle.setColor(new RGB(0,0,0));
+      textStyle.setFontData(new FontData("keyfont", 10, SWT.BOLD))
+      textStyle.setStyle(SWT.BOLD);
+      return textStyle;
+    }
+    
 	@Inject
 	private IScopeProvider scopeProvider
 	    
 	override completeKeyword(Keyword keyword, ContentAssistContext contentAssistContext,
 			ICompletionProposalAcceptor acceptor) {
+		var StyledString proposalString
 		if(keyword.getValue().equals("-") || keyword.getValue().equals(",")  || 
 			keyword.getValue().equals("(") || keyword.getValue().equals(")") ||
 			keyword.getValue().equals("{") || keyword.getValue().equals("}") )
-			return;
-		super.completeKeyword(keyword, contentAssistContext, acceptor);
+			return ;
+		if (keyword.value == ";" || keyword.value == ":")
+			proposalString =  new StyledString(keyword.value, stylerFactory.createXtextStyleAdapterStyler(getBoldTextStyle()))
+		else
+			proposalString = new StyledString(keyword.value, stylerFactory.createXtextStyleAdapterStyler(getKeywordTextStyle()))
+		var proposal = createCompletionProposal(keyword.getValue(), proposalString, getImage(keyword), contentAssistContext)
+		getPriorityHelper().adjustKeywordPriority(proposal, contentAssistContext.getPrefix())
+		acceptor.accept(proposal)
 	}
 
 	override completeVisBasis_Basis(EObject model, Assignment assignment, ContentAssistContext context, ICompletionProposalAcceptor acceptor) {
 		super.completeVisBasis_Basis(model, assignment, context, acceptor)
 	}
-	
-	override complete_OutDataset(EObject model, RuleCall ruleCall, ContentAssistContext context, ICompletionProposalAcceptor acceptor) {
-		super.complete_OutDataset(model, ruleCall, context, acceptor)
-	}
-	
 	
 	override protected StyledString getStyledDisplayString(EObject element, String qualifiedName, String shortName) {
 		var qualName = getQualifiedName(element, qualifiedName, shortName)
@@ -135,7 +153,7 @@ class HIPIEProposalProvider extends AbstractHIPIEProposalProvider {
 		
 		if (element instanceof Visualization) {
 			var viz = element.eContainer as VisualSection
-			typestring = viz.type
+			typestring = (element as Visualization).type
 			qualNameString = viz.name + "." + qualName.toString
 		}
 		

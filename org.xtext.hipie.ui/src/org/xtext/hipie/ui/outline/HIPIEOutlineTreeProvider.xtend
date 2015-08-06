@@ -93,9 +93,9 @@ class HIPIEOutlineTreeProvider extends org.eclipse.xtext.ui.editor.outline.impl.
 					}
 				}
 		}
-		var typestring = new StyledString(obj.property ,stylerFactory.createXtextStyleAdapterStyler(getBasePropTextStyle()) )
+		var typestring = new StyledString(obj.property ,stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()) )
 		var namestring = new StyledString(label_string) 
-		return typestring.append(" : ").append(namestring)
+		return namestring.append(" : ").append(typestring)
 	}
 	
 	// Permissions //

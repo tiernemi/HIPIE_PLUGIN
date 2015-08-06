@@ -7,6 +7,7 @@ import com.google.inject.Inject
 import org.xtext.hipie.hIPIE.*
 import org.eclipse.emf.edit.provider.StyledString
 import org.eclipse.swt.graphics.Image
+import org.eclipse.xtext.Keyword
 
 /**
  * Provides labels for EObjects.
@@ -21,7 +22,7 @@ class HIPIELabelProvider extends org.eclipse.xtext.ui.label.DefaultEObjectLabelP
 	}
 
 	// Labels and icons can be computed like this:
-	
+		
 	def text(Value v) {
 		if (v.name == null)
 		{
@@ -173,6 +174,10 @@ class HIPIELabelProvider extends org.eclipse.xtext.ui.label.DefaultEObjectLabelP
 		return "variable.png"
 	}
 	
+	def image(FieldDecl element) {
+		return "variable.png"
+	}
+	
 	def image(Visualization element) {
 		if (element.type == "PIE")
 			return "pie.png"
@@ -184,36 +189,31 @@ class HIPIELabelProvider extends org.eclipse.xtext.ui.label.DefaultEObjectLabelP
 			return "choro.png"		
 	}
 	
-	/* 
-	def text(Visualization vis)
-	{
-		var vis_type = vis.type.name
-		var out_string = ""
-		var vis_basis  = "";
-		if (vis.parens != null)
-			vis_basis =  vis.parens.input.basis.name
-		out_string = vis.name + " : " + vis_type + " - " + vis_basis
+	def image(Keyword element) {		
+		return "key.png"
 	}
 	
-	def text(VisualSection vis)
-	{
-		var sec_name = vis.section_name 
-		var sec_id = vis.name
-		
-		sec_name + " : " + sec_id
+	def image(VisualSection element) {
+		return "dashboard.png"
 	}
-
-	def text(OutTypeSimple out)
-	{
-		var out_string = ""
-		if (out.sitype != null)
-		{
-			if (out.vals.name != null)
-			{
-				out_string += out.vals.name + ' : ' + out.type
-			}
-		}
-	}
-	*/
 	
+	def image(BaseProp element) {
+		return "property.png"
+	}
+	
+	def image(Permission element) {
+		return "permissions.png"
+	}
+	
+	def text(Visualization element) {
+		var visBasis  = "";
+		if (element.parens != null)
+			visBasis =  element.parens.input.basis.name
+		return element.name  + " - " + visBasis + " : " + element.type
+	}
+	
+	def text(VisualSection element) {
+		var secId = element.name		
+		return  secId + " : "
+	}
 }
