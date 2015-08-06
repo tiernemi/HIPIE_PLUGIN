@@ -341,12 +341,6 @@ VisualSection:
 	type='VISUALIZE' name=TOKEN (ops=VisualSectionOptions)? (vis_elements+=Visualization)+ => 'END'
 ;
 
-
-
-//VisName :
-//	('CHORO'|'LINE'|'TIMELINE'|'PIE'|'BAR'|'TABLE'|'GRAPH'|'FORM'|'GROUP'|'SLIDER')
-//;
-
 VisInputValue:
 	types=InputSimpleTypes (in_ops=InputOptions)? ';'
 ;

@@ -177,7 +177,11 @@ class HIPIELabelProvider extends org.eclipse.xtext.ui.label.DefaultEObjectLabelP
 		if (element.type == "PIE")
 			return "pie.png"
 		if (element.type == "BAR")
-			return "bar.png"			
+			return "bar.png"
+		if (element.type == "TABLE")
+			return "table.png"					
+		if (element.type == "CHORO")
+			return "choro.png"		
 	}
 	
 	/* 
