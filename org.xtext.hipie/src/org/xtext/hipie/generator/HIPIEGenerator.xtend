@@ -188,7 +188,7 @@ class HIPIEGenerator implements IGenerator {
 			scIn.close()
 			
 			// Generate HTML //
-			var url = new URL("platform:/plugin/org.xtext.hipie/vis_files/marsh.html")		
+			var url = new URL("platform:/plugin/org.xtext.hipie/vis_files/dermatology.html")		
 			var inStreamConnection = url.openConnection().getInputStream()
 			var streamStringHtml = new String
 			scIn = new Scanner(inStreamConnection)
@@ -197,7 +197,7 @@ class HIPIEGenerator implements IGenerator {
 			
 			streamStringHtml = streamStringHtml.replace("%_data_%" , streamStringDatabomb)
 			streamStringHtml = streamStringHtml.replace("%_ddl_%" , streamStringDdl)
-			//streamString_html = streamString_html.replace("%_persist_%" , streamString_per)
+			streamStringHtml = streamStringHtml.replace("%_persist_%" , streamString_per)
 			
 			var htmlFilePath = resourceFile.projectRelativePath.removeFileExtension().addFileExtension("html")
 			var htmlFile = project.getFile(htmlFilePath)
