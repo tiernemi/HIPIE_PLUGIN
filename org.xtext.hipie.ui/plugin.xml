@@ -591,4 +591,37 @@
            id="org.xtext.hipie.ui.status_handler">
      </statusHandler>
   </extension>
+  <extension
+        id="HIPIENature"
+        point="org.eclipse.core.resources.natures">
+     <runtime>
+        <run
+              class="org.xtext.hipie.ui.HIPIENature">
+        </run>
+     </runtime>
+  </extension>
+  <extension
+        point="org.eclipse.ui.propertyPages">
+     <page
+           class="org.xtext.hipie.ui.DataPropertyPage"
+           id="org.xtext.hipie.databomb"
+           name="Databomb"
+           selectionFilter="single">
+        <enabledWhen>
+           <adapt
+                 type="org.eclipse.core.resources.IResource">
+              <or>
+                 <test
+                       property="org.eclipse.core.resources.extension"
+                       value="txt">
+                 </test>
+                 <test
+                       property="org.eclipse.core.resources.extension"
+                       value="csv">
+                 </test>
+              </or>
+           </adapt>
+        </enabledWhen>
+     </page>
+  </extension>
 </plugin>

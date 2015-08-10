@@ -3,6 +3,9 @@ package org.xtext.hipie.ui;
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
+import org.xtext.hipie.commands_listeners.DataSaveListener;
+import org.xtext.hipie.commands_listeners.DataSourceListener;
+import org.xtext.hipie.commands_listeners.DesignModeVisualiserListener;
 import org.xtext.hipie.views.DesignModeView;
 
 /**
@@ -12,6 +15,12 @@ import org.xtext.hipie.views.DesignModeView;
 public class HipiePerspective implements IPerspectiveFactory {
 
 	public static String perspec_id = "org.xtext.hipie.ui.hipie_perspec" ;
+	
+	public HipiePerspective() {
+		DataSourceListener.init() ;
+		DesignModeVisualiserListener.init() ;
+		DataSaveListener.init();
+	}
 	
 	@Override
 	public void createInitialLayout(IPageLayout layout) {

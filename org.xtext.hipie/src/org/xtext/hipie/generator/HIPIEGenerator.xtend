@@ -20,6 +20,10 @@ import java.util.ArrayList
 import org.eclipse.core.resources.ProjectScope
 import java.io.FileWriter
 import java.io.File
+import org.eclipse.core.resources.IProject
+import org.eclipse.core.resources.IFile
+import org.eclipse.core.resources.IFolder
+import org.eclipse.core.resources.IContainer
 
 /**
  * Generates code from your model files on save.
@@ -44,17 +48,7 @@ class HIPIEGenerator implements IGenerator {
 			val defaultCompilerPath = ResourcesPlugin.getWorkspace().getRoot().getRawLocation().toOSString() ;
 			var workPrefs = InstanceScope.INSTANCE.getNode("org.xtext.hipie.ui");
 			val compilerPath = new Path(workPrefs.get('Compiler Location' , defaultCompilerPath))
-			
-			// Get Data Source Selections //  
-			var filename = resourceFile.name
-			var selectedItems = projPrefs.node("data_prefs");
-			var selectString = selectedItems.get("select_prefs_" + filename, "")
-			var dataFileSelections = selectString.split(" ")
-			var dataFilePaths = new ArrayList<Path>	
-			for (i : 0..<dataFileSelections.size)
-				if(dataFileSelections.get(i).length() > 0)
-						dataFilePaths +=  new Path(dataFileSelections.get(i))		
-					
+
 			var ddlFilePath = resourceFile.projectRelativePath.removeFileExtension().addFileExtension("ddl")
 			var ddlFile = project.getFile(ddlFilePath)
 			println(ddlFile.rawLocation.toOSString)
@@ -81,61 +75,29 @@ class HIPIEGenerator implements IGenerator {
 			//  Generate DataBomb  //
 			var databombFilePath =  resourceFile.projectRelativePath.removeFileExtension().addFileExtension("databomb");
 			var databombFile = project.getFile(databombFilePath);
-			var tempDatFilePaths = new ArrayList()
-			
-			for (i : 0..<dataFilePaths.size) {
-				var datFilePath = dataFilePaths.get(i)
-				var datFile = ws_root.getFile(datFilePath)
-				var cmdLineArgs = selectedItems.get("cmd_line__prefs_" + datFile.name , "")
-				var dataCmdString = "-csv " + ws_root.getFile(datFilePath).rawLocation.toOSString + " " + cmdLineArgs
-				var tempFilePath = new Path(datFile.projectRelativePath.removeFileExtension.toOSString + "temp.databomb")
-				tempDatFilePaths += tempFilePath
-				var databombCmd = ""
-				databombCmd = 'java -cp ' + compilerPath.toOSString + ' org/hpcc/HIPIE/commandline/CommandLineService ' + dataCmdString + ' -o ' + project.getFile(tempFilePath).rawLocation.toOSString 
-				System.out.println(databombCmd)
-				var procData = Runtime.getRuntime().exec(databombCmd) as Process				
-				in = procData.inputStream
-				er = procData.errorStream
-				scVerbose = new Scanner(in)
-				scError = new Scanner(er)
-				streamString = new String
-				streamStringErrors = new String
-				if (scVerbose.hasNext())
-					streamString = scVerbose.useDelimiter("\\Z").next() ;
-				if (scError.hasNext())
-					streamStringErrors = scError.useDelimiter("\\Z").next() ;
-				println(streamString)
-				println(streamStringErrors)
-				println(dataCmdString)
-				in.close()
-				er.close()
-				scVerbose.close()
-				scError.close()
-			}
-			
-			for (i : 0..<tempDatFilePaths.size) {
-				var tempDatFile = project.getFile(tempDatFilePaths.get(i)).rawLocation.toOSString
-				var inStream = new FileInputStream(tempDatFile);
-				if (i == 0 && databombFile.exists())
-					databombFile.delete(true,null)
-				var fw = new FileWriter(databombFile.rawLocation.toOSString,true);
+			if (databombFile.exists())
+				databombFile.delete(true,null)
+				
+			var ArrayList<IFile> fileList = new ArrayList<IFile>() ;
+			findAllDatabombFiles(project , fileList)
+					
+			for (i : 0..<fileList.size) {
+				var tempDatFile = fileList.get(i)
+				var inStream = new FileInputStream(tempDatFile.rawLocation.toOSString)
+				var fw = new FileWriter(databombFile.rawLocation.toOSString,true)
 				var streamStringTemp = new String
 				var scIn = new Scanner(inStream)
 				if (scIn.hasNext())
 					streamStringTemp = scIn.useDelimiter("\\Z").next()
-				if(i != tempDatFilePaths.size-1 && tempDatFilePaths.size > 1)
-				{
+				if(i != fileList.size-1 && fileList.size > 1) {
 					streamStringTemp = streamStringTemp.substring(0, streamStringTemp.lastIndexOf("}"))
 					streamStringTemp += ","
 				}
-				if(i != 0 && tempDatFilePaths.size > 1)
-				{
+				if(i != 0 && fileList.size > 1) {
 					streamStringTemp = streamStringTemp.substring(streamStringTemp.indexOf("{")+1) 
 				}
 				fw.write(streamStringTemp)
 				fw.close
-				var file = new File(tempDatFile)
-				file.delete
 				inStream.close
 			}
 			
@@ -208,5 +170,17 @@ class HIPIEGenerator implements IGenerator {
 			er.close() 	
 			htmlOut.close()
 		}
+	}
+	
+	def void findAllDatabombFiles(IContainer cont, ArrayList<IFile> fileList) {	
+		var memberList = cont.members.toArray
+		for (i : 0..<memberList.size) {
+			if (memberList.get(i) instanceof IFolder || memberList.get(i) instanceof IProject)
+				findAllDatabombFiles((memberList.get(i) as IContainer), fileList)
+			if (memberList.get(i) instanceof IFile)
+				if ((memberList.get(i) as IFile).fileExtension == "databomb")
+					fileList += (memberList.get(i) as IFile)
+		}
+		return ;
 	}
 }

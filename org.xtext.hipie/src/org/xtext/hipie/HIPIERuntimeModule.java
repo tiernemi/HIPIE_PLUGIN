@@ -7,7 +7,8 @@ package org.xtext.hipie;
  * Use this class to register components to be used at runtime / without the Equinox extension registry.
  */
 public class HIPIERuntimeModule extends org.xtext.hipie.AbstractHIPIERuntimeModule {
-	 /* @Override
+	
+	/* @Override
 	  public void configure(Binder binder) {
 	    super.configure(binder);
 	    binder.bind(IOutputConfigurationProvider.class)
