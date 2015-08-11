@@ -8,6 +8,7 @@ package org.xtext.hipie;
  */
 public class HIPIERuntimeModule extends org.xtext.hipie.AbstractHIPIERuntimeModule {
 	
+	
 	/* @Override
 	  public void configure(Binder binder) {
 	    super.configure(binder);

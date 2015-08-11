@@ -24,6 +24,8 @@ import org.eclipse.core.resources.IProject
 import org.eclipse.core.resources.IFile
 import org.eclipse.core.resources.IFolder
 import org.eclipse.core.resources.IContainer
+import org.xtext.hipie.hIPIE.OutDataset
+import java.util.List
 
 /**
  * Generates code from your model files on save.
@@ -79,7 +81,9 @@ class HIPIEGenerator implements IGenerator {
 				databombFile.delete(true,null)
 				
 			var ArrayList<IFile> fileList = new ArrayList<IFile>() ;
-			findAllDatabombFiles(project , fileList)
+			var ArrayList<IFile> filteredFileList = new ArrayList<IFile>() ;
+			findAllDatabombFiles(project, fileList)
+			filterDatabombs(resource, fileList, filteredFileList)
 					
 			for (i : 0..<fileList.size) {
 				var tempDatFile = fileList.get(i)
@@ -167,7 +171,7 @@ class HIPIEGenerator implements IGenerator {
 			htmlOut.write(streamStringHtml.getBytes())
 			project.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor())
 			in.close()
-			er.close() 	
+			er.close()
 			htmlOut.close()
 		}
 	}
@@ -182,5 +186,20 @@ class HIPIEGenerator implements IGenerator {
 					fileList += (memberList.get(i) as IFile)
 		}
 		return ;
+	}
+	
+	def void filterDatabombs(Resource resource, ArrayList<IFile> fileList, ArrayList<IFile> filteredFileList) {
+		var List<OutDataset> datasetList = resource.allContents.filter(OutDataset).toIterable.toList
+		var ArrayList<OutDataset> databombList = new ArrayList() ;
+		for (i : 0..<datasetList.size)
+			if (datasetList.get(i).ops != null)
+				for (j : 0..<datasetList.get(i).ops.output_ops.size) 
+					if (datasetList.get(i).ops.output_ops.get(j).type == "DATABOMB")
+						databombList += datasetList.get(i)
+		
+		for (i : 0..<fileList.size)
+			for (j : 0..<databombList.size)
+				if (databombList.get(j).name == fileList.get(i).fullPath.removeFileExtension.lastSegment)
+					filteredFileList += fileList.get(i)				
 	}
 }

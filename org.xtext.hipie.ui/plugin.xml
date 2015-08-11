@@ -429,73 +429,6 @@
      </initializer>
   </extension>
   <extension
-        point="org.eclipse.ui.commands">
-     <command
-           description="Gets the data sources"
-           id="org.xtext.hipie.ui.datasources"
-           name="Data Sources">
-     </command>
-  </extension>
-  <extension
-        point="org.eclipse.ui.menus">
-     <menuContribution
-           allPopups="false"
-           locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
-        <toolbar
-              id="org.xtext.hipie.ui.datatool">
-           <command
-                 commandId="org.xtext.hipie.ui.datasources"
-                 icon="icons/data_folder.png"
-                 label="Data Sources"
-                 style="push">
-              <visibleWhen>
-                 <with
-                       variable="activeEditorId">
-                    <equals
-                          value="org.xtext.hipie.HIPIE">
-                    </equals>
-                 </with>
-              </visibleWhen>
-           </command>
-        </toolbar>
-     </menuContribution>
-     <menuContribution
-           allPopups="true"
-           locationURI="popup:org.eclipse.ui.navigator.ProjectExplorer#PopupMenu?after=additions">
-        <command
-              commandId="org.xtext.hipie.ui.datasources_select"
-              label="Data Sources"
-              style="push">
-           <visibleWhen>
-              <with
-                    variable="activeMenuSelection">
-                 <iterate
-                       ifEmpty="false">
-                    <adapt
-                          type="org.eclipse.core.resources.IResource">
-                       <test
-                             property="org.eclipse.core.resources.extension"
-                             value="dud">
-                       </test>
-                    </adapt>
-                 </iterate>
-              </with>
-           </visibleWhen>
-        </command>
-     </menuContribution>
-  </extension>
-  <extension
-        point="org.eclipse.ui.handlers">
-     <handler
-           class="org.xtext.hipie.commands_listeners.DataSources"
-           commandId="org.xtext.hipie.ui.datasources">
-     </handler>
-     <handler
-           class="org.xtext.hipie.commands_listeners.DataSourcesSelect"
-           commandId="org.xtext.hipie.ui.datasources_select">
-     </handler>
-  </extension>
-  <extension
         point="org.eclipse.core.runtime.preferences">
      <scope
            class="org.eclipse.core.internal.resources.ProjectPreferences"
@@ -563,7 +496,7 @@
   <extension
         point="org.eclipse.ui.perspectives">
      <perspective
-           class="org.xtext.hipie.ui.HipiePerspective"
+           class="org.xtext.hipie.ui.HIPIEPerspective"
            id="org.xtext.hipie.ui.hipie_perspec"
            name="HIPIE">
      </perspective>
@@ -604,22 +537,42 @@
         point="org.eclipse.ui.propertyPages">
      <page
            class="org.xtext.hipie.ui.DataPropertyPage"
-           id="org.xtext.hipie.databomb"
+           id="org.xtext.hipie.databombPage"
            name="Databomb"
            selectionFilter="single">
         <enabledWhen>
            <adapt
                  type="org.eclipse.core.resources.IResource">
-              <or>
+              <and>
                  <test
-                       property="org.eclipse.core.resources.extension"
-                       value="txt">
+                       property="org.eclipse.core.resources.projectNature "
+                       value="org.xtext.hipie.ui.HIPIENature">
                  </test>
-                 <test
-                       property="org.eclipse.core.resources.extension"
-                       value="csv">
-                 </test>
-              </or>
+                 <not>
+                    <or>
+                       <test
+                             property="org.eclipse.core.resources.extension"
+                             value="dud">
+                       </test>
+                       <test
+                             property="org.eclipse.core.resources.extension"
+                             value="html">
+                       </test>
+                       <test
+                             property="org.eclipse.core.resources.extension"
+                             value="databomb">
+                       </test>
+                       <test
+                             property="org.eclipse.core.resources.extension"
+                             value="ddl">
+                       </test>
+                       <test
+                             property="org.eclipse.core.resources.extension"
+                             value="persist">
+                       </test>
+                    </or>
+                 </not>
+              </and>
            </adapt>
         </enabledWhen>
      </page>
