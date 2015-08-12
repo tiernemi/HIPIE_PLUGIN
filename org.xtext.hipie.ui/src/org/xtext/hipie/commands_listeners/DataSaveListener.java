@@ -123,6 +123,7 @@ public class DataSaveListener {
 						IResource resource = delta.getResource();
 						//only interested in files with the "txt" extension
 			             if (resource.getType() == IResource.FILE && 
+			            	!resource.getName().startsWith(".") &&
 			       			!"databomb".equalsIgnoreCase(resource.getFileExtension()) && 
 			       			!"dud".equalsIgnoreCase(resource.getFileExtension()) && 
 					       	!"ddl".equalsIgnoreCase(resource.getFileExtension()) && 
