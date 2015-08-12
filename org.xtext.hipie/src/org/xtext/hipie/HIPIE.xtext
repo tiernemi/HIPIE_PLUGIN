@@ -108,7 +108,7 @@ EnumList:
 ;
 
 EnumDecl: 
-	type='ENUM' '(' enum_list=EnumList ')'
+	'ENUM' '(' enum_list=EnumList ')'
 ;
  
 InputSection: 
@@ -116,15 +116,15 @@ InputSection:
 ;
 
 Bool:
-	type='BOOL' name=TOKEN
+	'BOOL' name=TOKEN
 ;
 
 IntVar:
-	type='INT' name=TOKEN
+	'INT' name=TOKEN
 ;
 
 StringVar:
-	type='STRING' name=TOKEN
+	'STRING' name=TOKEN
 ;
 
 Dataset:
@@ -136,7 +136,7 @@ Group:
 ;
 
 Real :
-	type='REAL' name=TOKEN
+	'REAL' name=TOKEN
 ;
 
 InputSimpleTypes : 

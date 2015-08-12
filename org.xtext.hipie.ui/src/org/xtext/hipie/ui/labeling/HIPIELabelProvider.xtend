@@ -36,7 +36,7 @@ class HIPIELabelProvider extends org.eclipse.xtext.ui.label.DefaultEObjectLabelP
 	def text(Bool obj)
 	{
 		var label_string = ""
-		label_string = obj.name + " : " + obj.type
+		label_string = obj.name + " : " + "BOOL"
 	}
 	def text(FieldDecl obj)
 	{
@@ -47,12 +47,12 @@ class HIPIELabelProvider extends org.eclipse.xtext.ui.label.DefaultEObjectLabelP
 	def text(IntVar obj)
 	{
 		var label_string = ""
-		label_string = obj.name + " : " + obj.type
+		label_string = obj.name + " : " + "INT"
 	}
 	def text(StringVar obj)
 	{
 		var label_string = ""
-		label_string = obj.name + " : " + obj.type
+		label_string = obj.name + " : " + "STRING"
 	}
 	def text(Group obj)
 	{
@@ -62,7 +62,7 @@ class HIPIELabelProvider extends org.eclipse.xtext.ui.label.DefaultEObjectLabelP
 	def text(Real obj)
 	{
 		var label_string = ""
-		label_string = obj.name + " : " + obj.type
+		label_string = obj.name + " : " + "REAL"
 	}
 	def text(Record obj)
 	{

@@ -126,7 +126,7 @@ class HIPIEOutlineTreeProvider extends org.eclipse.xtext.ui.editor.outline.impl.
     // Inputs //
     
     def public Object _text(Bool obj) {
-      var typestring = new StyledString(obj.type , stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
+      var typestring = new StyledString("BOOL" , stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
       var namestring = new StyledString(obj.name)
       var label_string = namestring.append(" : ").append(typestring)
       return label_string
@@ -140,14 +140,14 @@ class HIPIEOutlineTreeProvider extends org.eclipse.xtext.ui.editor.outline.impl.
 	}
 	
 	def public Object _text(IntVar obj) {
-      var typestring = new StyledString(obj.type , stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
+      var typestring = new StyledString("INT" , stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
       var namestring = new StyledString(obj.name)
       var label_string = namestring.append(" : ").append(typestring)
       return label_string
 	}
 	
 	def public Object _text(StringVar obj) {
-      var typestring = new StyledString(obj.type , stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
+      var typestring = new StyledString("STRING" , stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
       var namestring = new StyledString(obj.name)
       var label_string = namestring.append(" : ").append(typestring)
       return label_string
@@ -161,7 +161,7 @@ class HIPIEOutlineTreeProvider extends org.eclipse.xtext.ui.editor.outline.impl.
 	}
 	
 	def public Object _text(Real obj) {
-      var typestring = new StyledString(obj.type , stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
+      var typestring = new StyledString("REAL" , stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
       var namestring = new StyledString(obj.name)
       var label_string = namestring.append(" : ").append(typestring)
       return label_string
@@ -465,6 +465,10 @@ class HIPIEOutlineTreeProvider extends org.eclipse.xtext.ui.editor.outline.impl.
     		return false
     }
     
+     def protected boolean _isLeaf(InputOptions obj) {
+    		return true
+    }
+        
     def protected boolean _isLeaf(KelBase kel) {
     	if (kel.kels.size == 0)
     		return true
