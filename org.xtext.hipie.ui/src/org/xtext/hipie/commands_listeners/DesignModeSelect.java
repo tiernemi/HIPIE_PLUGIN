@@ -51,14 +51,20 @@ public class DesignModeSelect implements IHandler {
 			IPath htmlFilepath = file.getFullPath() ;
 			
 			IFile htmlFile = ResourcesPlugin.getWorkspace().getRoot().getFile(htmlFilepath) ;
+			IFile corDudFile = htmlFile.getProject().getFile(htmlFile.getProjectRelativePath().removeFileExtension().addFileExtension("dud")) ;
 			DesignModeView view;
-			try {
-				view = (DesignModeView) HandlerUtil.getActiveWorkbenchWindowChecked(event).getActivePage().showView(DesignModeView.ID);
-				view.updateView(htmlFile) ;
-				return null ;
-			} catch (PartInitException e) {
-				e.printStackTrace();
+			
+			if (corDudFile.exists()) {
+				try {
+					view = (DesignModeView) HandlerUtil.getActiveWorkbenchWindowChecked(event).getActivePage().showView(DesignModeView.ID);
+					view.updateView(htmlFile) ;
+					return null ;
+				} catch (PartInitException e) {
+					e.printStackTrace();
+				}
 			}
+			// error report
+			
 		}
 		return null ;
 	}

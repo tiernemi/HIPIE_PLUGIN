@@ -20,6 +20,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Text;
@@ -32,8 +33,9 @@ public class MainTab extends AbstractLaunchConfigurationTab {
 	Composite programComp ;
 	
 	Label workspaceLabel ;
-	//workspaceTextBox 
-	
+	Text workspaceTextBox ;
+	Group workspaceGroup ;
+
 	Button runInExternalBrowserB ;
 	Label runInExternalBrowserL ;
 //	Combo externalBrowsers ;
@@ -56,10 +58,13 @@ public class MainTab extends AbstractLaunchConfigurationTab {
 		comp.setLayout(topLayout);
 		comp.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, true , true));
 		comp.setFont(font);
+		
+		workspaceGroup = new Group(comp, SWT.NONE) ; 
+		workspaceGroup.setText("Workspace");
 			
-		createVerticalSpacer(comp, 2);
+		createVerticalSpacer(workspaceGroup, 2);
 
-		workspaceLabel = new Label(comp, SWT.NONE) ;
+		workspaceLabel = new Label(workspaceGroup, SWT.NONE) ;
 		workspaceLabel.setText("Workspace data:");
 
 		

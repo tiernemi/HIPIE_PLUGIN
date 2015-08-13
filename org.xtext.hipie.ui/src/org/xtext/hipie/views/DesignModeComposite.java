@@ -18,8 +18,6 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
-import org.eclipse.swt.browser.ProgressEvent;
-import org.eclipse.swt.browser.ProgressListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -27,7 +25,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Event;
 
 
 public class DesignModeComposite extends Composite {
@@ -35,14 +32,13 @@ public class DesignModeComposite extends Composite {
 	
 	
 	private Composite buttonComposite;
-	
-	private String htmlFilepath ;
 
 	// Composite elements. //
 	private Browser designModeBrowser ;
 	private Button syncButton ;
 	private Button designModeButton;
-	private URL dermaHtmlUrl ; 
+	private URL dermaHtmlUrl = null; 
+	private URL cleanHtmlUrl = null;
 
 	public DesignModeComposite(final Composite parent, boolean showAddressBar) {
 		super(parent, SWT.NONE);
@@ -61,8 +57,6 @@ public class DesignModeComposite extends Composite {
 		rowLayout.spacing=2;
 		buttonComposite.setLayout(rowLayout);
 
-
-		
 		designModeButton = new Button(buttonComposite, SWT.PUSH | SWT.LEFT);
         designModeButton.setText("Design Mode");
         designModeButton.addSelectionListener(new SelectionAdapter() {
@@ -71,7 +65,6 @@ public class DesignModeComposite extends Composite {
             }
         });
      
-				
 		syncButton = new Button(buttonComposite, SWT.PUSH | SWT.LEFT ) ;
 		syncButton.setText("Sync") ;
 		syncButton.addSelectionListener(new SelectionAdapter() {		
@@ -82,36 +75,61 @@ public class DesignModeComposite extends Composite {
 				String getPersistCmd = "return getPersist();" ;
 				String getDdlCmd = "return getDdl();" ;
 				String getDatabombCmd = "return getDatabomb();" ;
+				
+				IEclipsePreferences workPrefs = InstanceScope.INSTANCE.getNode("org.xtext.hipie.ui");
 
 				try {
 					String ddl = (String) designModeBrowser.evaluate(getDdlCmd) ;
 					String databomb = (String) designModeBrowser.evaluate(getDatabombCmd) ;
 					String persist = (String) designModeBrowser.evaluate(getPersistCmd) ;
+					if (cleanHtmlUrl == null) {
+						 cleanHtmlUrl = new URL(workPrefs.get("clean_html_filepath_design" , ""));
+						 dermaHtmlUrl = new URL(workPrefs.get("derm_html_filepath_design" , ""));
+					}
 
-					IPath htmlPath = new Path(dermaHtmlUrl.getPath()) ;
-					IFile htmlFile = ResourcesPlugin.getWorkspace().getRoot().getFile(htmlPath) ;
+					IPath htmlCleanPath = new Path(cleanHtmlUrl.getPath()) ;
+					IFile htmlCleanFile = ResourcesPlugin.getWorkspace().getRoot().getFile(htmlCleanPath) ;
 					
-					IPath persistPath = htmlPath.removeFileExtension().addFileExtension("persist") ;
+					IPath htmlDermPath = new Path(dermaHtmlUrl.getPath()) ;
+					IFile htmlDermFile = ResourcesPlugin.getWorkspace().getRoot().getFile(htmlDermPath) ;
+					
+					IPath persistPath = htmlCleanPath.removeFileExtension().addFileExtension("persist") ;
 					FileWriter fw = new FileWriter(persistPath.toOSString());
 					fw.write(persist);
 					fw.close() ;
 					
-					URL url = new URL("platform:/plugin/org.xtext.hipie/vis_files/dermatology.html") ;	
-					InputStream inStream = url.openConnection().getInputStream() ;
+					URL dermUrl = new URL("platform:/plugin/org.xtext.hipie/vis_files/dermatology.html") ;	
+					InputStream inStreamDerm = dermUrl.openConnection().getInputStream() ;
 					String streamStringHtml = "" ;
-					Scanner scIn = new Scanner(inStream) ;
+					Scanner scIn = new Scanner(inStreamDerm) ;
 					if (scIn.hasNext())
 						streamStringHtml = scIn.useDelimiter("\\Z").next() ;
 					streamStringHtml = streamStringHtml.replace("%_data_%" , databomb) ;
 					streamStringHtml = streamStringHtml.replace("%_ddl_%" , ddl) ;
 					streamStringHtml = streamStringHtml.replace("%_persist_%" , persist) ;
-					inStream.close();
-					FileWriter html_out = new FileWriter(htmlFile.getFullPath().toOSString()) ;
+					inStreamDerm.close();
+					FileWriter html_out = new FileWriter(htmlDermFile.getFullPath().toOSString()) ;
 					html_out.write(streamStringHtml);
 					html_out.close();
 					scIn.close() ;
 					
-					workPrefs.put("html_filepath_design", dermaHtmlUrl.toString()); 
+					URL cleanUrl = new URL("platform:/plugin/org.xtext.hipie/vis_files/clean.html") ;	
+					InputStream inStreamClean = cleanUrl.openConnection().getInputStream() ;
+					streamStringHtml = "" ;
+					scIn = new Scanner(inStreamClean) ;
+					if (scIn.hasNext())
+						streamStringHtml = scIn.useDelimiter("\\Z").next() ;
+					streamStringHtml = streamStringHtml.replace("%_data_%" , databomb) ;
+					streamStringHtml = streamStringHtml.replace("%_ddl_%" , ddl) ;
+					streamStringHtml = streamStringHtml.replace("%_persist_%" , persist) ;
+					inStreamDerm.close();
+					html_out = new FileWriter(htmlCleanFile.getFullPath().toOSString()) ;
+					html_out.write(streamStringHtml);
+					html_out.close();
+					scIn.close() ;
+					
+					workPrefs.put("clean_html_filepath_design", cleanHtmlUrl.toString());
+					workPrefs.put("derm_html_filepath_design", dermaHtmlUrl.toString()); 
 				}
 				catch (IOException e1) {
 					// TODO Auto-generated catch block
@@ -129,25 +147,29 @@ public class DesignModeComposite extends Composite {
 		});
 		
 		
-		String htmlFileUrl = workPrefs.get("html_filepath_design" , "") ;
+		String dermFileUrl = workPrefs.get("derm_html_filepath_design" , "") ;
+		
 		designModeBrowser = new Browser(parent, SWT.NONE);
 		designModeBrowser.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		
-		if (!htmlFileUrl.equals(""))
-			designModeBrowser.setUrl(htmlFileUrl) ;
-		
+		if (!dermFileUrl.equals(""))
+			designModeBrowser.setUrl(dermFileUrl) ;
 		
 	}
 
 	public void setFilepath(IFile htmlfile) {
 		if (htmlfile.exists()) {
-			URL url;
+			URL cleanUrl;
+			URL dermUrl ;
 			try {
 				IEclipsePreferences workPrefs = InstanceScope.INSTANCE.getNode("org.xtext.hipie.ui");
-				url = htmlfile.getRawLocationURI().toURL();
-				dermaHtmlUrl = url ;
-				designModeBrowser.setUrl(url.toString()) ;
-				workPrefs.put("html_filepath_design", dermaHtmlUrl.toString()); 
+				cleanUrl = htmlfile.getRawLocationURI().toURL();
+				cleanHtmlUrl = cleanUrl ;
+				dermUrl = htmlfile.getProject().getFile(new Path(htmlfile.getProjectRelativePath().removeFileExtension().toOSString() + "Derm.html")).getRawLocationURI().toURL() ;
+				designModeBrowser.setUrl(dermUrl.toString()) ;
+				dermaHtmlUrl = dermUrl ;
+				workPrefs.put("clean_html_filepath_design", cleanHtmlUrl.toString()); 
+				workPrefs.put("derm_html_filepath_design", dermaHtmlUrl.toString()); 
 			} catch (MalformedURLException e) {
 				e.printStackTrace();
 			}

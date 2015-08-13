@@ -482,10 +482,16 @@
                        ifEmpty="false">
                     <adapt
                           type="org.eclipse.core.resources.IResource">
-                       <test
-                             property="org.eclipse.core.resources.extension"
-                             value="html">
-                       </test>
+                       <and>
+                          <test
+                                property="org.eclipse.core.resources.extension"
+                                value="html">
+                          </test>
+                          <test
+                                property="org.eclipse.core.resources.projectNature "
+                                value="org.xtext.hipie.ui.HIPIENature">
+                          </test>
+                       </and>
                     </adapt>
                  </iterate>
               </with>

@@ -154,10 +154,13 @@ class HIPIEGenerator implements IGenerator {
 			scIn.close()
 			
 			// Generate HTML //
-			var url = new URL("platform:/plugin/org.xtext.hipie/vis_files/dermatology.html")		
-			var inStreamConnection = url.openConnection().getInputStream()
+			var dermUrl = new URL("platform:/plugin/org.xtext.hipie/vis_files/dermatology.html")		
+			var cleanUrl = new URL("platform:/plugin/org.xtext.hipie/vis_files/clean.html")		
+			var inStreamDermConnection = dermUrl.openConnection().getInputStream()
+			var inStreamCleanConnection = cleanUrl.openConnection().getInputStream()
+
 			var streamStringHtml = new String
-			scIn = new Scanner(inStreamConnection)
+			scIn = new Scanner(inStreamDermConnection)
 			if (scIn.hasNext())
 				streamStringHtml = scIn.useDelimiter("\\Z").next() 
 			
@@ -165,10 +168,27 @@ class HIPIEGenerator implements IGenerator {
 			streamStringHtml = streamStringHtml.replace("%_ddl_%" , streamStringDdl)
 			streamStringHtml = streamStringHtml.replace("%_persist_%" , streamString_per)
 			
-			var htmlFilePath = resourceFile.projectRelativePath.removeFileExtension().addFileExtension("html")
-			var htmlFile = project.getFile(htmlFilePath)
-			var htmlOut = new FileOutputStream(htmlFile.rawLocation.toOSString)
+			var htmlCleanFilePath = resourceFile.projectRelativePath.removeFileExtension().addFileExtension("html")
+			var htmlDermFilePath = new Path(htmlCleanFilePath.removeFileExtension.toOSString + "Derm.html")		
+			var htmlDermFile = project.getFile(htmlDermFilePath)
+			var htmlOut = new FileOutputStream(htmlDermFile.rawLocation.toOSString)
 			htmlOut.write(streamStringHtml.getBytes())
+			in.close()
+			er.close()
+			htmlOut.close()
+			
+			streamStringHtml = new String
+			scIn = new Scanner(inStreamCleanConnection)
+			if (scIn.hasNext())
+				streamStringHtml = scIn.useDelimiter("\\Z").next() 
+			
+			streamStringHtml = streamStringHtml.replace("%_data_%" , streamStringDatabomb)
+			streamStringHtml = streamStringHtml.replace("%_ddl_%" , streamStringDdl)
+			streamStringHtml = streamStringHtml.replace("%_persist_%" , streamString_per)
+			
+			var htmlCleanFile = project.getFile(htmlCleanFilePath)
+			htmlOut = new FileOutputStream(htmlCleanFile.rawLocation.toOSString)
+			htmlOut.write(streamStringHtml.getBytes())			
 			project.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor())
 			in.close()
 			er.close()
