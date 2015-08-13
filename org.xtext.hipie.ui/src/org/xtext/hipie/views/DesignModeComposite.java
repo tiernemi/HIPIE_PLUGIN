@@ -18,40 +18,61 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
-import org.eclipse.swt.browser.ProgressAdapter;
 import org.eclipse.swt.browser.ProgressEvent;
+import org.eclipse.swt.browser.ProgressListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
 
 
 public class DesignModeComposite extends Composite {
 
+	
+	
+	private Composite buttonComposite;
+	
 	private String htmlFilepath ;
 
 	// Composite elements. //
 	private Browser designModeBrowser ;
 	private Button syncButton ;
-
+	private Button designModeButton;
 	private URL dermaHtmlUrl ; 
 
 	public DesignModeComposite(final Composite parent, boolean showAddressBar) {
 		super(parent, SWT.NONE);
+		GridLayout gridLayout = new GridLayout();
+		gridLayout.numColumns=1;
+		gridLayout.makeColumnsEqualWidth = false;
+		gridLayout.marginTop=-65;
+		parent.setLayout(gridLayout);
 
 		// Gets the information for the open design mode view from the previous instance of eclipse. //
 		final IEclipsePreferences workPrefs = InstanceScope.INSTANCE.getNode("org.xtext.hipie.ui");
 
-		String htmlFileUrl = workPrefs.get("html_filepath_design" , "") ;
-		parent.setLayout(new GridLayout(2, false));
-		designModeBrowser = new Browser(parent, SWT.NONE);
-		designModeBrowser.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-		if (!htmlFileUrl.equals(""))
-			designModeBrowser.setUrl(htmlFileUrl) ;
+		buttonComposite = new Composite(parent, SWT.NONE) ;
+		RowLayout rowLayout = new RowLayout();
+		rowLayout.marginTop=0;
+		rowLayout.spacing=2;
+		buttonComposite.setLayout(rowLayout);
+
+
 		
-		syncButton = new Button(parent, SWT.PUSH) ;
+		designModeButton = new Button(buttonComposite, SWT.PUSH | SWT.LEFT);
+        designModeButton.setText("Design Mode");
+        designModeButton.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent e) {
+            	designModeBrowser.execute("DesignMode();");
+            }
+        });
+     
+				
+		syncButton = new Button(buttonComposite, SWT.PUSH | SWT.LEFT ) ;
 		syncButton.setText("Sync") ;
 		syncButton.addSelectionListener(new SelectionAdapter() {		
 			
@@ -106,6 +127,16 @@ public class DesignModeComposite extends Composite {
 				}
 			}
 		});
+		
+		
+		String htmlFileUrl = workPrefs.get("html_filepath_design" , "") ;
+		designModeBrowser = new Browser(parent, SWT.NONE);
+		designModeBrowser.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		
+		if (!htmlFileUrl.equals(""))
+			designModeBrowser.setUrl(htmlFileUrl) ;
+		
+		
 	}
 
 	public void setFilepath(IFile htmlfile) {

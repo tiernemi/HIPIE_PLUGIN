@@ -2,6 +2,8 @@ package org.xtext.hipie.ui;
 
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTabGroup;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
+import org.eclipse.debug.ui.ILaunchConfigurationTab;
+import org.xtext.hipie.views.MainTab;
 
 public class HIPIELaunchConfigurationTabGroup extends
 		AbstractLaunchConfigurationTabGroup {
@@ -12,7 +14,10 @@ public class HIPIELaunchConfigurationTabGroup extends
 
 	@Override
 	public void createTabs(ILaunchConfigurationDialog dialog, String mode) {
-		// TODO Auto-generated method stub
+		ILaunchConfigurationTab[] tabs = new ILaunchConfigurationTab[] {
+				new MainTab()
+		};
+		setTabs(tabs);
 
 	}
 

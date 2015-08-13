@@ -654,4 +654,13 @@
            id="org.xtext.hipie.ui.HIPIELaunchConfigurationImage">
      </launchConfigurationTypeImage>
   </extension>
+  <extension
+        point="org.eclipse.ui.perspectiveExtensions">
+     <perspectiveExtension
+           targetID="org.xtext.hipie.ui.hipie_perspec">
+        <actionSet
+              id="org.eclipse.debug.ui.launchActionSet">
+        </actionSet>
+     </perspectiveExtension>
+  </extension>
 </plugin>
