@@ -20,6 +20,8 @@ public class HIPIEPerspective implements IPerspectiveFactory {
 		DataSaveListener.init();
 	}
 	
+	
+	
 	@Override
 	public void createInitialLayout(IPageLayout layout) {
 		layout.addShowViewShortcut(DesignModeView.ID) ;

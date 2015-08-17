@@ -52,9 +52,12 @@ public class DesignModeSelect implements IHandler {
 			
 			IFile htmlFile = ResourcesPlugin.getWorkspace().getRoot().getFile(htmlFilepath) ;
 			IFile corDudFile = htmlFile.getProject().getFile(htmlFile.getProjectRelativePath().removeFileExtension().addFileExtension("dud")) ;
+			IFile corDatabombFile = htmlFile.getProject().getFile(htmlFile.getProjectRelativePath().removeFileExtension().addFileExtension("databomb")) ;
+			IFile corPersistFile = htmlFile.getProject().getFile(htmlFile.getProjectRelativePath().removeFileExtension().addFileExtension("persist")) ;
+			
 			DesignModeView view;
 			
-			if (corDudFile.exists()) {
+			if (corDudFile.exists() && corDatabombFile.exists() && corPersistFile.exists()) {
 				try {
 					view = (DesignModeView) HandlerUtil.getActiveWorkbenchWindowChecked(event).getActivePage().showView(DesignModeView.ID);
 					view.updateView(htmlFile) ;

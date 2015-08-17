@@ -27,17 +27,17 @@ import org.eclipse.core.resources.IContainer
 import org.xtext.hipie.hIPIE.OutDataset
 import java.util.List
 
+
 /**
  * Generates code from your model files on save.
  * 
  * See https://www.eclipse.org/Xtext/documentation/303_runtime_concepts.html#code-generation
  */
+ 
 class HIPIEGenerator implements IGenerator {
 	
 	override void doGenerate(Resource resource, IFileSystemAccess fsa) {
-		
 		var ws_root = ResourcesPlugin.getWorkspace().getRoot() 
-			
 		if (resource.URI.isPlatformResource()) {
 			var platformString = resource.URI.toPlatformString(true)
 			var resourceFile = ws_root.findMember(platformString)
@@ -154,30 +154,12 @@ class HIPIEGenerator implements IGenerator {
 			scIn.close()
 			
 			// Generate HTML //
-			var dermUrl = new URL("platform:/plugin/org.xtext.hipie/vis_files/dermatology.html")		
 			var cleanUrl = new URL("platform:/plugin/org.xtext.hipie/vis_files/clean.html")		
-			var inStreamDermConnection = dermUrl.openConnection().getInputStream()
 			var inStreamCleanConnection = cleanUrl.openConnection().getInputStream()
-
-			var streamStringHtml = new String
-			scIn = new Scanner(inStreamDermConnection)
-			if (scIn.hasNext())
-				streamStringHtml = scIn.useDelimiter("\\Z").next() 
-			
-			streamStringHtml = streamStringHtml.replace("%_data_%" , streamStringDatabomb)
-			streamStringHtml = streamStringHtml.replace("%_ddl_%" , streamStringDdl)
-			streamStringHtml = streamStringHtml.replace("%_persist_%" , streamString_per)
 			
 			var htmlCleanFilePath = resourceFile.projectRelativePath.removeFileExtension().addFileExtension("html")
-			var htmlDermFilePath = new Path(htmlCleanFilePath.removeFileExtension.toOSString + "Derm.html")		
-			var htmlDermFile = project.getFile(htmlDermFilePath)
-			var htmlOut = new FileOutputStream(htmlDermFile.rawLocation.toOSString)
-			htmlOut.write(streamStringHtml.getBytes())
-			in.close()
-			er.close()
-			htmlOut.close()
 			
-			streamStringHtml = new String
+			var streamStringHtml = new String
 			scIn = new Scanner(inStreamCleanConnection)
 			if (scIn.hasNext())
 				streamStringHtml = scIn.useDelimiter("\\Z").next() 
@@ -187,7 +169,7 @@ class HIPIEGenerator implements IGenerator {
 			streamStringHtml = streamStringHtml.replace("%_persist_%" , streamString_per)
 			
 			var htmlCleanFile = project.getFile(htmlCleanFilePath)
-			htmlOut = new FileOutputStream(htmlCleanFile.rawLocation.toOSString)
+			var htmlOut = new FileOutputStream(htmlCleanFile.rawLocation.toOSString)
 			htmlOut.write(streamStringHtml.getBytes())			
 			project.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor())
 			in.close()
