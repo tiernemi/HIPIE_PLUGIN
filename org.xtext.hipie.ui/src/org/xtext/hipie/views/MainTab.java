@@ -22,6 +22,10 @@ import org.eclipse.emf.edit.command.SetCommand;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
@@ -45,8 +49,6 @@ import org.eclipse.ui.dialogs.CheckedTreeSelectionDialog;
 import org.eclipse.ui.dialogs.ContainerSelectionDialog;
 import org.eclipse.ui.internal.browser.DefaultWebBrowser;
 
-;
-
 public class MainTab extends AbstractLaunchConfigurationTab {
 
 	Label programToRun;
@@ -68,8 +70,15 @@ public class MainTab extends AbstractLaunchConfigurationTab {
 	Button runInDesignModeB;
 	Label runInDesignModeL;
 
+	String selectedFile;
+	String defaultContainer;
+	String containerPath;
+	boolean externState;
+	boolean designState;
+
 	@Override
 	public void createControl(Composite parent) {
+
 		Font font = parent.getFont();
 
 		Composite comp = new Composite(parent, SWT.NONE);
@@ -86,16 +95,57 @@ public class MainTab extends AbstractLaunchConfigurationTab {
 		workspaceGroup = new Group(comp, SWT.NONE);
 		workspaceGroup.setText("Workspace Data");
 		workspaceGroup.setLayout(new GridLayout(2, false));
-		workspaceGroup
-				.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
+		workspaceGroup.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true,
+				false));
 		workspaceLabel = new Label(workspaceGroup, SWT.NONE);
 		workspaceLabel.setText("Location:");
 		workspaceText = new Text(workspaceGroup, SWT.NONE);
 		workspaceText.setText(ResourcesPlugin.getWorkspace().getRoot()
 				.getRawLocation().toOSString());
+		defaultContainer = workspaceText.getText();
 		GridData gdWorkText = new GridData(SWT.FILL, SWT.CENTER, true, true);
 		gdWorkText.widthHint = 500;
 		workspaceText.setLayoutData(gdWorkText);
+		workspaceText.addModifyListener(new ModifyListener() {
+
+			@Override
+			public void modifyText(ModifyEvent e) {
+				updateLaunchConfigurationDialog();
+				IPath newContainerPath = new Path("");
+				if (newContainerPath.isValidPath(workspaceText.getText())) {
+					newContainerPath = new Path(workspaceText.getText());
+					IContainer newContainer = ResourcesPlugin.getWorkspace()
+							.getRoot()
+							.getContainerForLocation(newContainerPath);
+					if (newContainer != null && newContainer.exists()) {
+						ArrayList<IFile> dudFiles = new ArrayList<IFile>();
+						findAllDudFiles(newContainer, dudFiles);
+						ArrayList<String> items = new ArrayList<String>();
+						for (int i = 0; i < dudFiles.size(); ++i)
+							items.add(dudFiles.get(i).getFullPath()
+									.toOSString());
+
+						if (items.size() > 0) {
+							String[] dudFileList = items
+									.toArray(new String[items.size()]);
+							programCombo.setItems(dudFileList);
+							programCombo.setText(dudFileList[0]);
+						} else {
+							programCombo.removeAll();
+							programCombo.setText("");
+							selectedFile = programCombo.getText();
+							System.out.println("error2");
+
+						}
+					} else {
+						programCombo.removeAll();
+						programCombo.setText("");
+						selectedFile = programCombo.getText();
+						System.out.println("error2");
+					}
+				}
+			}
+		});
 
 		Composite workspaceFileSystemComp = new Composite(workspaceGroup,
 				SWT.NONE);
@@ -111,17 +161,45 @@ public class MainTab extends AbstractLaunchConfigurationTab {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				IContainer cont = ResourcesPlugin.getWorkspace().getRoot();
+				IPath workspacePath = cont.getRawLocation();
+				IPath oldContainerPath = new Path(containerPath);
+
 				if (cont.exists()) {
 					ContainerSelectionDialog dialog = new ContainerSelectionDialog(
 							PlatformUI.getWorkbench()
 									.getActiveWorkbenchWindow().getShell(),
 							cont, false, "");
-					if (dialog.open() == dialog.OK)
-						workspaceText.setText(cont
-								.getFile(((IPath) dialog.getResult()[0]))
-								.getRawLocation().toOSString());
-				} else
-					System.out.println("error"); // replace
+					if (dialog.open() == dialog.OK) {
+						IContainer newContainer;
+						IPath newContainerPath = workspacePath
+								.append(((IPath) dialog.getResult()[0]));
+						newContainer = ResourcesPlugin.getWorkspace().getRoot()
+								.getContainerForLocation(newContainerPath);
+						if (!oldContainerPath.equals(newContainerPath)) {
+							workspaceText.setText(newContainerPath.toOSString());
+							ArrayList<IFile> dudFiles = new ArrayList<IFile>();
+							findAllDudFiles(newContainer, dudFiles);
+							ArrayList<String> items = new ArrayList<String>();
+							for (int i = 0; i < dudFiles.size(); ++i)
+								items.add(dudFiles.get(i).getFullPath()
+										.toOSString());
+							if (items.size() > 0) {
+								String[] dudFileList = items
+										.toArray(new String[items.size()]);
+								programCombo.setItems(dudFileList);
+								programCombo.setText(dudFileList[0]);
+								selectedFile = programCombo.getText();
+							} else {
+								programCombo.removeAll();
+								programCombo.setText("");
+								selectedFile = programCombo.getText();
+							}
+							updateLaunchConfigurationDialog();
+						}
+
+					} else
+						System.out.println("error4"); // replace
+				}
 			}
 
 			@Override
@@ -131,65 +209,122 @@ public class MainTab extends AbstractLaunchConfigurationTab {
 			}
 		});
 
-		fileSystemButton.addSelectionListener(new SelectionListener() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				DirectoryDialog dialog = new DirectoryDialog(PlatformUI
-						.getWorkbench().getActiveWorkbenchWindow().getShell());
-				String path = dialog.open();
-				if (!path.equals(""))
-					workspaceText.setText(path);
-			}
-
-			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {
-				// TODO Auto-generated method stub
-
-			}
-		});
-
+		// Bugged
+		/*
+		 * fileSystemButton.addSelectionListener(new SelectionListener() {
+		 * 
+		 * @Override public void widgetSelected(SelectionEvent e) {
+		 * DirectoryDialog dialog = new DirectoryDialog(PlatformUI
+		 * .getWorkbench().getActiveWorkbenchWindow().getShell()); String path =
+		 * dialog.open(); if (!path.equals("")) { workspaceText.setText(path);
+		 * IContainer newContainer = ResourcesPlugin.getWorkspace()
+		 * .getRoot().getContainerForLocation(new Path(path));
+		 * ResourcesPlugin.getWorkspace()
+		 * .getRoot().findFilesForLocationURI(URIUtil.(new Path(path)). ;
+		 * 
+		 * System.out.println(newContainer.getRawLocation());
+		 * System.out.println(newContainer.exists()); ArrayList<IFile> dudFiles
+		 * = new ArrayList<IFile>(); findAllDudFiles(newContainer, dudFiles);
+		 * ArrayList<String> items = new ArrayList<String>(); for (int i = 0; i
+		 * < dudFiles.size(); ++i) items.add(dudFiles.get(i).getName());
+		 * String[] dudFileList = items.toArray(new String[items .size()]);
+		 * programCombo.setItems(dudFileList); } }
+		 * 
+		 * @Override public void widgetDefaultSelected(SelectionEvent e) { //
+		 * TODO Auto-generated method stub
+		 * 
+		 * } });
+		 */
 		programToRunGroup = new Group(comp, SWT.NONE);
 		programToRunGroup.setText("DUD file to Run");
-		programToRunGroup.setLayout(new GridLayout(3, false));
+		programToRunGroup.setLayout(new GridLayout(1, false));
 		programToRunGroup.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true,
 				true));
 
-		programLabel = new Label(programToRunGroup, SWT.NONE);
-		programLabel.setText("Dud file:");
-		programCombo = new Combo(programToRunGroup, SWT.DROP_DOWN
-				| SWT.READ_ONLY);
-		
-		ArrayList<IFile> dudFiles = new ArrayList<IFile>() ;
-		findAllDudFiles(ResourcesPlugin.getWorkspace().getRoot(), dudFiles) ;
-		ArrayList<String> items = new ArrayList<String>() ;
-		for (int i = 0 ; i < dudFiles.size() ; ++i)
-			items.add(dudFiles.get(i).getName()) ;
-		String[] dudFileList =  items.toArray(new String[items.size()]) ;
-		programCombo.setItems(dudFileList) ;
-		programCombo.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, true, true, 2, 1));
-		
-		if (programCombo.getItems().length >= 1)
-			programCombo.setText(programCombo.getItems()[0]);
-		else
+		Composite comboComposite = new Composite(programToRunGroup, SWT.NONE);
+		comboComposite.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER,
+				true, true));
+		comboComposite.setLayout(new GridLayout(2, false));
+
+		programLabel = new Label(comboComposite, SWT.NONE);
+		programLabel.setText("Dud file to Run:");
+		programCombo = new Combo(comboComposite, SWT.DROP_DOWN | SWT.READ_ONLY);
+
+		ArrayList<IFile> dudFiles = new ArrayList<IFile>();
+		findAllDudFiles(ResourcesPlugin.getWorkspace().getRoot(), dudFiles);
+		ArrayList<String> items = new ArrayList<String>();
+		for (int i = 0; i < dudFiles.size(); ++i)
+			items.add(dudFiles.get(i).getFullPath().toOSString());
+		String[] dudFileList = items.toArray(new String[items.size()]);
+		programCombo.setItems(dudFileList);
+		programCombo.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER,
+				true, true, 1, 1));
+
+		programCombo.setEnabled(true);
+		if (programCombo.getItems().length >= 1) {
+			programCombo
+					.select(programCombo.indexOf(programCombo.getItems()[0]));
+			selectedFile = programCombo.getText();
+
+		} else
 			programCombo.setEnabled(false);
-		
-		Button runInExternalBrowserB = new Button(programToRunGroup, SWT.CHECK) ;
-		runInExternalBrowserB.setText("Run in external browser :");
-		Label runInExternalBrowserL;
-		Combo externalBrowsers;
 
+		programCombo.addSelectionListener(new SelectionListener() {
 
-		// programToRun.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER,
-		// false, false)) ;
-		// programToRun.setText("Dud file to run:") ;
-		// dudList = new Combo(comp, SWT.DROP_DOWN | SWT.READ_ONLY) ;
-		// dudList.setSize(700, dudList.getItemHeight());
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if (!selectedFile.equals(programCombo.getText()))
+					updateLaunchConfigurationDialog();
+			}
 
-		// ResourcesPlugin.getWorkspace() ;
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+				// TODO Auto-generated method stub
+			}
+		});
 
-		// dudList.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, true,
-		// false)) ;
+		Composite radioComposite = new Composite(programToRunGroup, SWT.NONE);
+		radioComposite.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true,
+				true));
+		radioComposite.setLayout(new GridLayout(2, false));
 
+		runInExternalBrowserB = new Button(radioComposite, SWT.RADIO);
+		runInExternalBrowserB.setText("Run in external browser");
+		runInExternalBrowserB.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER,
+				true, true));
+		runInExternalBrowserB.addSelectionListener(new SelectionListener() {
+
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if (externState != runInExternalBrowserB.getSelection()) {
+					updateLaunchConfigurationDialog();
+				}
+
+			}
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+		});
+
+		runInDesignModeB = new Button(radioComposite, SWT.RADIO);
+		runInDesignModeB.setText("Run in design mode");
+
+		runInDesignModeB.addSelectionListener(new SelectionListener() {
+
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if (designState != runInDesignModeB.getSelection()) {
+					updateLaunchConfigurationDialog();
+				}
+			}
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+		});
+		runInDesignModeB.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER,
+				true, true));
 	}
 
 	private void findAllDudFiles(IContainer cont, ArrayList<IFile> dudFiles) {
@@ -214,19 +349,80 @@ public class MainTab extends AbstractLaunchConfigurationTab {
 
 	@Override
 	public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
-
 	}
 
 	@Override
 	public void initializeFrom(ILaunchConfiguration configuration) {
-		// TODO Auto-generated method stub
+		try {
+			workspaceText.setText(configuration.getAttribute(
+					"ContainerLocation", ResourcesPlugin.getWorkspace()
+							.getRoot().getRawLocation().toOSString()));
+			containerPath = configuration.getAttribute("ContainerLocation",
+					ResourcesPlugin.getWorkspace().getRoot().getRawLocation()
+							.toOSString());
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
+		try {
+			final IPath dudFilePath = new Path(configuration.getAttribute(
+					"filePath", selectedFile));
+			Display.getDefault().syncExec(new Runnable() {
 
+				@Override
+				public void run() {
+					ArrayList<IFile> dudFiles = new ArrayList<IFile>();
+					IContainer cont = ResourcesPlugin.getWorkspace().getRoot()
+							.getContainerForLocation(new Path(containerPath));
+					findAllDudFiles(cont, dudFiles);
+					ArrayList<String> items = new ArrayList<String>();
+					for (int i = 0; i < dudFiles.size(); ++i)
+						items.add(dudFiles.get(i).getFullPath().toOSString());
+					String[] dudFileList = items.toArray(new String[items
+							.size()]);
+					programCombo.setItems(dudFileList);
+					programCombo.setText(dudFilePath.toOSString());
+				}
+
+			});
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
+
+		try {
+			runInDesignModeB.setSelection(configuration.getAttribute(
+					"isRunningDesign", false));
+			designState = configuration.getAttribute("isRunningDesign", false);
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
+
+		try {
+			runInExternalBrowserB.setSelection(configuration.getAttribute(
+					"isRunningExtern", true));
+			externState = configuration.getAttribute("isRunningExtern", true);
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
-		// TODO Auto-generated method stub
-
+		configuration.setAttribute("filePath", programCombo.getText());
+		configuration.setAttribute("isRunningDesign",
+				runInDesignModeB.getSelection());
+		configuration.setAttribute("isRunningExtern",
+				runInExternalBrowserB.getSelection());
+		configuration
+				.setAttribute("ContainerLocation", workspaceText.getText());
+		ArrayList<String> temp = new ArrayList<String>();
+		String[] itemList = programCombo.getItems();
+		for (int i = 0; i < itemList.length; ++i)
+			temp.add(itemList[i]);
+		configuration.setAttribute("dudFileList", temp);
+		selectedFile = programCombo.getText();
+		externState = runInExternalBrowserB.getSelection();
+		designState = runInDesignModeB.getSelection();
+		containerPath = workspaceText.getText();
 	}
 
 	@Override
@@ -234,4 +430,10 @@ public class MainTab extends AbstractLaunchConfigurationTab {
 		return "Main";
 	}
 
+	@Override
+	public boolean isValid(ILaunchConfiguration launchConfig) {
+		// TODO Auto-generated method stub
+		return super.isValid(launchConfig);
+	}
+	
 }

@@ -23,13 +23,14 @@ import org.xtext.hipie.ui.internal.HIPIEActivator;
 import org.xtext.hipie.views.DesignModeView;
 
 /**
- *  This class opens the design mode view based off the selection in the package explorer.
+ * This class opens the design mode view based off the selection in the package
+ * explorer.
  */
 
 public class DesignModeSelect implements IHandler {
 
-	static public String ID = "org.xtext.hipie.visualiser_select" ;
-	
+	static public String ID = "org.xtext.hipie.visualiser_select";
+
 	@Override
 	public void addHandlerListener(IHandlerListener handlerListener) {
 	}
@@ -40,38 +41,48 @@ public class DesignModeSelect implements IHandler {
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		
-		TreeSelection selectTree = (TreeSelection) HandlerUtil.getCurrentSelection(event) ;
-		Object[] selectionList = selectTree.toArray() ;
-	
-		for (int j=0 ; j<selectionList.length ; ++j) 
-		{
-			IFile file = (IFile) Platform.getAdapterManager().getAdapter(selectionList[j], IFile.class) ;				
-				
-			IPath htmlFilepath = file.getFullPath() ;
-			
-			IFile htmlFile = ResourcesPlugin.getWorkspace().getRoot().getFile(htmlFilepath) ;
-			IFile corDudFile = htmlFile.getProject().getFile(htmlFile.getProjectRelativePath().removeFileExtension().addFileExtension("dud")) ;
-			IFile corDatabombFile = htmlFile.getProject().getFile(htmlFile.getProjectRelativePath().removeFileExtension().addFileExtension("databomb")) ;
-			IFile corPersistFile = htmlFile.getProject().getFile(htmlFile.getProjectRelativePath().removeFileExtension().addFileExtension("persist")) ;
-			
+
+		TreeSelection selectTree = (TreeSelection) HandlerUtil
+				.getCurrentSelection(event);
+		Object[] selectionList = selectTree.toArray();
+
+		for (int j = 0; j < selectionList.length; ++j) {
+			IFile file = (IFile) Platform.getAdapterManager().getAdapter(
+					selectionList[j], IFile.class);
+
+			IPath htmlFilepath = file.getFullPath();
+
+			IFile htmlFile = ResourcesPlugin.getWorkspace().getRoot()
+					.getFile(htmlFilepath);
+			IFile corDudFile = htmlFile.getProject().getFile(
+					htmlFile.getProjectRelativePath().removeFileExtension()
+							.addFileExtension("dud"));
+			IFile corDatabombFile = htmlFile.getProject().getFile(
+					htmlFile.getProjectRelativePath().removeFileExtension()
+							.addFileExtension("databomb"));
+			IFile corPersistFile = htmlFile.getProject().getFile(
+					htmlFile.getProjectRelativePath().removeFileExtension()
+							.addFileExtension("persist"));
+
 			DesignModeView view;
-			
-			if (corDudFile.exists() && corDatabombFile.exists() && corPersistFile.exists()) {
+
+			if (corDudFile.exists() && corDatabombFile.exists()
+					&& corPersistFile.exists()) {
 				try {
-					view = (DesignModeView) HandlerUtil.getActiveWorkbenchWindowChecked(event).getActivePage().showView(DesignModeView.ID);
-					view.updateView(htmlFile) ;
-					return null ;
+					view = (DesignModeView) HandlerUtil
+							.getActiveWorkbenchWindowChecked(event)
+							.getActivePage().showView(DesignModeView.ID);
+					view.updateView(htmlFile);
+					return null;
 				} catch (PartInitException e) {
 					e.printStackTrace();
 				}
 			}
 			// error report
-			
-		}
-		return null ;
-	}
 
+		}
+		return null;
+	}
 
 	@Override
 	public boolean isEnabled() {
@@ -85,7 +96,7 @@ public class DesignModeSelect implements IHandler {
 
 	@Override
 	public void removeHandlerListener(IHandlerListener handlerListener) {
-		
+
 	}
 
 }

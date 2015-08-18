@@ -25,11 +25,10 @@ import org.xtext.hipie.views.DesignModeView;
  * Opens design mode view when DesignModeVisualiserListener is triggered.
  */
 
-
 public class DesignModePostBuild implements IHandler {
 
-	static public String ID = "org.xtext.hipie.visualiser_post_build" ;
-	
+	static public String ID = "org.xtext.hipie.visualiser_post_build";
+
 	@Override
 	public void addHandlerListener(IHandlerListener handlerListener) {
 
@@ -42,18 +41,22 @@ public class DesignModePostBuild implements IHandler {
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		IEditorInput editorInput = HandlerUtil.getActiveEditorInput(event) ;
-		IFile file = ((FileEditorInput)editorInput).getFile() ;
-		IPath htmlFilepath = file.getFullPath().removeFileExtension().addFileExtension("html") ;
-		IFile htmlFile = ResourcesPlugin.getWorkspace().getRoot().getFile(htmlFilepath) ;
+		IEditorInput editorInput = HandlerUtil.getActiveEditorInput(event);
+		IFile file = ((FileEditorInput) editorInput).getFile();
+		IPath htmlFilepath = file.getFullPath().removeFileExtension()
+				.addFileExtension("html");
+		IFile htmlFile = ResourcesPlugin.getWorkspace().getRoot()
+				.getFile(htmlFilepath);
 
 		try {
-			DesignModeView view = (DesignModeView) HandlerUtil.getActiveWorkbenchWindowChecked(event).getActivePage().showView(DesignModeView.ID) ;
+			DesignModeView view = (DesignModeView) HandlerUtil
+					.getActiveWorkbenchWindowChecked(event).getActivePage()
+					.showView(DesignModeView.ID);
 			view.updateView(htmlFile);
-		} 	catch (PartInitException e) {
+		} catch (PartInitException e) {
 			e.printStackTrace();
 		}
-		return null ;
+		return null;
 	}
 
 	@Override

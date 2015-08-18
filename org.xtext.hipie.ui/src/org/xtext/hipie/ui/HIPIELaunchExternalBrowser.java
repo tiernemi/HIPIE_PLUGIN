@@ -74,12 +74,14 @@ public class HIPIELaunchExternalBrowser implements ILaunchShortcut {
 
 	@Override
 	public void launch(IEditorPart editor, String mode) {
+		
 		Injector injector = HIPIEActivator.getInstance().getInjector("org.xtext.hipie.HIPIE");
 		ResourceSet resourceSet = injector.getInstance(ResourceSet.class);
 		IGenerator generator = injector.getInstance(IGenerator.class);
 		InMemoryFileSystemAccess fsa = injector.getInstance(InMemoryFileSystemAccess.class);		
 		IFile dudFile = (IFile) editor.getEditorInput().getAdapter(IFile.class) ;
-		
+		System.out.println(URI.createPlatformResourceURI(dudFile.getFullPath().toOSString(), false)) ;
+
 		Resource r = resourceSet.getResource(URI.createPlatformResourceURI(dudFile.getFullPath().toOSString(), false), true);
 		try {
 			r.load(null);
