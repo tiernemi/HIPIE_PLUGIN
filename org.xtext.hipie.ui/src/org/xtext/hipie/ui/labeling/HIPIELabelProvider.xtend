@@ -6,7 +6,6 @@ package org.xtext.hipie.ui.labeling
 import com.google.inject.Inject
 import org.xtext.hipie.hIPIE.*
 import org.eclipse.emf.edit.provider.StyledString
-import org.eclipse.swt.graphics.Image
 import org.eclipse.xtext.Keyword
 
 /**

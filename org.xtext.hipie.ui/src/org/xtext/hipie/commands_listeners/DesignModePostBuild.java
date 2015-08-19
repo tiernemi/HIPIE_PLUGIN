@@ -1,24 +1,16 @@
 package org.xtext.hipie.commands_listeners;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Scanner;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IHandler;
 import org.eclipse.core.commands.IHandlerListener;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.part.FileEditorInput;
-import org.eclipse.ui.statushandlers.StatusManager;
-import org.xtext.hipie.error.HIPIEStatus;
-import org.xtext.hipie.ui.internal.HIPIEActivator;
 import org.xtext.hipie.views.DesignModeView;
 
 /**

@@ -151,10 +151,11 @@ public class DataSaveListener {
 								Preferences preferences = projectScope.getNode("org.xtext.hipie.ui");
 								Preferences dataPrefNode = preferences.node("data_prefs");
 								String dataCompileState = dataPrefNode.get("comp_state" + fileName, "false") ;
-								if (dataCompileState.equals("false"))
-									promptDialog(changedFile) ;
-								else {	
+								String dataVisited = dataPrefNode.get("cmd_visited" + fileName, "false") ;
+								if (dataCompileState.equals("true"))
 									compileDatabomb(changedFile) ;
+								else if (dataVisited.equals("false")) {
+									promptDialog(changedFile) ;
 								} 
 							}
 						} catch (CoreException e) {

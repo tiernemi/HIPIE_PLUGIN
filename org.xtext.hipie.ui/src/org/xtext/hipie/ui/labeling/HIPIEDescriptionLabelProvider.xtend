@@ -3,7 +3,6 @@
  */
 package org.xtext.hipie.ui.labeling
 
-import org.eclipse.xtext.resource.IEObjectDescription
 
 //import org.eclipse.xtext.resource.IEObjectDescription
 

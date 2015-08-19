@@ -16,7 +16,6 @@ import org.eclipse.swt.SWT
 import org.eclipse.jface.viewers.StyledString
 import org.eclipse.xtext.Assignment
 import org.eclipse.xtext.Keyword
-import org.eclipse.xtext.scoping.IScopeProvider
 import org.xtext.hipie.hIPIE.OutDataset
 import org.eclipse.xtext.naming.QualifiedName
 import org.xtext.hipie.hIPIE.PosVizData
@@ -38,99 +37,98 @@ import org.xtext.hipie.hIPIE.ECLUnsigned
 import org.xtext.hipie.hIPIE.ECLBoolean
 import org.xtext.hipie.hIPIE.ECLNumType
 import org.xtext.hipie.hIPIE.ECLDecType
-import org.eclipse.jface.text.contentassist.ICompletionProposal
 
 /**
  * See https://www.eclipse.org/Xtext/documentation/304_ide_concepts.html#content-assist
  * on how to customize the content assistant.
  */
 class HIPIEProposalProvider extends AbstractHIPIEProposalProvider {
-	 	 
-	@Inject
-    private StylerFactory stylerFactory;
-     
-    def protected TextStyle getTypeTextStyle() {
-      var textStyle = new TextStyle();
-      textStyle.setColor(new RGB(125,38,205));
-      textStyle.setFontData(new FontData("typefont", 9, SWT.NORMAL))
-      textStyle.setStyle(SWT.NORMAL);
-      return textStyle;
-    } 
-    
-    def protected TextStyle getCrossRefTextStyle() {
-      var textStyle = new TextStyle()
-      textStyle.setColor(new RGB(140,140,140));
-      textStyle.setFontData(new FontData("basefont", 9, SWT.ITALIC))
-      textStyle.setStyle(SWT.ITALIC);
-      return textStyle;
-    }
-    
-    def protected TextStyle getKeywordTextStyle() {
-      var textStyle = new TextStyle()
-      textStyle.setColor(new RGB(39, 64, 138));
-      textStyle.setFontData(new FontData("keyfont", 10, SWT.BOLD))
-      textStyle.setStyle(SWT.BOLD);
-      return textStyle;
-    }
 
-	 def protected TextStyle getBoldTextStyle() {
-      var textStyle = new TextStyle()
-      textStyle.setColor(new RGB(0,0,0));
-      textStyle.setFontData(new FontData("keyfont", 10, SWT.BOLD))
-      textStyle.setStyle(SWT.BOLD);
-      return textStyle;
-    }
-    
 	@Inject
-	private IScopeProvider scopeProvider
-	    
+	private StylerFactory stylerFactory;
+
+	def protected TextStyle getTypeTextStyle() {
+		var textStyle = new TextStyle();
+		textStyle.setColor(new RGB(125, 38, 205));
+		textStyle.setFontData(new FontData("typefont", 9, SWT.NORMAL))
+		textStyle.setStyle(SWT.NORMAL);
+		return textStyle;
+	}
+
+	def protected TextStyle getCrossRefTextStyle() {
+		var textStyle = new TextStyle()
+		textStyle.setColor(new RGB(140, 140, 140));
+		textStyle.setFontData(new FontData("basefont", 9, SWT.ITALIC))
+		textStyle.setStyle(SWT.ITALIC);
+		return textStyle;
+	}
+
+	def protected TextStyle getKeywordTextStyle() {
+		var textStyle = new TextStyle()
+		textStyle.setColor(new RGB(39, 64, 138));
+		textStyle.setFontData(new FontData("keyfont", 10, SWT.BOLD))
+		textStyle.setStyle(SWT.BOLD);
+		return textStyle;
+	}
+
+	def protected TextStyle getBoldTextStyle() {
+		var textStyle = new TextStyle()
+		textStyle.setColor(new RGB(0, 0, 0));
+		textStyle.setFontData(new FontData("keyfont", 10, SWT.BOLD))
+		textStyle.setStyle(SWT.BOLD);
+		return textStyle;
+	}
+
 	override completeKeyword(Keyword keyword, ContentAssistContext contentAssistContext,
-			ICompletionProposalAcceptor acceptor) {
+		ICompletionProposalAcceptor acceptor) {
 		var StyledString proposalString
-		if(keyword.getValue().equals("-") || keyword.getValue().equals(",")  || 
-			keyword.getValue().equals("(") || keyword.getValue().equals(")") ||
-			keyword.getValue().equals("{") || keyword.getValue().equals("}") )
-			return ;
+		if (keyword.getValue().equals("-") || keyword.getValue().equals(",") || keyword.getValue().equals("(") ||
+			keyword.getValue().equals(")") || keyword.getValue().equals("{") || keyword.getValue().equals("}"))
+			return;
 		if (keyword.value == ";" || keyword.value == ":")
-			proposalString =  new StyledString(keyword.value, stylerFactory.createXtextStyleAdapterStyler(getBoldTextStyle()))
+			proposalString = new StyledString(keyword.value,
+				stylerFactory.createXtextStyleAdapterStyler(getBoldTextStyle()))
 		else
-			proposalString = new StyledString(keyword.value, stylerFactory.createXtextStyleAdapterStyler(getKeywordTextStyle()))
-		var proposal = createCompletionProposal(keyword.getValue(), proposalString, getImage(keyword), contentAssistContext)
+			proposalString = new StyledString(keyword.value,
+				stylerFactory.createXtextStyleAdapterStyler(getKeywordTextStyle()))
+		var proposal = createCompletionProposal(keyword.getValue(), proposalString, getImage(keyword),
+			contentAssistContext)
 		getPriorityHelper().adjustKeywordPriority(proposal, contentAssistContext.getPrefix())
 		acceptor.accept(proposal)
 	}
 
-	override completeVisBasis_Basis(EObject model, Assignment assignment, ContentAssistContext context, ICompletionProposalAcceptor acceptor) {
+	override completeVisBasis_Basis(EObject model, Assignment assignment, ContentAssistContext context,
+		ICompletionProposalAcceptor acceptor) {
 		super.completeVisBasis_Basis(model, assignment, context, acceptor)
 	}
-	
+
 	override protected StyledString getStyledDisplayString(EObject element, String qualifiedName, String shortName) {
 		var qualName = getQualifiedName(element, qualifiedName, shortName)
 		var name = new StyledString(qualName.lastSegment)
 		var qualNameString = qualName.toString
 		var type = new StyledString()
 		var typestring = ""
-		
+
 		if (element instanceof PosVizData) {
 			var obj = element as PosVizData
 			if (element instanceof ECLFieldType) {
 				var cont = obj.eContainer.eContainer
 				switch element {
-    				case element instanceof ECLString : typestring = 'STRING'
-					case element instanceof ECLInteger : typestring = 'INTEGER'
-					case element instanceof ECLQstring : typestring = 'QSTRING'
-					case element instanceof ECLReal : typestring = 'REAL'
-					case element instanceof ECLUnicode : typestring ='UNICODE' 
-					case element instanceof ECLData : typestring = 'DATA'
-					case element instanceof ECLVarstring : typestring = 'VARSTRING'
-					case element instanceof ECLVarunicode : typestring ='VARUNICODE'
-					case element instanceof ECLUnsigned : typestring = 'UNSIGNED'
-					case element instanceof ECLBoolean : typestring = 'BOOL'
-					case element instanceof ECLNumType : typestring = (element as ECLNumType).type
-					case element instanceof ECLDecType : typestring = (element as ECLDecType).type
-    			}
+					case element instanceof ECLString: typestring = 'STRING'
+					case element instanceof ECLInteger: typestring = 'INTEGER'
+					case element instanceof ECLQstring: typestring = 'QSTRING'
+					case element instanceof ECLReal: typestring = 'REAL'
+					case element instanceof ECLUnicode: typestring = 'UNICODE'
+					case element instanceof ECLData: typestring = 'DATA'
+					case element instanceof ECLVarstring: typestring = 'VARSTRING'
+					case element instanceof ECLVarunicode: typestring = 'VARUNICODE'
+					case element instanceof ECLUnsigned: typestring = 'UNSIGNED'
+					case element instanceof ECLBoolean: typestring = 'BOOL'
+					case element instanceof ECLNumType: typestring = (element as ECLNumType).type
+					case element instanceof ECLDecType: typestring = (element as ECLDecType).type
+				}
 				while (cont instanceof OutDataset || cont instanceof NestedDatasetDecl || cont instanceof Dataset) {
-					if (cont instanceof OutDataset){
+					if (cont instanceof OutDataset) {
 						var dataset = cont as OutDataset
 						qualNameString = "OUTPUTS." + dataset.name + "." + qualNameString
 					}
@@ -141,38 +139,39 @@ class HIPIEProposalProvider extends AbstractHIPIEProposalProvider {
 					cont = cont.eContainer.eContainer
 				}
 			}
-			if (element instanceof FieldDecl){
+			if (element instanceof FieldDecl) {
 				var cont = obj.eContainer
 				typestring = "FIELD"
-				if (cont instanceof Dataset){
+				if (cont instanceof Dataset) {
 					var dataset = cont as Dataset
 					qualNameString = "INPUTS." + dataset.name + "." + qualNameString
 				}
 			}
 		}
-		
+
 		if (element instanceof Visualization) {
 			var viz = element.eContainer as VisualSection
 			typestring = (element as Visualization).type
 			qualNameString = viz.name + "." + qualName.toString
 		}
-		
+
 		if (element instanceof OutDataset) {
 			var data = element as OutDataset
 			typestring = data.type
 		}
-		
+
 		if (element instanceof Dataset) {
 			var data = element as Dataset
 			typestring = data.type
 		}
-		
-		var qualSec = new StyledString(" - " + qualNameString , stylerFactory.createXtextStyleAdapterStyler(getCrossRefTextStyle()))
+
+		var qualSec = new StyledString(" - " + qualNameString,
+			stylerFactory.createXtextStyleAdapterStyler(getCrossRefTextStyle()))
 		if (typestring != "")
-			type = new StyledString(" : " + typestring , stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
+			type = new StyledString(" : " + typestring, stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
 		return name.append(type).append(qualSec)
 	}
-	
+
 	protected def QualifiedName getQualifiedName(EObject element, String qualifiedName, String shortName) {
 		var qualifiedNameAsString = qualifiedName
 		if (qualifiedNameAsString == null)
@@ -185,6 +184,5 @@ class HIPIEProposalProvider extends AbstractHIPIEProposalProvider {
 		}
 		return qualifiedNameConverter.toQualifiedName(qualifiedNameAsString)
 	}
-	
-	
+
 }

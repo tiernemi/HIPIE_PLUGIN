@@ -4,16 +4,13 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.RowData;
-import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbenchPropertyPage;
@@ -46,13 +43,28 @@ public class DataPropertyPage extends PropertyPage implements
 		dataPrefs = preferences.node("data_prefs");
 		String dataCompileState = dataPrefs.get("comp_state" + fileName, "false") ;
 		String dataCmdArgs = dataPrefs.get("cmd_prefs" + fileName, "") ;
+		dataPrefs.put("cmd_visited" + fileName, "true") ;
 		
 		compileCheckBox = new Button(parent, SWT.CHECK);
 		compileCheckBox.setText("Compile To Databomb");
 		if (dataCompileState.equals("true"))
 			compileCheckBox.setSelection(true);
 		else
-			compileCheckBox.setSelection(false);	
+			compileCheckBox.setSelection(false);
+		compileCheckBox.addSelectionListener(new SelectionListener() {
+			
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if (compileCheckBox.getSelection())
+					cmdArgsTextBox.setEnabled(true);
+				else
+					cmdArgsTextBox.setEnabled(false);
+			}
+			
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {				
+			}
+		});
 		
 		
 		Composite labelComposite = new Composite(parent, SWT.NONE) ;
@@ -68,7 +80,10 @@ public class DataPropertyPage extends PropertyPage implements
         cmdArgsTextBox = new Text(labelComposite ,SWT.SINGLE | SWT.LEAD | SWT.BORDER) ;
         cmdArgsTextBox.setLayoutData(textData);
         cmdArgsTextBox.setText(dataCmdArgs);
-        
+        if (dataCompileState.equals("true"))
+        	cmdArgsTextBox.setEnabled(true);
+        else
+        	cmdArgsTextBox.setEnabled(false); 
 		return parent;	
 	}
 

@@ -586,7 +586,7 @@
   <extension
         point="org.eclipse.debug.core.launchConfigurationTypes">
      <launchConfigurationType
-           delegate="org.xtext.hipie.ui.HIPIELauncher"
+           delegate="org.xtext.hipie.launcher.HIPIELauncher"
            id="org.xtext.hipie.ui.launchConfiguration"
            modes="run"
            name="RunConfig">
@@ -595,7 +595,7 @@
   <extension
         point="org.eclipse.debug.ui.launchConfigurationTabGroups">
      <launchConfigurationTabGroup
-           class="org.xtext.hipie.ui.HIPIELaunchConfigurationTabGroup"
+           class="org.xtext.hipie.launcher.HIPIELaunchConfigurationTabGroup"
            id="org.xtext.hipie.ui.launchConfigurationDatabomb"
            type="org.xtext.hipie.ui.launchConfiguration">
      </launchConfigurationTabGroup>
@@ -603,7 +603,7 @@
   <extension
         point="org.eclipse.debug.ui.launchShortcuts">
      <shortcut
-           class="org.xtext.hipie.ui.HIPIELaunchExternalBrowser"
+           class="org.xtext.hipie.launcher.HIPIELaunchExternalBrowser"
            icon="icons/internet.png"
            id="org.xtext.hipie.ui.externalBrowser"
            label="External Browser"
@@ -629,7 +629,7 @@
   <extension
         point="org.eclipse.debug.ui.launchShortcuts">
      <shortcut
-           class="org.xtext.hipie.ui.HIPIELaunchDesignMode"
+           class="org.xtext.hipie.launcher.HIPIELaunchDesignMode"
            icon="icons/designMode.png"
            id="org.xtext.hipie.ui.designMode"
            label="Design Mode"

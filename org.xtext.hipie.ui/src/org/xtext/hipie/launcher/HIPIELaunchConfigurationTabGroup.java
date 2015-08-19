@@ -1,10 +1,8 @@
-package org.xtext.hipie.ui;
+package org.xtext.hipie.launcher;
 
-import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTabGroup;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.debug.ui.ILaunchConfigurationTab;
-import org.xtext.hipie.views.MainTab;
 
 public class HIPIELaunchConfigurationTabGroup extends
 		AbstractLaunchConfigurationTabGroup {

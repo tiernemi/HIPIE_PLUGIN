@@ -1,25 +1,16 @@
 package org.xtext.hipie.commands_listeners;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Scanner;
-
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IHandler;
 import org.eclipse.core.commands.IHandlerListener;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.handlers.HandlerUtil;
-import org.eclipse.ui.statushandlers.StatusManager;
-import org.xtext.hipie.error.HIPIEStatus;
-import org.xtext.hipie.ui.internal.HIPIEActivator;
 import org.xtext.hipie.views.DesignModeView;
 
 /**
@@ -54,9 +45,9 @@ public class DesignModeSelect implements IHandler {
 
 			IFile htmlFile = ResourcesPlugin.getWorkspace().getRoot()
 					.getFile(htmlFilepath);
-			IFile corDudFile = htmlFile.getProject().getFile(
+			IFile corDdlFile = htmlFile.getProject().getFile(
 					htmlFile.getProjectRelativePath().removeFileExtension()
-							.addFileExtension("dud"));
+							.addFileExtension("ddl"));
 			IFile corDatabombFile = htmlFile.getProject().getFile(
 					htmlFile.getProjectRelativePath().removeFileExtension()
 							.addFileExtension("databomb"));
@@ -66,7 +57,7 @@ public class DesignModeSelect implements IHandler {
 
 			DesignModeView view;
 
-			if (corDudFile.exists() && corDatabombFile.exists()
+			if (corDdlFile.exists() && corDatabombFile.exists()
 					&& corPersistFile.exists()) {
 				try {
 					view = (DesignModeView) HandlerUtil

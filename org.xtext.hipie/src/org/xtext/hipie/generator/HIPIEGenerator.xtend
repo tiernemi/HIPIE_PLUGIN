@@ -17,9 +17,7 @@ import org.eclipse.core.runtime.NullProgressMonitor
 import org.eclipse.core.runtime.Path
 import java.io.FileOutputStream
 import java.util.ArrayList
-import org.eclipse.core.resources.ProjectScope
 import java.io.FileWriter
-import java.io.File
 import org.eclipse.core.resources.IProject
 import org.eclipse.core.resources.IFile
 import org.eclipse.core.resources.IFolder
@@ -42,10 +40,7 @@ class HIPIEGenerator implements IGenerator {
 			var platformString = resource.URI.toPlatformString(true)
 			var resourceFile = ws_root.findMember(platformString)
 			var project = resourceFile.project
-				
-			var projectScope = new ProjectScope(project) ;
-			var projPrefs= projectScope.getNode("org.xtext.hipie.ui");
-		
+						
 			// Get Compiler Location //
 			val defaultCompilerPath = ResourcesPlugin.getWorkspace().getRoot().getRawLocation().toOSString() ;
 			var workPrefs = InstanceScope.INSTANCE.getNode("org.xtext.hipie.ui");
