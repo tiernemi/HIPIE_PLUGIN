@@ -589,7 +589,7 @@
            delegate="org.xtext.hipie.launcher.HIPIELauncher"
            id="org.xtext.hipie.ui.launchConfiguration"
            modes="run"
-           name="RunConfig">
+           name="HIPIE application">
      </launchConfigurationType>
   </extension>
   <extension
