@@ -15,6 +15,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.part.FileEditorInput;
@@ -35,56 +36,55 @@ public class DesignModeVisualiserListener {
 					public void resourceChanged(IResourceChangeEvent event) {
 						Display.getDefault().syncExec(new Runnable() {
 							public void run() {
-								IEditorPart activeEditor = PlatformUI
-										.getWorkbench()
-										.getActiveWorkbenchWindow()
-										.getActivePage().getActiveEditor();
-								if (activeEditor != null) {
-									IEditorInput editorFile = activeEditor
-											.getEditorInput();
-									IPath dudFilepath = ((FileEditorInput) editorFile)
-											.getFile().getFullPath();
-									IWorkspaceRoot workspaceRoot = ResourcesPlugin
-											.getWorkspace().getRoot();
-									IFile htmlFile = workspaceRoot
-											.getFile(dudFilepath
-													.removeFileExtension()
-													.addFileExtension("html"));
-									IFile ddlFile = workspaceRoot
-											.getFile(dudFilepath
-													.removeFileExtension()
-													.addFileExtension("ddl"));
-									IFile databombFile = workspaceRoot
-											.getFile(dudFilepath
-													.removeFileExtension()
-													.addFileExtension(
-															"databomb"));
-
-									if (htmlFile.exists() && ddlFile.exists()
-											&& databombFile.exists()) {
-										ICommandService commandServ = (ICommandService) PlatformUI
-												.getWorkbench().getService(
-														ICommandService.class);
-
-										Command command = commandServ
-												.getCommand(DesignModePostBuild.ID);
-										try {
-											command.executeWithChecks(new ExecutionEvent());
-										} catch (ExecutionException e) {
-											e.printStackTrace();
-										} catch (NotDefinedException e) {
-											e.printStackTrace();
-										} catch (NotEnabledException e) {
-											e.printStackTrace();
-										} catch (NotHandledException e) {
-											e.printStackTrace();
-										}
-									}
-								}
+								openDesignMode();
 							}
 						});
-
 					}
 				}, IResourceChangeEvent.POST_BUILD);
+	}
+
+	public static void openDesignMode() {
+
+		IWorkbenchWindow activeWindow = PlatformUI.getWorkbench()
+				.getActiveWorkbenchWindow();
+		if (activeWindow != null) {
+			IEditorPart activeEditor = PlatformUI.getWorkbench()
+					.getActiveWorkbenchWindow().getActivePage()
+					.getActiveEditor();
+
+			if (activeEditor != null) {
+				IEditorInput editorFile = activeEditor.getEditorInput();
+				IPath dudFilepath = ((FileEditorInput) editorFile).getFile()
+						.getFullPath();
+				IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace()
+						.getRoot();
+				IFile htmlFile = workspaceRoot.getFile(dudFilepath
+						.removeFileExtension().addFileExtension("html"));
+				IFile ddlFile = workspaceRoot.getFile(dudFilepath
+						.removeFileExtension().addFileExtension("ddl"));
+				IFile databombFile = workspaceRoot.getFile(dudFilepath
+						.removeFileExtension().addFileExtension("databomb"));
+
+				if (htmlFile.exists() && ddlFile.exists()
+						&& databombFile.exists()) {
+					ICommandService commandServ = (ICommandService) PlatformUI
+							.getWorkbench().getService(ICommandService.class);
+
+					Command command = commandServ
+							.getCommand(DesignModePostBuild.ID);
+					try {
+						command.executeWithChecks(new ExecutionEvent());
+					} catch (ExecutionException e) {
+						e.printStackTrace();
+					} catch (NotDefinedException e) {
+						e.printStackTrace();
+					} catch (NotEnabledException e) {
+						e.printStackTrace();
+					} catch (NotHandledException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}
 	}
 }

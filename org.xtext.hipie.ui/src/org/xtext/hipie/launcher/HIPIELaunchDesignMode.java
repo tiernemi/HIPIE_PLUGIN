@@ -23,59 +23,36 @@ public class HIPIELaunchDesignMode implements ILaunchShortcut {
 
 	@Override
 	public void launch(ISelection selection, String mode) {
+		IFile dudFile = null;
+		
+		if (selection instanceof TreeSelection) {
+			Object[] selectionArray = ((TreeSelection) selection).toArray();
+			for (int i = 0; i < selectionArray.length; ++i)
+				if (selectionArray[i] instanceof IFile)
+					if (((IFile) selectionArray[i]).getFileExtension().equals(
+							"dud")) {
+						dudFile = (IFile) selectionArray[i];
+						launchInDesignMode(dudFile);
+					}
+		}
+
+	}
+
+	@Override
+	public void launch(IEditorPart editor, String mode) {
+		IFile dudFile = (IFile) editor.getEditorInput().getAdapter(IFile.class);
+		launchInDesignMode(dudFile);
+	}
+
+	public void launchInDesignMode(IFile dudFile) {
 		Injector injector = HIPIEActivator.getInstance().getInjector(
 				"org.xtext.hipie.HIPIE");
 		ResourceSet resourceSet = injector.getInstance(ResourceSet.class);
 		IGenerator generator = injector.getInstance(IGenerator.class);
 		InMemoryFileSystemAccess fsa = injector
 				.getInstance(InMemoryFileSystemAccess.class);
-		IFile dudFile = null;
-
-		if (selection instanceof TreeSelection) {
-			Object[] selectionArray = ((TreeSelection) selection).toArray();
-			for (int i = 0; i < selectionArray.length; ++i)
-				if (selectionArray[i] instanceof IFile)
-					if (((IFile) selectionArray[i]).getFileExtension().equals(
-							"dud"))
-						dudFile = (IFile) selectionArray[i];
-
-			if (dudFile != null) {
-				Resource r = resourceSet.getResource(URI.createPlatformResourceURI(dudFile.getFullPath().toOSString(), false), true);
-				try {
-					r.load(null);
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
-				generator.doGenerate(r, fsa);
-
-				IFile htmlFile = dudFile.getProject().getFile(
-						dudFile.getProjectRelativePath().removeFileExtension()
-								.addFileExtension("html"));
-
-				if (htmlFile.exists()) {
-					DesignModeView view;
-					try {
-						view = (DesignModeView) PlatformUI.getWorkbench()
-								.getActiveWorkbenchWindow().getActivePage()
-								.showView(DesignModeView.ID);
-						view.updateView(htmlFile);
-					} catch (PartInitException e) {
-						e.printStackTrace();
-					}
-				}
-			}
-		}
-	}
-
-	@Override
-	public void launch(IEditorPart editor, String mode) {
-		Injector injector = HIPIEActivator.getInstance().getInjector("org.xtext.hipie.HIPIE");
-		ResourceSet resourceSet = injector.getInstance(ResourceSet.class);
-		IGenerator generator = injector.getInstance(IGenerator.class);
-		InMemoryFileSystemAccess fsa = injector.getInstance(InMemoryFileSystemAccess.class);
-		IFile dudFile = (IFile) editor.getEditorInput().getAdapter(IFile.class);
-
-		Resource r = resourceSet.getResource(URI.createPlatformResourceURI(dudFile.getFullPath().toOSString(), false), true);
+		Resource r = resourceSet.getResource(URI.createPlatformResourceURI(
+				dudFile.getFullPath().toOSString(), false), true);
 		try {
 			r.load(null);
 		} catch (IOException e1) {

@@ -195,6 +195,13 @@ class HIPIEOutlineTreeProvider extends org.eclipse.xtext.ui.editor.outline.impl.
       return label_string
 	}
 	
+	def public Object _text(KelStringDecl obj) {
+      var typestring = new StyledString("STRING" , stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
+      var namestring = new StyledString(obj.val_r.name)
+      var label_string = namestring.append(" : ").append(typestring)
+      return label_string
+	}
+	
 	def public Object _text(KelBase obj) {
       var typestring = new StyledString(obj.type , stylerFactory.createXtextStyleAdapterStyler(getTypeTextStyle()))
       var namestring = new StyledString(obj.name)
@@ -484,6 +491,10 @@ class HIPIEOutlineTreeProvider extends org.eclipse.xtext.ui.editor.outline.impl.
     }
     
     def protected boolean _isLeaf(KelEntityDeclSimple kel_dec) {
+    	return true
+    }
+    
+    def protected boolean _isLeaf(KelStringDecl kel_dec) {
     	return true
     }
     

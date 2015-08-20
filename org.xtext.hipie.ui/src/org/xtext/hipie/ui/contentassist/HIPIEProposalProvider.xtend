@@ -83,8 +83,13 @@ class HIPIEProposalProvider extends AbstractHIPIEProposalProvider {
 		ICompletionProposalAcceptor acceptor) {
 		var StyledString proposalString
 		if (keyword.getValue().equals("-") || keyword.getValue().equals(",") || keyword.getValue().equals("(") ||
-			keyword.getValue().equals(")") || keyword.getValue().equals("{") || keyword.getValue().equals("}"))
-			return;
+			keyword.getValue().equals(")") || keyword.getValue().equals("{") || keyword.getValue().equals("}")) {
+			if (contentAssistContext.prefix == keyword.value)
+				return;
+			if (contentAssistContext.offset < contentAssistContext.lastCompleteNode.endOffset)
+				return ;
+		}
+
 		if (keyword.value == ";" || keyword.value == ":")
 			proposalString = new StyledString(keyword.value,
 				stylerFactory.createXtextStyleAdapterStyler(getBoldTextStyle()))
