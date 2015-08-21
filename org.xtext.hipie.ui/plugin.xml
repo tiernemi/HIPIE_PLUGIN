@@ -669,4 +669,46 @@
         </actionSet>
      </perspectiveExtension>
   </extension>
+  <extension
+        point="org.eclipse.debug.ui.launchShortcuts">
+     <shortcut
+           class="org.xtext.hipie.launcher.DatabombLauncher"
+           icon="icons/data_folder.png"
+           id="org.xtext.hipie.ui.createDatabomb"
+           label="Create Databomb"
+           modes="run">
+        <contextualLaunch>
+           <enablement>
+              <with
+                    variable="selection">
+                 <count
+                       value="1">
+                 </count>
+                 <iterate>
+                    <and>
+                       <test
+                             forcePluginActivation="true"
+                             property="org.xtext.hipie.ui.isCompilationEnabled">
+                       </test>
+                       <test
+                             forcePluginActivation="true"
+                             property="org.xtext.hipie.ui.isValidFile">
+                       </test>
+                    </and>
+                 </iterate>
+              </with>
+           </enablement>
+        </contextualLaunch>
+     </shortcut>
+  </extension>
+  <extension
+        point="org.eclipse.core.expressions.propertyTesters">
+     <propertyTester
+           class="org.xtext.hipie.propertyTesters.DatabombPropTester"
+           id="org.xtext.hipie.ui.DatabombTester"
+           namespace="org.xtext.hipie.ui"
+           properties="isCompilationEnabled, isValidFile,hasBeenPrompted"
+           type="java.lang.Object">
+     </propertyTester>
+  </extension>
 </plugin>

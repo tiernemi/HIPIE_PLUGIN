@@ -19,7 +19,7 @@ Program :
 ;
  
 BaseProp: 
-	(property=('NAME' | 'DESCRIPTION' | 'AUTHOR' | 'LICENSE' | 'COPYRIGHT' | 'VERSION' | 'LABEL' | 'ID' | 'TEMPLATE' ) val_list=ValueList ';')|
+	(property=('NAME' | 'DESCRIPTION' | 'AUTHOR' | 'LICENSE' | 'COPYRIGHT' | 'VERSION' | 'LABEL' | 'ID' | 'TEMPLATE' | 'HIPIEVERSION_MIN' ) val_list=ValueList ';')|
 	(property='CATEGORY' cat_list=CategoryTypeList ';')
 ;
    
@@ -88,7 +88,11 @@ FieldDecl:
 ;
 
 KelAttrDecl: 
-	type='ATTRIBUTE' name=TOKEN options=InputOptions? ';'
+	type=('ATTRIBUTE'|'QUERY'|'SHELL') name=TOKEN options=InputOptions? ';'
+;
+
+KelStringDecl:
+	'STRING' val_r=Value ';'
 ;
 
 KelEntityDeclSimple: 
@@ -148,7 +152,7 @@ Record :
 ;
 
 KelBase :
-	type='KELBASE' name=TOKEN (options=InputOptions)? (kels+=(KelEntityDecl|KelEntityDeclSimple|KelAttrDecl))* 'END'
+	type='KELBASE' name=TOKEN (options=InputOptions)? (kels+=(KelEntityDecl|KelEntityDeclSimple|KelAttrDecl|KelStringDecl))* 'END'
 ;
 
 Datatype :
@@ -362,6 +366,7 @@ VisFilter :
 	'(' + vals+=[ECLFieldType|TOKEN] + ')'
 ;
 
+
 VisBasisQualifiers: 
 	'{' funcs+=Function ( ',' (funcs+=Function)|(nest+=NestBasisQualifier) )* '}'
 ;
@@ -369,6 +374,7 @@ VisBasisQualifiers:
 PosVizData : 
 	(ECLFieldType | FieldDecl)
 ;
+
 
 Function: 
 	{Function}
@@ -379,8 +385,11 @@ Function:
     'SCALE' '(' ((vars=[PosVizData|TOKEN])|count_func=CountFunction|agg_func=AggFunction) ',' type=INT ')')
 ;
 
+
+// Nest Basis Qualifiers doesnt work
+
 NestBasisQualifier: 
-	(TOKEN) VisBasisQualifiers
+	inner_basis=TOKEN nestbasis=VisBasisQualifiers
 ;
 
 CountFunction: 
@@ -506,10 +515,6 @@ terminal ECLNUMBEREDTYPE:
 terminal ECLDECIMALTYPE: 
 	('DECIMAL')('0'..'9')*
 ;
-
-//terminal UTOKEN: 
-//	('_')('a'..'z'|'A'..'Z'|'0'..'9'|'_'|'-')('a'..'z'|'A'..'Z'|'0'..'9'|'_')*
-//;
 
 terminal GEN_BLOCK :
 	'INLINE' -> 'ENDGENERATES'

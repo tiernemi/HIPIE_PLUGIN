@@ -9,8 +9,8 @@ import org.osgi.service.prefs.Preferences;
 
 public class DatabombPropTester extends PropertyTester {
 
-	public static final String[] INVALID_DATABOMB_FILES = { "html", "ddl",
-			"databomb", "html", "persist" };
+	public static final String[] INVALID_DATABOMB_FILES = { "html", "dud", "ddl",
+			"databomb", "persist" };
 	public static final String PROPERTY_NAMESPACE = "org.xtext.hipie.ui";
 	public static final String PROPERTY_IS_COMPILATION_ENABLED = "isCompilationEnabled";
 	public static final String PROPERTY_IS_VALID_FILE = "isValidFile";

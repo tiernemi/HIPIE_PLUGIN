@@ -19,6 +19,9 @@ public class HIPIEDesignModeErrorHandler extends AbstractStatusHandler {
 				ErrorDialog.openError(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), "Design Mode Error", oldStatus.getMessage(), oldStatus) ;
 			if (oldStatus.getCode() == HIPIEStatus.DESIGN_MODE_DDL__ERROR)
 				ErrorDialog.openError(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), "Design Mode Error", oldStatus.getMessage(), oldStatus) ;
+			if (oldStatus.getCode() == HIPIEStatus.COMPILER_MISSING)
+				ErrorDialog.openError(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), "Build Error", oldStatus.getMessage(), oldStatus) ;
+
 	}
 
 }
