@@ -9,8 +9,8 @@ import org.osgi.service.prefs.Preferences;
 
 public class DatabombPropTester extends PropertyTester {
 
-	public static final String[] INVALID_DATABOMB_FILES = { "html", "dud", "ddl",
-			"databomb", "persist" };
+	public static final String[] VALID_DATABOMB_FILES = { "txt", "csv", "tsv",
+			"dat"};
 	public static final String PROPERTY_NAMESPACE = "org.xtext.hipie.ui";
 	public static final String PROPERTY_IS_COMPILATION_ENABLED = "isCompilationEnabled";
 	public static final String PROPERTY_IS_VALID_FILE = "isValidFile";
@@ -45,11 +45,11 @@ public class DatabombPropTester extends PropertyTester {
 				else
 					return false;
 			} else if (property.equals(PROPERTY_IS_VALID_FILE)) {
-				for (int i = 0; i < INVALID_DATABOMB_FILES.length; ++i)
+				for (int i = 0; i < VALID_DATABOMB_FILES.length; ++i)
 					if (testFile.getFileExtension().equals(
-							INVALID_DATABOMB_FILES[i]))
-						return false;
-				return true;
+							VALID_DATABOMB_FILES[i]))
+						return true;
+				return false;
 			} else if (property.equals(PROPERTY_HAS_BEEN_PROMPTED)) {
 				IScopeContext projectScope = new ProjectScope(
 						testFile.getProject());

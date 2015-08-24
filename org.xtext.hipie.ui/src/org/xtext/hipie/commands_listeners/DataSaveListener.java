@@ -25,29 +25,6 @@ public class DataSaveListener {
 
 	static public IResourceChangeListener dataSaveListener = new IResourceChangeListener() {
 
-		public void promptDialog(final IFile changedFile) {
-			Display.getDefault().syncExec(new Runnable() {
-				public void run() {
-					MessageBox dialog = new MessageBox(PlatformUI
-							.getWorkbench().getActiveWorkbenchWindow()
-							.getShell(), SWT.ICON_QUESTION | SWT.OK
-							| SWT.CANCEL);
-					dialog.setText("Databomb");
-					dialog.setMessage("Do you want to enable databomb compilation for this file?");
-					int answer = dialog.open();
-					if (answer == SWT.OK)
-						PreferencesUtil.createPropertyDialogOn(
-								PlatformUI.getWorkbench()
-										.getActiveWorkbenchWindow().getShell(),
-								changedFile, DataPropertyPage.ID, null, null)
-								.open();
-				}
-			});
-			if (DatabombPropTester.testFile(changedFile,
-					DatabombPropTester.PROPERTY_IS_COMPILATION_ENABLED))
-				DatabombLauncher.compileDatabomb(changedFile);
-		}
-
 		public void resourceChanged(IResourceChangeEvent event) {
 
 			if (event.getDelta() != null) {
@@ -88,13 +65,8 @@ public class DataSaveListener {
 										.testFile(
 												changedFile,
 												DatabombPropTester.PROPERTY_IS_COMPILATION_ENABLED))
-									DatabombLauncher.compileDatabomb(changedFile);
-								else if (!DatabombPropTester
-										.testFile(
-												changedFile,
-												DatabombPropTester.PROPERTY_HAS_BEEN_PROMPTED)) {
-									promptDialog(changedFile);
-								}
+									DatabombLauncher
+											.compileDatabomb(changedFile);
 							}
 						} catch (CoreException e) {
 							e.printStackTrace();

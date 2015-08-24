@@ -13,10 +13,15 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.model.ILaunchConfigurationDelegate;
+import org.eclipse.emf.common.util.Diagnostic;
 import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.emf.ecore.util.Diagnostician;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.xtext.generator.IGenerator;
@@ -57,55 +62,67 @@ public class HIPIELauncher implements ILaunchConfigurationDelegate {
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-		generator.doGenerate(r, fsa);
-		final IFile htmlFile = dudFile.getProject().getFile(
-				dudFile.getProjectRelativePath().removeFileExtension()
-						.addFileExtension("html"));
 
-		if (htmlFile.exists()) {
-			if (externState) {
-				URL url;
-				try {
-					url = htmlFile.getRawLocationURI().toURL();
-					PlatformUI.getWorkbench().getBrowserSupport()
-							.getExternalBrowser().openURL(url);
-				} catch (MalformedURLException e) {
-					e.printStackTrace();
-				} catch (PartInitException e) {
-					e.printStackTrace();
-				}
-			}
-			if (designState) {
-				IFile corDdlFile = htmlFile.getProject().getFile(
-						htmlFile.getProjectRelativePath().removeFileExtension()
-								.addFileExtension("ddl"));
-				IFile corDatabombFile = htmlFile.getProject().getFile(
-						htmlFile.getProjectRelativePath().removeFileExtension()
-								.addFileExtension("databomb"));
-				IFile corPersistFile = htmlFile.getProject().getFile(
-						htmlFile.getProjectRelativePath().removeFileExtension()
-								.addFileExtension("persist"));
+		EObject myModel = r.getContents().get(0);
+		Diagnostic diagnostic = Diagnostician.INSTANCE.validate(myModel);
+		System.out.println(r.getErrors().size());
+		if (r.getErrors().size() == 0) {
+				System.out.println(diagnostic.getSeverity());
+				generator.doGenerate(r, fsa);
+				final IFile htmlFile = dudFile.getProject().getFile(
+						dudFile.getProjectRelativePath().removeFileExtension()
+								.addFileExtension("html"));
 
-				if (corDdlFile.exists() && corDatabombFile.exists()
-						&& corPersistFile.exists()) {
-					Display.getDefault().syncExec(new Runnable() {
-						public void run() {
-							DesignModeView view = null;
-							try {
-								view = (DesignModeView) PlatformUI
-										.getWorkbench()
-										.getActiveWorkbenchWindow()
-										.getActivePage()
-										.showView(DesignModeView.ID);
-							} catch (PartInitException e) {
-								e.printStackTrace();
-							}
-							view.updateView(htmlFile);
+				if (htmlFile.exists()) {
+					if (externState) {
+						URL url;
+						try {
+							url = htmlFile.getRawLocationURI().toURL();
+							PlatformUI.getWorkbench().getBrowserSupport()
+									.getExternalBrowser().openURL(url);
+						} catch (MalformedURLException e) {
+							e.printStackTrace();
+						} catch (PartInitException e) {
+							e.printStackTrace();
 						}
-					});
+					}
+					if (designState) {
+						IFile corDdlFile = htmlFile.getProject().getFile(
+								htmlFile.getProjectRelativePath()
+										.removeFileExtension()
+										.addFileExtension("ddl"));
+						IFile corDatabombFile = htmlFile.getProject().getFile(
+								htmlFile.getProjectRelativePath()
+										.removeFileExtension()
+										.addFileExtension("databomb"));
+						IFile corPersistFile = htmlFile.getProject().getFile(
+								htmlFile.getProjectRelativePath()
+										.removeFileExtension()
+										.addFileExtension("persist"));
+
+						if (corDdlFile.exists() && corDatabombFile.exists()
+								&& corPersistFile.exists()) {
+							Display.getDefault().syncExec(new Runnable() {
+								public void run() {
+									DesignModeView view = null;
+									try {
+										view = (DesignModeView) PlatformUI
+												.getWorkbench()
+												.getActiveWorkbenchWindow()
+												.getActivePage()
+												.showView(DesignModeView.ID);
+									} catch (PartInitException e) {
+										e.printStackTrace();
+									}
+									view.updateView(htmlFile);
+								}
+							});
+						}
+					}
 				}
 			}
+	else {
+		  /// errors exist
 		}
 	}
-
 }

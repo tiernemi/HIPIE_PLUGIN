@@ -80,15 +80,15 @@ class HIPIEGenerator implements IGenerator {
 			findAllDatabombFiles(project, fileList)
 			filterDatabombs(resource, fileList, filteredFileList)
 					
-			for (i : 0..<fileList.size) {
-				var tempDatFile = fileList.get(i)
+			for (i : 0..<filteredFileList.size) {
+				var tempDatFile = filteredFileList.get(i)
 				var inStream = new FileInputStream(tempDatFile.rawLocation.toOSString)
 				var fw = new FileWriter(databombFile.rawLocation.toOSString,true)
 				var streamStringTemp = new String
 				var scIn = new Scanner(inStream)
 				if (scIn.hasNext())
 					streamStringTemp = scIn.useDelimiter("\\Z").next()
-				if(i != fileList.size-1 && fileList.size > 1) {
+				if(i != filteredFileList.size-1 && filteredFileList.size > 1) {
 					streamStringTemp = streamStringTemp.substring(0, streamStringTemp.lastIndexOf("}"))
 					streamStringTemp += ","
 				}
@@ -196,7 +196,10 @@ class HIPIEGenerator implements IGenerator {
 		
 		for (i : 0..<fileList.size)
 			for (j : 0..<databombList.size)
-				if (databombList.get(j).name == fileList.get(i).fullPath.removeFileExtension.lastSegment)
-					filteredFileList += fileList.get(i)				
+				if (databombList.get(j).name == fileList.get(i).fullPath.removeFileExtension.lastSegment) {
+					filteredFileList += fileList.get(i)
+					
+				}
+					
 	}
 }

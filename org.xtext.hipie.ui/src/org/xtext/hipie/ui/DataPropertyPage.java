@@ -95,7 +95,7 @@ public class DataPropertyPage extends PropertyPage implements
 			dataPrefs.put("comp_state" + datFile.getName(), "false") ;
 		dataPrefs.put("cmd_prefs" + datFile.getName(), cmdArgsTextBox.getText()) ;
 		try {
-			dataPrefs.parent().flush();
+			 dataPrefs.parent().flush();
 		} catch (BackingStoreException e) {
 			e.printStackTrace();
 		}
