@@ -15,13 +15,14 @@ public class HIPIEDesignModeErrorHandler extends AbstractStatusHandler {
 	@Override
 	public void handle(StatusAdapter statusAdapter, int style) {
 			IStatus oldStatus = statusAdapter.getStatus() ;
-			if (oldStatus.getCode() == HIPIEStatus.DESIGN_MODE_DATBOMB__ERROR)
+			if (oldStatus.getCode() == HIPIEStatus.DESIGN_MODE_FAILED)
 				ErrorDialog.openError(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), "Design Mode Error", oldStatus.getMessage(), oldStatus) ;
-			if (oldStatus.getCode() == HIPIEStatus.DESIGN_MODE_DDL__ERROR)
+			if (oldStatus.getCode() == HIPIEStatus.MISSING_DATABOMB)
 				ErrorDialog.openError(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), "Design Mode Error", oldStatus.getMessage(), oldStatus) ;
-			if (oldStatus.getCode() == HIPIEStatus.COMPILER_MISSING)
-				ErrorDialog.openError(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), "Build Error", oldStatus.getMessage(), oldStatus) ;
-
+			if (oldStatus.getCode() == HIPIEStatus.MISSING_DDL)
+				ErrorDialog.openError(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), "Design Mode Error", oldStatus.getMessage(), oldStatus) ;
+			if (oldStatus.getCode() == HIPIEStatus.MISSING_PERSIST)
+				ErrorDialog.openError(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), "Design Mode Error", oldStatus.getMessage(), oldStatus) ;
 	}
 
 }

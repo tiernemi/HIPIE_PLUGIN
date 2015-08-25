@@ -38,15 +38,15 @@ public class MainTab extends AbstractLaunchConfigurationTab {
 	Label containerLabel;
 	Group containerGroup;
 	Text dudFileContainerText;
-	Button workspaceButton ;
-	Composite workspaceFileSystemComp ;
+	Button workspaceButton;
+	Composite workspaceFileSystemComp;
 
 	Group programToRunGroup;
 	Label dudFileComboLabel;
 	Combo dudFileListCombo;
-	Composite comboComposite ;
-	
-	Composite radioComposite ;
+	Composite comboComposite;
+
+	Composite radioComposite;
 	Button externalBrowserButton;
 	Button designModeButton;
 
@@ -124,7 +124,7 @@ public class MainTab extends AbstractLaunchConfigurationTab {
 			}
 		});
 
-		workspaceFileSystemComp = new Composite(containerGroup, SWT.NONE)  ;
+		workspaceFileSystemComp = new Composite(containerGroup, SWT.NONE);
 		workspaceFileSystemComp.setLayoutData(new GridData(SWT.RIGHT,
 				SWT.CENTER, true, true, 2, 1));
 		workspaceFileSystemComp.setLayout(new GridLayout(1, false));
@@ -150,7 +150,8 @@ public class MainTab extends AbstractLaunchConfigurationTab {
 						newContainer = ResourcesPlugin.getWorkspace().getRoot()
 								.getContainerForLocation(newContainerPath);
 						if (!oldContainerPath.equals(newContainerPath)) {
-							dudFileContainerText.setText(newContainerPath.toOSString());
+							dudFileContainerText.setText(newContainerPath
+									.toOSString());
 							ArrayList<IFile> dudFiles = new ArrayList<IFile>();
 							findAllDudFiles(newContainer, dudFiles);
 							ArrayList<String> items = new ArrayList<String>();
@@ -192,7 +193,8 @@ public class MainTab extends AbstractLaunchConfigurationTab {
 
 		dudFileComboLabel = new Label(comboComposite, SWT.NONE);
 		dudFileComboLabel.setText("Dud file to Run:");
-		dudFileListCombo = new Combo(comboComposite, SWT.DROP_DOWN | SWT.READ_ONLY);
+		dudFileListCombo = new Combo(comboComposite, SWT.DROP_DOWN
+				| SWT.READ_ONLY);
 
 		ArrayList<IFile> dudFiles = new ArrayList<IFile>();
 		findAllDudFiles(ResourcesPlugin.getWorkspace().getRoot(), dudFiles);
@@ -206,8 +208,8 @@ public class MainTab extends AbstractLaunchConfigurationTab {
 
 		dudFileListCombo.setEnabled(true);
 		if (dudFileListCombo.getItems().length >= 1) {
-			dudFileListCombo
-					.select(dudFileListCombo.indexOf(dudFileListCombo.getItems()[0]));
+			dudFileListCombo.select(dudFileListCombo.indexOf(dudFileListCombo
+					.getItems()[0]));
 			selectedFile = dudFileListCombo.getText();
 
 		} else
@@ -317,14 +319,17 @@ public class MainTab extends AbstractLaunchConfigurationTab {
 					ArrayList<IFile> dudFiles = new ArrayList<IFile>();
 					IContainer cont = ResourcesPlugin.getWorkspace().getRoot()
 							.getContainerForLocation(new Path(containerPath));
-					findAllDudFiles(cont, dudFiles);
-					ArrayList<String> items = new ArrayList<String>();
-					for (int i = 0; i < dudFiles.size(); ++i)
-						items.add(dudFiles.get(i).getFullPath().toOSString());
-					String[] dudFileList = items.toArray(new String[items
-							.size()]);
-					dudFileListCombo.setItems(dudFileList);
-					dudFileListCombo.setText(dudFilePath.toOSString());
+					if (cont != null && cont.exists()) {
+						findAllDudFiles(cont, dudFiles);
+						ArrayList<String> items = new ArrayList<String>();
+						for (int i = 0; i < dudFiles.size(); ++i)
+							items.add(dudFiles.get(i).getFullPath()
+									.toOSString());
+						String[] dudFileList = items.toArray(new String[items
+								.size()]);
+						dudFileListCombo.setItems(dudFileList);
+						dudFileListCombo.setText(dudFilePath.toOSString());
+					}
 				}
 
 			});
@@ -356,8 +361,8 @@ public class MainTab extends AbstractLaunchConfigurationTab {
 				designModeButton.getSelection());
 		configuration.setAttribute("isRunningExtern",
 				externalBrowserButton.getSelection());
-		configuration
-				.setAttribute("ContainerLocation", dudFileContainerText.getText());
+		configuration.setAttribute("ContainerLocation",
+				dudFileContainerText.getText());
 		ArrayList<String> temp = new ArrayList<String>();
 		String[] itemList = dudFileListCombo.getItems();
 		for (int i = 0; i < itemList.length; ++i)
@@ -376,7 +381,10 @@ public class MainTab extends AbstractLaunchConfigurationTab {
 
 	@Override
 	public boolean isValid(ILaunchConfiguration launchConfig) {
-		return super.isValid(launchConfig) ;
+		if (selectedFile.equals(""))
+			return false;
+		else
+			return true;
 	}
-	
+
 }

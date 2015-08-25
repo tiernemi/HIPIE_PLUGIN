@@ -7,10 +7,13 @@ import org.eclipse.core.commands.IHandlerListener;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.handlers.HandlerUtil;
+import org.eclipse.ui.statushandlers.StatusManager;
+import org.xtext.hipie.error.HIPIEStatus;
 import org.xtext.hipie.views.DesignModeView;
 
 /**
@@ -66,10 +69,41 @@ public class DesignModeSelect implements IHandler {
 					view.updateView(htmlFile);
 					return null;
 				} catch (PartInitException e) {
+					String message = "Design Mode failed to open.";
+					IStatus status = new HIPIEStatus(IStatus.ERROR,
+							"org.xtext.hipie.ui",
+							HIPIEStatus.DESIGN_MODE_FAILED, message, e);
+					StatusManager.getManager().handle(status,
+							StatusManager.LOG | StatusManager.SHOW);
 					e.printStackTrace();
 				}
 			}
-			// error report
+			else {
+				if (!corDdlFile.exists()) {
+					String message = "Corresponding DDL file does not exist.";
+					IStatus status = new HIPIEStatus(IStatus.ERROR,
+							"org.xtext.hipie.ui",
+							HIPIEStatus.MISSING_DDL, message, null);
+					StatusManager.getManager().handle(status,
+							StatusManager.LOG | StatusManager.SHOW);
+				}
+				if (!corDatabombFile.exists()) {
+					String message = "Corresponding databomb file does not exist.";
+					IStatus status = new HIPIEStatus(IStatus.ERROR,
+							"org.xtext.hipie.ui",
+							HIPIEStatus.MISSING_DATABOMB, message, null);
+					StatusManager.getManager().handle(status,
+							StatusManager.LOG | StatusManager.SHOW);
+				}
+				if (!corPersistFile.exists()) {
+					String message = "Corresponding persist file does not exist.";
+					IStatus status = new HIPIEStatus(IStatus.ERROR,
+							"org.xtext.hipie.ui",
+							HIPIEStatus.MISSING_PERSIST, message, null);
+					StatusManager.getManager().handle(status,
+							StatusManager.LOG | StatusManager.SHOW);					
+				}
+			}
 
 		}
 		return null;

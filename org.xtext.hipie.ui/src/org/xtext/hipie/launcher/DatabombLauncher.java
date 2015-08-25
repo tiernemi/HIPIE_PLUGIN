@@ -20,7 +20,9 @@ import org.eclipse.debug.ui.ILaunchShortcut;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.statushandlers.StatusManager;
 import org.osgi.service.prefs.Preferences;
+import org.xtext.hipie.error.HIPIEStatus;
 
 public class DatabombLauncher implements ILaunchShortcut {
 
@@ -60,6 +62,7 @@ public class DatabombLauncher implements ILaunchShortcut {
 		String databombCmd = "java -cp " + compilerPath.toOSString()
 				+ " org/hpcc/HIPIE/commandline/CommandLineService "
 				+ dataCmdString + " -o " + dataBombFilePath.toOSString();
+		System.out.println("Compiling Databomb......");
 		System.out.println(databombCmd);
 		Process procData = null;
 		try {
@@ -76,6 +79,15 @@ public class DatabombLauncher implements ILaunchShortcut {
 				streamStringErrors = scError.useDelimiter("\\Z").next();
 			System.out.println(streamString);
 			System.out.println(streamStringErrors);
+			if (!streamStringErrors.isEmpty()) {
+				String message = streamStringErrors;
+				IStatus status = new HIPIEStatus(IStatus.ERROR,
+						"org.xtext.hipie.ui",
+						HIPIEStatus.FAILED_TO_COMPILE_DATABOMB, message, null);
+				StatusManager.getManager().handle(status,
+						StatusManager.LOG | StatusManager.SHOW);
+			}
+
 			in.close();
 			er.close();
 			scVerbose.close();
@@ -83,6 +95,7 @@ public class DatabombLauncher implements ILaunchShortcut {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
 		Job job = new Job("Refresh") {
 			protected IStatus run(IProgressMonitor monitor) {
 				try {

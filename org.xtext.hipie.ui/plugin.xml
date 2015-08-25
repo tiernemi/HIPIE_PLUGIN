@@ -521,6 +521,10 @@
            class="org.xtext.hipie.error.HIPIEDesignModeErrorHandler"
            id="org.xtext.hipie.ui.status_handler">
      </statusHandler>
+     <statusHandler
+           class="org.xtext.hipie.error.HIPIELauncherErrorHandler"
+           id="org.xtext.hipie.ui.status_handler">
+     </statusHandler>
   </extension>
   <extension
         id="HIPIENature"

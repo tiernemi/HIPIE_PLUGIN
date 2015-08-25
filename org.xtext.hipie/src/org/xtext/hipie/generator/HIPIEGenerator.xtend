@@ -24,7 +24,8 @@ import org.eclipse.core.resources.IFolder
 import org.eclipse.core.resources.IContainer
 import org.xtext.hipie.hIPIE.OutDataset
 import java.util.List
-
+import java.io.IOException
+import org.eclipse.core.runtime.IStatus
 
 /**
  * Generates code from your model files on save.
@@ -48,11 +49,11 @@ class HIPIEGenerator implements IGenerator {
 
 			var ddlFilePath = resourceFile.projectRelativePath.removeFileExtension().addFileExtension("ddl")
 			var ddlFile = project.getFile(ddlFilePath)
-			println(ddlFile.rawLocation.toOSString)
 			
-			//  Generate DDL  //	
+			//  Generate DDL  //
 			var ddl_cmd = "java -cp "  + compilerPath.toOSString + " org/hpcc/HIPIE/commandline/CommandLineService -databomb " + resourceFile.rawLocation.toOSString() + " -o " + ddlFile.rawLocation.toOSString() + " -verbose"
-			System.out.println(ddl_cmd)
+			println("Generating DDL......")
+			println(ddl_cmd)
 			var proc = Runtime.getRuntime().exec(ddl_cmd) as Process
 			var in = proc.inputStream
 			var er = proc.errorStream
@@ -64,8 +65,8 @@ class HIPIEGenerator implements IGenerator {
 				streamString = scVerbose.useDelimiter("\\Z").next() ;
 			if (scError.hasNext())
 				streamStringErrors = scError.useDelimiter("\\Z").next() ;
-			System.out.println(streamString)
-			System.out.println(streamStringErrors)
+			println(streamString)
+			println(streamStringErrors)
 			in.close()
 			er.close() 	
 		
@@ -79,7 +80,9 @@ class HIPIEGenerator implements IGenerator {
 			var ArrayList<IFile> filteredFileList = new ArrayList<IFile>() ;
 			findAllDatabombFiles(project, fileList)
 			filterDatabombs(resource, fileList, filteredFileList)
-					
+			
+			
+			println("Generating databomb......")
 			for (i : 0..<filteredFileList.size) {
 				var tempDatFile = filteredFileList.get(i)
 				var inStream = new FileInputStream(tempDatFile.rawLocation.toOSString)
@@ -101,6 +104,7 @@ class HIPIEGenerator implements IGenerator {
 			}
 			
 			// Creates an empty persist if there is none already //
+			println("Generating persist......")
 			var perFilepath = resourceFile.projectRelativePath.removeFileExtension().addFileExtension("persist")
 			var perFile =  project.getFile(perFilepath)
 			if(!perFile.exists) {
@@ -150,26 +154,33 @@ class HIPIEGenerator implements IGenerator {
 			
 			// Generate HTML //
 			var cleanUrl = new URL("platform:/plugin/org.xtext.hipie/vis_files/clean.html")		
-			var inStreamCleanConnection = cleanUrl.openConnection().getInputStream()
-			
 			var htmlCleanFilePath = resourceFile.projectRelativePath.removeFileExtension().addFileExtension("html")
-			
-			var streamStringHtml = new String
-			scIn = new Scanner(inStreamCleanConnection)
-			if (scIn.hasNext())
-				streamStringHtml = scIn.useDelimiter("\\Z").next() 
-			
-			streamStringHtml = streamStringHtml.replace("%_data_%" , streamStringDatabomb)
-			streamStringHtml = streamStringHtml.replace("%_ddl_%" , streamStringDdl)
-			streamStringHtml = streamStringHtml.replace("%_persist_%" , streamString_per)
-			
 			var htmlCleanFile = project.getFile(htmlCleanFilePath)
-			var htmlOut = new FileOutputStream(htmlCleanFile.rawLocation.toOSString)
-			htmlOut.write(streamStringHtml.getBytes())			
-			project.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor())
-			in.close()
-			er.close()
-			htmlOut.close()
+			println("Generating HTML......")
+			
+			
+			try {
+				var inStreamCleanConnection = cleanUrl.openConnection().getInputStream()
+						
+				var streamStringHtml = new String
+				scIn = new Scanner(inStreamCleanConnection)
+				if (scIn.hasNext())
+					streamStringHtml = scIn.useDelimiter("\\Z").next() 
+			
+				streamStringHtml = streamStringHtml.replace("%_data_%" , streamStringDatabomb)
+				streamStringHtml = streamStringHtml.replace("%_ddl_%" , streamStringDdl)
+				streamStringHtml = streamStringHtml.replace("%_persist_%" , streamString_per)
+				
+				var htmlOut = new FileOutputStream(htmlCleanFile.rawLocation.toOSString)
+				htmlOut.write(streamStringHtml.getBytes())			
+				project.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor())
+				in.close()
+				er.close()
+				htmlOut.close() 
+			}
+			catch (IOException e){
+				e.printStackTrace ;
+			}
 		}
 	}
 	
@@ -198,7 +209,6 @@ class HIPIEGenerator implements IGenerator {
 			for (j : 0..<databombList.size)
 				if (databombList.get(j).name == fileList.get(i).fullPath.removeFileExtension.lastSegment) {
 					filteredFileList += fileList.get(i)
-					
 				}
 					
 	}
