@@ -20,14 +20,15 @@ Require-Bundle: org.eclipse.xtext;visibility:=reexport,
 Import-Package: org.apache.log4j
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Export-Package: org.xtext.hipie,
- org.xtext.hipie.services,
+ org.xtext.hipie.error,
+ org.xtext.hipie.formatting,
+ org.xtext.hipie.generator,
  org.xtext.hipie.hIPIE,
  org.xtext.hipie.hIPIE.impl,
  org.xtext.hipie.hIPIE.util,
- org.xtext.hipie.serializer,
  org.xtext.hipie.parser.antlr,
  org.xtext.hipie.parser.antlr.internal,
- org.xtext.hipie.validation,
  org.xtext.hipie.scoping,
- org.xtext.hipie.generator,
- org.xtext.hipie.formatting
+ org.xtext.hipie.serializer,
+ org.xtext.hipie.services,
+ org.xtext.hipie.validation

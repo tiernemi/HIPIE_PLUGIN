@@ -81,7 +81,7 @@ public class DesignModeComposite extends Composite {
 					String persist = (String) designModeBrowser.evaluate(getPersistCmd) ;
 					
 					if (cleanHtmlUrl == null) {
-						 cleanHtmlUrl = new URL(workPrefs.get("clean_html_filepath_design" , ""));
+						 cleanHtmlUrl = new URL(workPrefs.get("clean_html_url_design" , ""));
 					}
 
 					IPath htmlCleanPath = new Path(cleanHtmlUrl.getPath()) ;
@@ -107,7 +107,7 @@ public class DesignModeComposite extends Composite {
 					htmlOut.close();
 					scIn.close() ;
 					
-					workPrefs.put("clean_html_filepath_design", cleanHtmlUrl.toString());
+					workPrefs.put("clean_html_url_design", cleanHtmlUrl.toString());
 				}
 				catch (IOException e1) {
 					e1.printStackTrace();
@@ -123,13 +123,15 @@ public class DesignModeComposite extends Composite {
 		});
 		
 		
-		String cleanFileUrl = workPrefs.get("clean_html_filepath_design" , "") ;
+		String cleanFilePath =  workPrefs.get("clean_html_filepath_design" , "") ;
 		
 		designModeBrowser = new Browser(parent, SWT.NONE) ;
 		designModeBrowser.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true)) ;
+	    IFile htmlFile = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(new Path(cleanFilePath)) ;
 		
-		if (!cleanFileUrl .equals(""))
-			designModeBrowser.setUrl(cleanFileUrl) ;
+		if (htmlFile!= null && htmlFile.exists()) {
+			setFilepath(htmlFile) ;
+		}
 		
 	}
 
@@ -142,12 +144,12 @@ public class DesignModeComposite extends Composite {
 				cleanUrl = htmlfile.getRawLocationURI().toURL() ;
 				cleanHtmlUrl = cleanUrl ;
 				
+				
 				IFile ddlFile = htmlfile.getProject().getFile(htmlfile.getProjectRelativePath().removeFileExtension().addFileExtension("ddl")) ; 
 				IFile databombFile = htmlfile.getProject().getFile(htmlfile.getProjectRelativePath().removeFileExtension().addFileExtension("databomb")) ; 
 				IFile persistFile = htmlfile.getProject().getFile(htmlfile.getProjectRelativePath().removeFileExtension().addFileExtension("persist")) ; 
 			
 				if (ddlFile.exists() && databombFile.exists() && persistFile.exists()) {
-					
 					InputStream inStreamDdl = ddlFile.getContents() ;
 					String streamStringDdl = "" ;
 					Scanner scInddl = new Scanner(inStreamDdl) ;
@@ -162,7 +164,6 @@ public class DesignModeComposite extends Composite {
 					if (scIndatabomb.hasNext())
 						streamStringData = scIndatabomb.useDelimiter("\\Z").next() ;
 					streamStringData = streamStringData.replace("\n" , "") ;
-					streamStringData = streamStringData.replace(" " , "") ;
 					streamStringData = streamStringData.replace("\t" , "") ;
 					streamStringData = streamStringData.replace("\r" , "") ;
 					inStreamDatabomb.close() ;
@@ -196,7 +197,9 @@ public class DesignModeComposite extends Composite {
 					String html = streamStringHtml ;
 
 					designModeBrowser.setText(html) ;
-					workPrefs.put("clean_html_filepath_design", cleanHtmlUrl.toString()); 
+					String htmlFilepath = htmlfile.getRawLocation().toOSString()  ;
+					workPrefs.put("clean_html_url_design", cleanHtmlUrl.toString()); 
+					workPrefs.put("clean_html_filepath_design", htmlFilepath); 
 				}
 			} catch (MalformedURLException e) {
 				e.printStackTrace();

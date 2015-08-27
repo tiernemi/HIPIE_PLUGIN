@@ -26,6 +26,8 @@ import org.xtext.hipie.hIPIE.OutDataset
 import java.util.List
 import java.io.IOException
 import org.eclipse.core.runtime.IStatus
+import org.xtext.hipie.error.HIPIEStatus
+import org.eclipse.ui.statushandlers.StatusManager
 
 /**
  * Generates code from your model files on save.
@@ -68,8 +70,18 @@ class HIPIEGenerator implements IGenerator {
 			println(streamString)
 			println(streamStringErrors)
 			in.close()
-			er.close() 	
-		
+			er.close()
+			
+			if (!streamStringErrors.isEmpty()) {
+				var message = streamStringErrors
+				var status = new HIPIEStatus(IStatus.ERROR,
+					"org.xtext.hipie", HIPIEStatus.DDL_GENERATION_FAILED,
+					message, null);
+				StatusManager.getManager().handle(status,
+					(StatusManager.SHOW.bitwiseOr(StatusManager.LOG)));
+				return ;
+			}
+			
 			//  Generate DataBomb  //
 			var databombFilePath =  resourceFile.projectRelativePath.removeFileExtension().addFileExtension("databomb");
 			var databombFile = project.getFile(databombFilePath);
@@ -78,8 +90,8 @@ class HIPIEGenerator implements IGenerator {
 				
 			var ArrayList<IFile> fileList = new ArrayList<IFile>() ;
 			var ArrayList<IFile> filteredFileList = new ArrayList<IFile>() ;
-			findAllDatabombFiles(project, fileList)
-			filterDatabombs(resource, fileList, filteredFileList)
+			DatabombLocator.findAllDatabombFiles(project, fileList)
+			DatabombLocator.filterDatabombs(resource, fileList, filteredFileList)
 			
 			
 			println("Generating databomb......")
@@ -120,7 +132,6 @@ class HIPIEGenerator implements IGenerator {
 				streamStringDdl = scIn.useDelimiter("\\Z").next()
 		
 			streamStringDdl = streamStringDdl.replace("\n" , "")
-			streamStringDdl = streamStringDdl.replace(" " , "")
 			streamStringDdl = streamStringDdl.replace("\t" , "")
 			streamStringDdl = streamStringDdl.replace("\r" , "")
 			inStream.close() 
@@ -134,7 +145,6 @@ class HIPIEGenerator implements IGenerator {
 				streamStringDatabomb = scIn.useDelimiter("\\Z").next()
 		
 			streamStringDatabomb = streamStringDatabomb.replace("\n" , "")
-			streamStringDatabomb = streamStringDatabomb.replace(" " , "")
 			streamStringDatabomb = streamStringDatabomb.replace("\t" , "")
 			streamStringDatabomb = streamStringDatabomb.replace("\r" , "")
 			inStream.close()
@@ -146,7 +156,6 @@ class HIPIEGenerator implements IGenerator {
 			if (scIn.hasNext())
 				streamString_per = scIn.useDelimiter("\\Z").next()
 			streamString_per = streamString_per.replace("\n" , "")
-			streamString_per = streamString_per.replace(" " , "")
 			streamString_per = streamString_per.replace("\t" , "")
 			streamString_per = streamString_per.replace("\r" , "")
 			inStream.close()
@@ -157,7 +166,6 @@ class HIPIEGenerator implements IGenerator {
 			var htmlCleanFilePath = resourceFile.projectRelativePath.removeFileExtension().addFileExtension("html")
 			var htmlCleanFile = project.getFile(htmlCleanFilePath)
 			println("Generating HTML......")
-			
 			
 			try {
 				var inStreamCleanConnection = cleanUrl.openConnection().getInputStream()
@@ -183,33 +191,5 @@ class HIPIEGenerator implements IGenerator {
 			}
 		}
 	}
-	
-	def void findAllDatabombFiles(IContainer cont, ArrayList<IFile> fileList) {	
-		var memberList = cont.members.toArray
-		for (i : 0..<memberList.size) {
-			if (memberList.get(i) instanceof IFolder || memberList.get(i) instanceof IProject)
-				findAllDatabombFiles((memberList.get(i) as IContainer), fileList)
-			if (memberList.get(i) instanceof IFile)
-				if ((memberList.get(i) as IFile).fileExtension == "databomb")
-					fileList += (memberList.get(i) as IFile)
-		}
-		return ;
-	}
-	
-	def void filterDatabombs(Resource resource, ArrayList<IFile> fileList, ArrayList<IFile> filteredFileList) {
-		var List<OutDataset> datasetList = resource.allContents.filter(OutDataset).toIterable.toList
-		var ArrayList<OutDataset> databombList = new ArrayList() ;
-		for (i : 0..<datasetList.size)
-			if (datasetList.get(i).ops != null)
-				for (j : 0..<datasetList.get(i).ops.output_ops.size) 
-					if (datasetList.get(i).ops.output_ops.get(j).type == "DATABOMB")
-						databombList += datasetList.get(i)
-		
-		for (i : 0..<fileList.size)
-			for (j : 0..<databombList.size)
-				if (databombList.get(j).name == fileList.get(i).fullPath.removeFileExtension.lastSegment) {
-					filteredFileList += fileList.get(i)
-				}
-					
-	}
 }
+	

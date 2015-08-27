@@ -204,6 +204,10 @@ class HIPIELabelProvider extends org.eclipse.xtext.ui.label.DefaultEObjectLabelP
 		return "permissions.png"
 	}
 	
+	def image(VisualOption element) {
+		return "custom.png"
+	}
+	
 	def text(Visualization element) {
 		var visBasis  = "";
 		if (element.parens != null)

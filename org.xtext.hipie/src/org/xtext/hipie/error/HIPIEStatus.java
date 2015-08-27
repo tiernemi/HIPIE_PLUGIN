@@ -16,6 +16,12 @@ public class HIPIEStatus extends Status {
 	public static final int MISSING_DATABOMB = -10 ;
 	public static final int MISSING_DDL = -11 ;
 	public static final int MISSING_PERSIST = -12 ;
+	public static final int DUPLICATE_DATABOMB_FILES = -13 ;
+	public static final int DATABOMB_GENERATION_FAILED = -14 ;
+	public static final int DDL_GENERATION_FAILED = -15 ;
+	public static final int HTML_GENERATION_FAILED = -16 ;
+	public static final int INSUFFICIENT_DATABOMB_FILES = -17 ;
+
 	
 	public HIPIEStatus(int severity, String id, int code, String message, Throwable t) {
 		  super(severity, id, code, message, t);

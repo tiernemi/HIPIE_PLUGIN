@@ -37,6 +37,11 @@ import org.xtext.hipie.hIPIE.ECLUnsigned
 import org.xtext.hipie.hIPIE.ECLBoolean
 import org.xtext.hipie.hIPIE.ECLNumType
 import org.xtext.hipie.hIPIE.ECLDecType
+import org.xtext.hipie.hIPIE.VisualCustomOption
+import org.xtext.hipie.hIPIE.VisualOptions
+import org.xtext.hipie.hIPIE.VisualOption
+import org.eclipse.xtext.RuleCall
+import org.eclipse.jface.text.contentassist.CompletionProposal
 
 /**
  * See https://www.eclipse.org/Xtext/documentation/304_ide_concepts.html#content-assist
@@ -87,7 +92,7 @@ class HIPIEProposalProvider extends AbstractHIPIEProposalProvider {
 			if (contentAssistContext.prefix == keyword.value)
 				return;
 			if (contentAssistContext.offset < contentAssistContext.lastCompleteNode.endOffset)
-				return ;
+				return;
 		}
 
 		if (keyword.value == ";" || keyword.value == ":")
@@ -107,6 +112,18 @@ class HIPIEProposalProvider extends AbstractHIPIEProposalProvider {
 		super.completeVisBasis_Basis(model, assignment, context, acceptor)
 	}
 
+	override completeVisualOption_Vis_cust(EObject model, Assignment assignment, ContentAssistContext context,
+		ICompletionProposalAcceptor acceptor) {
+		super.completeVisualOption_Vis_cust(model, assignment, context, acceptor)
+		var validCustValues = CustomOptionFetcher.fetchValidCustomOptions();
+		for (i : 0 ..< validCustValues.length) {
+			var proposal = validCustValues.get(i);
+			var proposalStyleString = new StyledString(validCustValues.get(i),
+				stylerFactory.createXtextStyleAdapterStyler(getKeywordTextStyle()));
+			acceptor.accept(createCompletionProposal(proposal, proposalStyleString, getImage(model), context));
+		}
+	}
+	
 	override protected StyledString getStyledDisplayString(EObject element, String qualifiedName, String shortName) {
 		var qualName = getQualifiedName(element, qualifiedName, shortName)
 		var name = new StyledString(qualName.lastSegment)

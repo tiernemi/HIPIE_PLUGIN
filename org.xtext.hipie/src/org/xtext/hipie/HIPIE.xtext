@@ -345,6 +345,10 @@ VisualSection:
 	type='VISUALIZE' name=TOKEN (ops=VisualSectionOptions)? (vis_elements+=Visualization)+ => 'END'
 ;
 
+Visuals :
+	(VisualSection | Visualization)
+;
+
 VisInputValue:
 	types=InputSimpleTypes (in_ops=InputOptions)? ';'
 ;
@@ -429,11 +433,10 @@ VisualOptions:
 VisualOption: 
 	type=('TITLE'|'DATE'|'DESCRIPTION'|'PICTURE'|'STATE'|'COUNTY'|'FIRST'|'WEIGHT'|'SIZE'|'LEVELS'|'LEVEL'|'UID'|'TYPE') '(' funcs+=Function ')' |
     type=('ICON'|'FLAG'|'TYPE') '(' funcs+=Function (',' decl=VizEnumDecl)? ')' |
-    vis_cust=VisualCustomOption |
+    vis_cust=VisualCustomOption ('(' funcs+=Function ( ',' funcs+=Function)* ')')? |
     type='COLLAPSE' | 
     type='VISIBILITY' '(' visibility_op=VisibilityOption ')' |
     type='ENABLE' '(' assigns+=AssignList ')' |
-    vis_cust=VisualCustomOption '(' funcs+=Function ( ',' funcs+=Function)* ')' |
     type=VisualMultival '(' funcs+=Function ( ',' funcs+=Function )* ')'|
     select_op=SelectOption |
     link_op=LinkOption

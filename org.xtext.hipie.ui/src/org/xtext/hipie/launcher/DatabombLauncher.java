@@ -24,6 +24,7 @@ import org.eclipse.ui.statushandlers.StatusManager;
 import org.osgi.service.prefs.Preferences;
 import org.xtext.hipie.error.HIPIEStatus;
 
+
 public class DatabombLauncher implements ILaunchShortcut {
 
 	@Override
