@@ -40,6 +40,8 @@ class HIPIEGenerator implements IGenerator {
 	override void doGenerate(Resource resource, IFileSystemAccess fsa) {
 		var ws_root = ResourcesPlugin.getWorkspace().getRoot() 
 		if (resource.URI.isPlatformResource()) {
+			
+			println("rarararrararararar")
 			var platformString = resource.URI.toPlatformString(true)
 			var resourceFile = ws_root.findMember(platformString)
 			var project = resourceFile.project

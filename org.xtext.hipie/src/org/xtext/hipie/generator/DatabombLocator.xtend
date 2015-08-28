@@ -11,10 +11,7 @@ import java.util.List
 import org.xtext.hipie.error.HIPIEStatus
 import org.eclipse.core.runtime.IStatus
 import org.eclipse.ui.statushandlers.StatusManager
-import org.eclipse.swt.widgets.Display
-import org.eclipse.ui.dialogs.ListDialog
-import org.eclipse.ui.PlatformUI
-import org.eclipse.jface.viewers.ArrayContentProvider
+import org.xtext.hipie.error.DuplicatesPrompt
 
 class DatabombLocator {
 	
@@ -33,31 +30,48 @@ class DatabombLocator {
 	static def void filterDatabombs(Resource resource, ArrayList<IFile> fileList, ArrayList<IFile> filteredFileList) {
 		var List<OutDataset> datasetList = resource.allContents.filter(OutDataset).toIterable.toList
 		var ArrayList<OutDataset> databombList = new ArrayList()
-		var ArrayList<String> nonDuplicateList = new ArrayList()
+		var ArrayList<IFile> nonDuplicateList = new ArrayList()
 		for (i : 0..<datasetList.size)
 			if (datasetList.get(i).ops != null)
 				for (j : 0..<datasetList.get(i).ops.output_ops.size) 
 					if (datasetList.get(i).ops.output_ops.get(j).type == "DATABOMB")
 						databombList += datasetList.get(i)
-		
+				
 		for (i : 0..<fileList.size)
 			for (j : 0..<databombList.size)
 				if (databombList.get(j).name == fileList.get(i).fullPath.removeFileExtension.lastSegment) {
 					var nonDuplicate = true ;
 					for (k : 0..<nonDuplicateList.size)
-						if (nonDuplicateList.get(k) == fileList.get(i).fullPath.removeFileExtension.lastSegment) {
+						if (nonDuplicateList.get(k).fullPath.removeFileExtension.lastSegment == fileList.get(i).fullPath.removeFileExtension.lastSegment) {
 							nonDuplicate = false
-							var message = "Warning. Duplicate files with the name : " + fileList.get(i).name + "have been detected."
-							var status = new HIPIEStatus(IStatus.WARNING,
-								"org.xtext.hipie", HIPIEStatus.DUPLICATE_DATABOMB_FILES,
-								message, null);
-							StatusManager.getManager().handle(status,
-								(StatusManager.SHOW.bitwiseOr(StatusManager.LOG)));
+							DuplicatesPrompt.prompt(nonDuplicateList.get(k))
 						}
-					if (nonDuplicate)
+					if (nonDuplicate) {
 						filteredFileList += fileList.get(i)
-						nonDuplicateList += fileList.get(i).fullPath.removeFileExtension.lastSegment
+						nonDuplicateList += fileList.get(i)
+					}
 				}
+		
+		
+		if (nonDuplicateList.size != databombList.size) {
+			var ArrayList<OutDataset> missingDatabombs = new ArrayList() ;
+			for (i : 0..<databombList.size) {
+				var exists = false
+				for (j : 0..<nonDuplicateList.size)
+					if (nonDuplicateList.get(j).fullPath.removeFileExtension.lastSegment == databombList.get(i).name)
+						exists = true ;
+				if (!exists)
+					missingDatabombs += databombList.get(i)
+			}
+			var message = "Databombs for the following files are missing."
+			for (i : 0..<missingDatabombs.size)
+				message += "\n" + missingDatabombs.get(i).name + ".databomb"
+			var status = new HIPIEStatus(IStatus.ERROR,
+					"org.xtext.hipie", HIPIEStatus.INSUFFICIENT_DATABOMB_FILES,
+					message, null);
+				StatusManager.getManager().handle(status,
+					(StatusManager.SHOW.bitwiseOr(StatusManager.LOG)));
+				return ;		
 		}
-					
+	}	
 }

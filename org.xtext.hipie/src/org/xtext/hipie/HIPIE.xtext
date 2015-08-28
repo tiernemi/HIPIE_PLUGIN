@@ -47,6 +47,10 @@ TOKEN :
 	ID
 ;
 
+QualifiedTOKEN:
+  ID ('.' ID)*
+; 
+
 UTOKEN :
 	'_'ID
 ;
@@ -112,7 +116,7 @@ EnumList:
 ;
 
 EnumDecl: 
-	'ENUM' '(' enum_list=EnumList ')'
+	'ENUM' '(' enum_list=EnumList ')' name=TOKEN
 ;
  
 InputSection: 
@@ -155,9 +159,12 @@ KelBase :
 	type='KELBASE' name=TOKEN (options=InputOptions)? (kels+=(KelEntityDecl|KelEntityDeclSimple|KelAttrDecl|KelStringDecl))* 'END'
 ;
 
+// Convience rule for crossReference in the Outputs(Base) rule
+
 Datatype :
 (Record | Dataset | KelBase | Group)
 ;
+
 
 InputValue: 
 	(in_val=(InputSimpleTypes|Record) (options=InputOptions)? ';')  |
@@ -279,7 +286,7 @@ OutputOption:
     (atr='WUID') ('(' (name=TOKEN|val_list=ValueList) ')')? |
     (atr='SOAP') '(' val_list=ValueList|vals=Value ')' |
     (atr='ENABLE' '(' assigns=AssignList ')') |
-    (atr='PREFIX' '(' (name=TOKEN) ')') |
+    (atr='PREFIX' '(' (prefixXRef=[Datatype|QualifiedTOKEN] ) ')') |
     (atr=('FILLS') '(' val_list=ValueList ')') |
     (atr=('DESCRIPTION'|'JSON'|'ROXIE'|'XPATH') '(' vals=Value ')')
 ;
@@ -347,6 +354,10 @@ VisualSection:
 
 Visuals :
 	(VisualSection | Visualization)
+;
+
+PosSelections :
+	Visuals | PosVizData
 ;
 
 VisInputValue:
@@ -447,7 +458,7 @@ SelectEvent:
 ;
 
 SelectOptionMapping:
-	(src=[PosVizData|TOKEN]) '->' viz+=[Visualization|TOKEN] ( ',' viz+=[Visualization|TOKEN] )*
+	(src=[PosVizData|TOKEN]) '->' viz+=[PosSelections|QualifiedTOKEN] ( ',' viz+=[PosSelections|QualifiedTOKEN] )*
 ;
 
 SelectOption:

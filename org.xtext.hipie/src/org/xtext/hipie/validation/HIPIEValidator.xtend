@@ -17,7 +17,7 @@ import org.xtext.hipie.hIPIE.HIPIEPackage
 class HIPIEValidator extends AbstractHIPIEValidator {
 
   public static val INVALID_NAME = 'Argument should be a string.'
-
+  
 /*
 	@Check
 	def checkIfBPString(BaseProp base) {

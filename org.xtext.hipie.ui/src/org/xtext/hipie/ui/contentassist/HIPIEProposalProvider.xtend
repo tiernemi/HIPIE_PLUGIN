@@ -37,11 +37,27 @@ import org.xtext.hipie.hIPIE.ECLUnsigned
 import org.xtext.hipie.hIPIE.ECLBoolean
 import org.xtext.hipie.hIPIE.ECLNumType
 import org.xtext.hipie.hIPIE.ECLDecType
-import org.xtext.hipie.hIPIE.VisualCustomOption
-import org.xtext.hipie.hIPIE.VisualOptions
-import org.xtext.hipie.hIPIE.VisualOption
+import org.eclipse.xtext.scoping.IScopeProvider
+import org.eclipse.emf.ecore.EReference
+import org.eclipse.xtext.resource.IEObjectDescription
+import org.eclipse.jface.text.contentassist.ICompletionProposal
+import com.google.common.base.Predicate
+import org.eclipse.xtext.scoping.IScope
+import com.google.common.base.Function
+import java.util.ArrayList
+import org.eclipse.xtext.naming.IQualifiedNameConverter
+import org.eclipse.xtext.conversion.IValueConverter
+import org.eclipse.xtext.conversion.IValueConverterService
+import org.eclipse.xtext.ui.editor.contentassist.ContentProposalLabelProvider
+import org.eclipse.jface.viewers.ILabelProvider
+import org.eclipse.xtext.ui.editor.contentassist.IProposalConflictHelper
+import org.eclipse.xtext.ui.editor.contentassist.IContentProposalPriorities
+import org.eclipse.emf.common.util.Logger
+import org.eclipse.xtext.ui.editor.contentassist.AbstractJavaBasedContentProposalProvider
+import org.eclipse.xtext.conversion.ValueConverterException
+import org.eclipse.xtext.CrossReference
 import org.eclipse.xtext.RuleCall
-import org.eclipse.jface.text.contentassist.CompletionProposal
+import org.xtext.hipie.hIPIE.SelectOptionMapping
 
 /**
  * See https://www.eclipse.org/Xtext/documentation/304_ide_concepts.html#content-assist
@@ -83,6 +99,14 @@ class HIPIEProposalProvider extends AbstractHIPIEProposalProvider {
 		textStyle.setStyle(SWT.BOLD);
 		return textStyle;
 	}
+	
+	
+	@Inject
+	private IScopeProvider scopeProvider;
+
+	@Inject
+	private HIPIEProposalCreator customHIPIEProposalCreator;
+	
 
 	override completeKeyword(Keyword keyword, ContentAssistContext contentAssistContext,
 		ICompletionProposalAcceptor acceptor) {
@@ -124,6 +148,10 @@ class HIPIEProposalProvider extends AbstractHIPIEProposalProvider {
 		}
 	}
 	
+	override completeSelectOptionMapping_Viz(EObject model, Assignment assignment, ContentAssistContext context, ICompletionProposalAcceptor acceptor) {
+		super.completeSelectOptionMapping_Viz(model, assignment, context, acceptor)
+	}
+		
 	override protected StyledString getStyledDisplayString(EObject element, String qualifiedName, String shortName) {
 		var qualName = getQualifiedName(element, qualifiedName, shortName)
 		var name = new StyledString(qualName.lastSegment)
@@ -206,5 +234,95 @@ class HIPIEProposalProvider extends AbstractHIPIEProposalProvider {
 		}
 		return qualifiedNameConverter.toQualifiedName(qualifiedNameAsString)
 	}
+	
+	// Manipulation of the objects passed from a scope can be done here
+	
+	public static class HIPIEProposalCreator {
 
+		@Inject
+		private IScopeProvider scopeProvider;
+
+		public final def lookupCrossReference(EObject model, EReference reference, ICompletionProposalAcceptor acceptor,
+				Predicate<IEObjectDescription> filter,
+				Function<IEObjectDescription, ICompletionProposal> proposalFactory , ContentAssistContext contentAssistContext) {
+			if (model != null) {
+				var scope = getScopeProvider().getScope(model, reference);
+				lookupCrossReference(scope, model, reference, acceptor, filter, proposalFactory, contentAssistContext);
+			}
+		}
+		
+		protected def Function<IEObjectDescription, ICompletionProposal> getWrappedFactory(
+				EObject model, EReference reference,
+				Function<IEObjectDescription, ICompletionProposal> proposalFactory) {
+			return proposalFactory;
+		}
+
+		// Need to overwrite validProposal functionality with wrappedDactory.apply in order to remove duplicates
+	
+		public def lookupCrossReference(IScope scope, EObject model, EReference reference,
+				ICompletionProposalAcceptor acceptor, Predicate<IEObjectDescription> filter,
+				Function<IEObjectDescription, ICompletionProposal> proposalFactory, ContentAssistContext contentAssistContext) {
+			var Function<IEObjectDescription, ICompletionProposal> wrappedFactory = getWrappedFactory(model, reference, proposalFactory);
+			var Iterable<IEObjectDescription> candidates = queryScope(scope, model, reference, filter);
+			var ArrayList<IEObjectDescription> filteredCandidates = filter(candidates, model, contentAssistContext)
+			for (IEObjectDescription candidate : filteredCandidates) {
+				if (!acceptor.canAcceptMoreProposals())
+					return;
+				if (filter.apply(candidate)) {
+					acceptor.accept(wrappedFactory.apply(candidate));
+				}
+			}
+		}
+		
+		def ArrayList<IEObjectDescription> filter(Iterable<IEObjectDescription> candidates, EObject model, ContentAssistContext contentAssistContext) {
+			var results = new ArrayList<IEObjectDescription>()
+			if (model instanceof SelectOptionMapping) {
+				if (contentAssistContext.prefix.empty) {
+				for (i : 0..<candidates.size)
+					for(j : 0..<candidates.size) {
+						var qualName1 = candidates.get(i).qualifiedName
+						var qualName2 = candidates.get(j).qualifiedName
+						if (qualName1.lastSegment == qualName2.lastSegment) {
+								if(qualName1.lastSegment == qualName1.firstSegment)
+									results += candidates.get(i)
+						}
+					}
+					
+					}
+			}
+				return results
+		}
+
+		def void setScopeProvider(IScopeProvider scopeProvider) {
+			this.scopeProvider = scopeProvider;
+		}
+
+		def IScopeProvider getScopeProvider() {
+			return scopeProvider;
+		}
+		
+		def Iterable<IEObjectDescription> queryScope(IScope scope, EObject model, EReference reference, Predicate<IEObjectDescription> filter) {
+			return scope.getAllElements();
+		}
+	}	
+	
+	override void lookupCrossReference(CrossReference crossReference, EReference reference,
+			ContentAssistContext contentAssistContext, ICompletionProposalAcceptor acceptor,
+			Predicate<IEObjectDescription> filter) {
+		var String ruleName = null;
+		if (crossReference.getTerminal() instanceof RuleCall) {
+			ruleName = (crossReference.getTerminal() as RuleCall).getRule().getName();
+		}
+		lookupCrossReference(contentAssistContext.getCurrentModel(), reference, acceptor, filter,
+				getProposalFactory(ruleName, contentAssistContext), contentAssistContext);
+	}
+	
+	def protected lookupCrossReference(EObject model, EReference reference, ICompletionProposalAcceptor acceptor,
+			Predicate<IEObjectDescription> filter, Function<IEObjectDescription, ICompletionProposal> proposalFactory, ContentAssistContext contentAssistContext) {
+		customHIPIEProposalCreator.lookupCrossReference(model, reference, acceptor, filter, proposalFactory, contentAssistContext);
+	}
+	
+	
+	// Manipulation of proposal creations can be done here.
+	
 }

@@ -180,8 +180,22 @@ class HIPIEScopeProvider extends org.eclipse.xtext.scoping.impl.AbstractDeclarat
 	}
 
 	def scope_SelectOptionMapping_viz(VisualSection context, EReference ref) {
-		var valid_vars = (context.eContents)
-		return Scopes::scopeFor(valid_vars)
+
+		// UNQUALIFIED //
+		var unQualPosSelections = (context.eContainer.eAllContents.filter(PosSelections).toIterable)
+		var scopeUnQualList = Scopes::scopedElementsFor(unQualPosSelections)
+		// QUALIFIED //
+		var programScope = context.eContainer.getScope(ref);
+		var scopeQualList = programScope.allElements;
+		var scopeList = scopeUnQualList + scopeQualList
+		return MapBasedScope::createScope(IScope::NULLSCOPE, scopeList)
+	}
+
+	def scope_OutputOption_prefixXRef(OutputSection context, EReference ref) {
+		val parent = EcoreUtil.getRootContainer(context)
+		for (i : 0 ..< parent.eContents.length)
+			if (parent.eContents.get(i) instanceof InputSection)
+				return getScope(parent.eContents.get(i), ref)
 	}
 
 }

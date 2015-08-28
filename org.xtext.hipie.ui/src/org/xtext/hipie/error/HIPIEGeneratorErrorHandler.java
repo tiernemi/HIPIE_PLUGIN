@@ -25,8 +25,5 @@ public class HIPIEGeneratorErrorHandler extends AbstractStatusHandler {
 				ErrorDialog.openError(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), "DDL Generation Error", oldStatus.getMessage(), oldStatus) ;
 			if (oldStatus.getCode() == HIPIEStatus.INSUFFICIENT_DATABOMB_FILES)
 				ErrorDialog.openError(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), "Insufficient Databombs", oldStatus.getMessage(), oldStatus) ;
-			if (oldStatus.getCode() == HIPIEStatus.DUPLICATE_DATABOMB_FILES)
-				//MessageDialog dialog = new MessageDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), "Duplicate Databombs", null, oldStatus.getMessage(), MessageDialog.WARNING , new String[] {"Ok"}, 0) ;
-				ErrorDialog.openError(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), "Duplicate Databombs", oldStatus.getMessage(), oldStatus) ;	}
-
+	}
 }
