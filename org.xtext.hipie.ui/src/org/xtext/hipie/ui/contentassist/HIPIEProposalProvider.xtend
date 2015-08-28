@@ -277,6 +277,7 @@ class HIPIEProposalProvider extends AbstractHIPIEProposalProvider {
 		def ArrayList<IEObjectDescription> filter(Iterable<IEObjectDescription> candidates, EObject model, ContentAssistContext contentAssistContext) {
 			var results = new ArrayList<IEObjectDescription>()
 			if (model instanceof SelectOptionMapping) {
+				println(contentAssistContext.prefix)
 				if (contentAssistContext.prefix.empty) {
 				for (i : 0..<candidates.size)
 					for(j : 0..<candidates.size) {
@@ -286,9 +287,13 @@ class HIPIEProposalProvider extends AbstractHIPIEProposalProvider {
 								if(qualName1.lastSegment == qualName1.firstSegment)
 									results += candidates.get(i)
 						}
-					}
-					
-					}
+					}					
+				} else {
+					results.addAll(candidates)
+				}
+			}
+			else {
+				results.addAll(candidates)
 			}
 				return results
 		}
